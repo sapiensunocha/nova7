@@ -1,0 +1,1627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wallet - nova7</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://js.stripe.com/v3/"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F0F2F5;
+            color: #1a202c;
+            display: flex;
+            min-height: 100vh;
+            font-size: 102%;
+        }
+        .header-nova7 {
+            background-color: #FFFFFF;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 0.75rem 1.5rem;
+            height: 60px;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        .nova7-logo-header {
+            max-height: 36px;
+            width: auto;
+        }
+        .sidebar-nova7 {
+            background-color: #004182;
+            color: #E0F2FE;
+            width: 260px;
+            box-shadow: 2px 0 8px rgba(0,0,0,0.15);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding-top: 1rem;
+            transition: transform 0.3s ease-in-out;
+            z-index: 40;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar-header {
+            padding: 0.75rem 1.5rem 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid #0053a0;
+            margin-bottom: 0.75rem;
+        }
+        .sidebar-logo-img {
+            max-height: 120px;
+            width: auto;
+            filter: brightness(0) invert(1);
+        }
+        .sidebar-nova7 .nav-link-sidebar {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            margin: 0.25rem 1rem;
+            font-weight: 500;
+            color: #E0F2FE;
+            text-decoration: none;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .sidebar-nova7 .nav-link-sidebar:hover {
+            background-color: #0A66C2;
+            color: #FFFFFF;
+        }
+        .sidebar-nova7 .nav-link-sidebar.active {
+            background-color: #FFFFFF;
+            color: #0A66C2;
+            font-weight: 600;
+        }
+        .sidebar-nova7 .nav-link-sidebar i {
+            width: 20px;
+            margin-right: 0.75rem;
+            text-align: center;
+        }
+        .main-content-area {
+            margin-left: 260px;
+            padding: 2rem;
+            width: calc(100% - 260px);
+            min-height: 100vh;
+        }
+        .card-styled {
+            background-color: #FFFFFF;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+        .card-header {
+            background-color: #F8FAFC;
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+        .card-header:hover {
+            background-color: #EDF2F7;
+        }
+        .card-content {
+            padding: 1.5rem;
+            display: none;
+        }
+        .card-content.open {
+            display: block;
+        }
+        .balance-display {
+            font-size: 2.55rem;
+            font-weight: 800;
+            color: #0A66C2;
+            text-align: center;
+            margin-bottom: 1rem;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        .balance-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 100px;
+            z-index: -1;
+        }
+        .form-label {
+            display: block;
+            font-size: 0.8925rem;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 0.5rem;
+            position: relative;
+        }
+        .form-label .tooltip {
+            visibility: hidden;
+            background-color: #4A5568;
+            color: #FFFFFF;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px 10px;
+            position: absolute;
+            z-index: 10;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.765rem;
+            width: 200px;
+        }
+        .form-label:hover .tooltip {
+            visibility: visible;
+        }
+        .form-input, .form-select {
+            width: 100%;
+            border: 1px solid #D1D5DB;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            font-size: 0.969rem;
+            color: #1D2939;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #0A66C2;
+            box-shadow: 0 0 0 2px rgba(10, 102, 194, 0.2);
+        }
+        .btn-primary-action {
+            background-color: #0A66C2;
+            color: white;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            font-size: 0.969rem;
+            transition: background-color 0.2s, box-shadow 0.2s, transform 0.1s;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
+            cursor: pointer;
+        }
+        .btn-primary-action:hover {
+            background-color: #004182;
+            box-shadow: 0 2px 4px 0 rgba(0,0,0,0.1);
+            transform: translateY(-1px);
+        }
+        .btn-primary-action:disabled {
+            background-color: #A0AEC0;
+            cursor: not-allowed;
+            opacity: 0.7;
+            transform: none;
+        }
+        .btn-secondary-action {
+            background-color: #EDF2F7;
+            color: #4A5568;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            font-size: 0.969rem;
+            transition: background-color 0.2s, box-shadow 0.2s, transform 0.1s;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-secondary-action:hover {
+            background-color: #E2E8F0;
+            box-shadow: 0 2px 4px 0 rgba(0,0,0,0.1);
+            transform: translateY(-1px);
+        }
+        .btn-danger-action {
+            background-color: #EF4444;
+            color: white;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            font-size: 0.969rem;
+            transition: background-color 0.2s, box-shadow 0.2s, transform 0.1s;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-danger-action:hover {
+            background-color: #DC2626;
+            box-shadow: 0 2px 4px 0 rgba(0,0,0,0.1);
+            transform: translateY(-1px);
+        }
+        #card-element {
+            border: 1px solid #D1D5DB;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            background-color: white;
+            margin-bottom: 1rem;
+        }
+        .StripeElement--focus {
+            box-shadow: 0 0 0 2px rgba(10, 102, 194, 0.2);
+            border-color: #0A66C2;
+        }
+        .StripeElement--invalid {
+            border-color: #EF4444;
+        }
+        .message-box {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            text-align: center;
+            min-width: 250px;
+            font-size: 0.969rem;
+        }
+        .message-box.error {
+            background-color: #F44336;
+        }
+        .message-box.show {
+            display: block;
+            opacity: 1;
+        }
+        .greeting-summary-card {
+            background-color: #FFFFFF;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.07);
+            padding: 1.5rem 2rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+        .greeting-text {
+            font-size: 1.53rem;
+            font-weight: 700;
+            color: #2D3748;
+            margin-bottom: 0.5rem;
+        }
+        .ai-summary-text {
+            font-size: 0.969rem;
+            color: #4A5568;
+            line-height: 1.6;
+        }
+        .ai-summary-text strong {
+            color: #004182;
+            font-weight: 600;
+        }
+        .transaction-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.918rem;
+        }
+        .transaction-table th, .transaction-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #E2E8F0;
+        }
+        .transaction-table th {
+            background-color: #F8FAFC;
+            font-weight: 600;
+            color: #4A5568;
+            text-transform: uppercase;
+            font-size: 0.765rem;
+        }
+        .transaction-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        .transaction-table tbody tr:hover {
+            background-color: #F0F4F8;
+        }
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.765rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .status-completed { background-color: #D1FAE5; color: #059669; }
+        .status-pending { background-color: #FEF3C7; color: #D97706; }
+        .status-failed { background-color: #FEE2E2; color: #EF4444; }
+        .status-deposit { background-color: #DBEAFE; color: #2563EB; }
+        .status-withdrawal { background-color: #E0F2FE; color: #0A66C2; }
+        .status-request { background-color: #FCE7F6; color: #C026D3; }
+        .status-transfer { background-color: #E0F7FA; color: #00ACC1; }
+        #recipientSuggestions, #senderSuggestions {
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-height: 200px;
+            overflow-y: auto;
+            background-color: #FFFFFF;
+            border-radius: 8px;
+        }
+        .suggestion-item {
+            padding: 0.75rem;
+            cursor: pointer;
+        }
+        .suggestion-item:hover {
+            background-color: #F0F4F8;
+        }
+        @media (max-width: 768px) {
+            .sidebar-nova7 {
+                transform: translateX(-100%);
+                top: 0;
+                height: 100vh;
+            }
+            .sidebar-nova7.open {
+                transform: translateX(0);
+            }
+            .main-content-area {
+                margin-left: 0;
+                width: 100%;
+                padding-top: calc(60px + 1rem);
+                padding: 1rem;
+            }
+            .desktop-header { display: none; }
+            .mobile-header {
+                display: flex;
+                background-color: #FFFFFF;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+                padding: 0 1rem;
+                height: 60px;
+                align-items: center;
+                justify-content: space-between;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 50;
+            }
+            .card-styled { padding: 1rem; }
+            .transaction-table th, .transaction-table td {
+                padding: 0.75rem;
+                font-size: 0.867rem;
+            }
+            .greeting-text {
+                font-size: 1.275rem;
+            }
+            .balance-display {
+                font-size: 2rem;
+            }
+            .mobile-header i {
+                font-size: 1.53rem;
+            }
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+    <div id="messageBox" class="message-box"></div>
+
+    <header class="mobile-header md:hidden">
+        <button id="hamburgerBtnMobile" class="p-2 text-gray-700 hover:text-blue-600">
+            <i class="fas fa-bars text-2xl"></i>
+        </button>
+        <a href="dashboard.html">
+            <img src="nova-logo.png" alt="nova7 Logo" class="nova7-logo-header"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+            <span style="display:none;" class="text-xl font-semibold text-gray-700">nova7</span>
+        </a>
+        <a href="#" id="mobileLogoutLink" class="p-2 text-gray-700 hover:text-blue-600">
+            <i class="fas fa-sign-out-alt text-xl"></i>
+        </a>
+    </header>
+
+    <aside id="sidebar" class="sidebar-nova7">
+        <div class="sidebar-header">
+            <a href="dashboard.html" class="flex items-center">
+                <img src="nova-logo.png" alt="nova7 Logo" class="sidebar-logo-img"
+                     onerror="this.style.display='none';">
+            </a>
+        </div>
+        <nav class="flex-grow">
+            <a href="dashboard.html" class="nav-link-sidebar">
+                <i class="fas fa-tachometer-alt"></i>Dashboard
+            </a>
+            <a href="view-transactions.html" class="nav-link-sidebar">
+                <i class="fas fa-exchange-alt"></i>Transactions
+            </a>
+            <a href="reports.html" class="nav-link-sidebar">
+                <i class="fas fa-chart-pie"></i>Reports
+            </a>
+            <a href="community.html" class="nav-link-sidebar">
+                <i class="fas fa-users"></i>Community
+            </a>
+            <a href="chatbot.html" class="nav-link-sidebar">
+                <i class="fas fa-comments-dollar"></i>Chat Advisor
+            </a>
+            <a href="resources.html" class="nav-link-sidebar">
+                <i class="fas fa-book-open"></i>Resources
+            </a>
+            <a href="settings.html" class="nav-link-sidebar">
+                <i class="fas fa-cog"></i>Settings
+            </a>
+            <a href="wallet.html" class="nav-link-sidebar active">
+                <i class="fas fa-wallet"></i>Wallet
+            </a>
+            <a href="marketplace.html" class="nav-link-sidebar">
+                <i class="fas fa-store"></i>Marketplace
+            </a>
+        </nav>
+        <div class="pb-4">
+            <a href="profile.html" class="nav-link-sidebar">
+                <i class="fas fa-user-circle"></i>Profile
+            </a>
+            <a href="#" id="sidebarLogoutLink" class="nav-link-sidebar">
+                <i class="fas fa-sign-out-alt"></i>Logout
+            </a>
+        </div>
+    </aside>
+
+    <main class="main-content-area">
+        <header class="desktop-header hidden md:flex items-center justify-between mb-8">
+            <div></div>
+            <div class="flex items-center space-x-3">
+                <span id="desktopUserWelcome" class="text-[0.867rem] text-gray-700">Welcome, User!</span>
+            </div>
+        </header>
+
+        <div class="greeting-summary-card">
+            <h1 id="personalizedGreeting" class="greeting-text">Hello, User!</h1>
+            <p class="ai-summary-text" id="aiSummaryText">
+                Manage your funds, view your balance, and track your transactions below.
+            </p>
+        </div>
+
+        <div class="card-styled text-center">
+            <h2 class="text-[1.02rem] font-semibold text-gray-700 mb-2">Current Balance</h2>
+            <div class="relative inline-block">
+                <svg class="balance-ring" viewBox="0 0 36 36">
+                    <path d="M18 2.0845
+                        a 15.9155 15.9155 0 0 1 0 31.831
+                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                        fill="none" stroke="#E0F2FE" stroke-width="2"/>
+                    <path id="balanceProgress" d="M18 2.0845
+                        a 15.9155 15.9155 0 0 1 0 31.831"
+                        fill="none" stroke="#0A66C2" stroke-width="2" stroke-dasharray="0, 100"/>
+                </svg>
+                <p id="walletBalance" class="balance-display">$0.00</p>
+            </div>
+            <div id="pendingRequestsSummary" class="text-[0.867rem] text-gray-600 mt-4 font-semibold">
+                <p>Incoming Requests: <span id="numPendingRequests" class="text-orange-500">0</span> (Total: <span id="totalPendingAmount" class="text-orange-500">$0.00</span>)</p>
+                <button id="viewPendingRequestsBtn" class="text-blue-600 hover:underline text-[0.867rem] mt-1">View Details</button>
+            </div>
+        </div>
+
+        <div id="pendingRequestsContainer" class="card-styled">
+            <div class="card-header">
+                <h2 class="text-[1.02rem] font-semibold text-gray-700">Pending Requests</h2>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div id="pendingRequestsContent" class="card-content"></div>
+        </div>
+
+        <div class="card-styled">
+            <div class="card-header">
+                <h2 class="text-[1.02rem] font-semibold text-gray-700">Deposit Funds (via Stripe)</h2>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="card-content">
+                <form id="depositForm">
+                    <div class="mb-4">
+                        <label for="depositAmount" class="form-label">Amount (USD)
+                            <span class="tooltip">Enter the amount to deposit (minimum $1.00)</span>
+                        </label>
+                        <input type="number" id="depositAmount" class="form-input" placeholder="e.g., 50.00" step="0.01" min="1.00" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="card-element" class="form-label">Credit or Debit Card
+                            <span class="tooltip">Enter your card details securely via Stripe</span>
+                        </label>
+                        <div id="card-element"></div>
+                        <div id="card-errors" role="alert" class="text-red-500 text-[0.867rem] mt-2"></div>
+                    </div>
+                    <button type="submit" id="depositSubmitBtn" class="btn-primary-action w-full">
+                        <i class="fas fa-money-bill-wave mr-2"></i>Confirm Deposit
+                    </button>
+                </form>
+                <div id="depositMessage" class="text-[0.867rem] text-center mt-4"></div>
+            </div>
+        </div>
+
+        <div class="card-styled">
+            <div class="card-header">
+                <h2 class="text-[1.02rem] font-semibold text-gray-700">Transfer Funds</h2>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="card-content">
+                <form id="transferForm">
+                    <div class="mb-4 relative">
+                        <label for="transferRecipient" class="form-label">Recipient's Username, User ID, or Email
+                            <span class="tooltip">Search by username, email, or user ID</span>
+                        </label>
+                        <input type="text" id="transferRecipient" class="form-input" placeholder="e.g., John Doe, user@example.com, or 1234567" required autocomplete="off">
+                        <div id="recipientSuggestions" class="absolute z-10 w-full bg-white border border-gray-300 rounded-lg mt-1 hidden"></div>
+                    </div>
+                    <div class="mb-4">
+                        <label for="transferAmount" class="form-label">Amount (USD)
+                            <span class="tooltip">Enter the amount to transfer (minimum $0.01)</span>
+                        </label>
+                        <input type="number" id="transferAmount" class="form-input" placeholder="e.g., 25.00" step="0.01" min="0.01" required>
+                    </div>
+                    <button type="submit" id="transferSubmitBtn" class="btn-primary-action w-full">
+                        <i class="fas fa-paper-plane mr-2"></i>Confirm Transfer
+                    </button>
+                </form>
+                <div id="transferMessage" class="text-[0.867rem] text-center mt-4"></div>
+            </div>
+        </div>
+
+        <div class="card-styled">
+            <div class="card-header">
+                <h2 class="text-[1.02rem] font-semibold text-gray-700">Request Funds</h2>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="card-content">
+                <form id="requestForm">
+                    <div class="mb-4 relative">
+                        <label for="requestSender" class="form-label">Sender's Username, User ID, or Email
+                            <span class="tooltip">Search for the user to request money from</span>
+                        </label>
+                        <input type="text" id="requestSender" class="form-input" placeholder="e.g., John Doe, user@example.com, or 7654321" required autocomplete="off">
+                        <div id="senderSuggestions" class="absolute z-10 w-full bg-white border border-gray-300 rounded-lg mt-1 hidden"></div>
+                    </div>
+                    <div class="mb-4">
+                        <label for="requestAmount" class="form-label">Amount (USD)
+                            <span class="tooltip">Enter the amount to request (minimum $0.01)</span>
+                        </label>
+                        <input type="number" id="requestAmount" class="form-input" placeholder="e.g., 10.00" step="0.01" min="0.01" required>
+                    </div>
+                    <button type="submit" id="requestSubmitBtn" class="btn-primary-action w-full">
+                        <i class="fas fa-hand-holding-usd mr-2"></i>Send Request
+                    </button>
+                </form>
+                <div id="requestMessage" class="text-[0.867rem] text-center mt-4"></div>
+            </div>
+        </div>
+
+        <div class="card-styled">
+            <div class="card-header">
+                <h2 class="text-[1.02rem] font-semibold text-gray-700">Withdraw Funds</h2>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="card-content">
+                <form id="withdrawalForm">
+                    <div class="mb-4">
+                        <label for="withdrawalAmount" class="form-label">Amount (USD)
+                            <span class="tooltip">Enter the amount to withdraw (minimum $1.00)</span>
+                        </label>
+                        <input type="number" id="withdrawalAmount" class="form-input" placeholder="e.g., 20.00" step="0.01" min="1.00" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="withdrawalMethod" class="form-label">Withdrawal Method
+                            <span class="tooltip">Select how you want to receive your funds</span>
+                        </label>
+                        <select id="withdrawalMethod" class="form-select" required>
+                            <option value="">Select Method</option>
+                            <option value="bank_transfer">Bank Transfer</option>
+                            <option value="mobile_money">Mobile Money</option>
+                            <option value="office_withdrawal">Office Withdrawal</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label for="withdrawalAccount" class="form-label">Account/Mobile Number/Reference
+                            <span class="tooltip">Provide your account details or reference number</span>
+                        </label>
+                        <input type="text" id="withdrawalAccount" class="form-input" placeholder="Your account, mobile number, or reference" required>
+                    </div>
+                    <button type="submit" id="withdrawalSubmitBtn" class="btn-primary-action w-full">
+                        <i class="fas fa-paper-plane mr-2"></i>Confirm Withdrawal
+                    </button>
+                </form>
+                <div id="withdrawalMessage" class="text-[0.867rem] text-center mt-4"></div>
+            </div>
+        </div>
+
+        <div class="card-styled">
+            <div class="card-header">
+                <h2 class="text-[1.02rem] font-semibold text-gray-700">Recent Wallet Transactions</h2>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="card-content open">
+                <div class="table-container">
+                    <table class="transaction-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Type</th>
+                                <th>Amount</th>
+                                <th>Description</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactionHistoryTableBody">
+                            <tr><td colspan="6" class="text-center text-gray-500 py-4">Loading transactions...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="noTransactionsMessage" class="text-center text-gray-500 py-4 hidden text-[0.918rem]">No recent transactions found.</div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Supabase Configuration
+            const SUPABASE_URL = 'https://nvxqorudztbpwyanakdj.supabase.co';
+            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52eHFvcnVkenRicHd5YW5ha2RqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIzOTk5NTQsImV4cCI6MjA2Nzk3NTk1NH0.XvITDAnpEkjQTh4SCVOfwGKsaANS6tp58Up37SXwYRw';
+            const TRANSACTION_FEE_RATE = 0.001;
+
+            // Initialize Supabase
+            const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+            // Initialize Stripe
+            const stripe = Stripe('pk_live_51QlhX1DV4GGUfngRRIJi02QYB2pTZg2bbX9T4xwM0i6FflEPt2FtV7ydZfNks9I9vOAcmwsLGM1U7tzbpmaP454C00qsme0XJ8');
+            const elements = stripe.elements();
+            const cardElement = elements.create('card');
+            cardElement.mount('#card-element');
+
+            // UI Elements
+            const messageBox = document.getElementById('messageBox');
+            const walletBalanceElement = document.getElementById('walletBalance');
+            const pendingRequestsContainer = document.getElementById('pendingRequestsContent');
+            const numPendingRequests = document.getElementById('numPendingRequests');
+            const totalPendingAmount = document.getElementById('totalPendingAmount');
+            const transactionTableBody = document.getElementById('transactionHistoryTableBody');
+            const noTransactionsMessage = document.getElementById('noTransactionsMessage');
+
+            // User Info
+            let userId = null;
+            let userName = 'User';
+
+            // Authenticate User
+            const { data: { user }, error: userError } = await supabase.auth.getUser();
+            if (userError || !user) {
+                console.error('Authentication error:', userError?.message || 'No user found');
+                showMessage('Please log in to access your wallet.', 'error');
+                window.location.href = 'login.html';
+                return;
+            }
+            userId = user.id;
+            console.log('Authenticated User ID:', userId);
+
+            // Fetch User Profile
+            try {
+                const { data: profile, error: profileError } = await supabase
+                    .from('users')
+                    .select('full_name')
+                    .eq('id', userId)
+                    .maybeSingle();
+
+                if (profileError) {
+                    console.error('Error fetching user profile:', profileError.message);
+                    userName = user.email || 'User';
+                } else {
+                    userName = profile?.full_name || user.email || 'User';
+                }
+
+                // Update Greeting
+                const greetingElement = document.getElementById('personalizedGreeting');
+                const desktopUserWelcomeElement = document.getElementById('desktopUserWelcome');
+                if (greetingElement) {
+                    const currentHour = new Date().getHours();
+                    let timeOfDayGreeting = 'Hello';
+                    if (currentHour < 12) timeOfDayGreeting = 'Good morning';
+                    else if (currentHour < 18) timeOfDayGreeting = 'Good afternoon';
+                    else timeOfDayGreeting = 'Good evening';
+                    greetingElement.textContent = `${timeOfDayGreeting}, ${userName}!`;
+                }
+                if (desktopUserWelcomeElement) {
+                    desktopUserWelcomeElement.textContent = `Welcome, ${userName}!`;
+                }
+            } catch (error) {
+                console.error('Error fetching user profile:', error);
+                showMessage('Failed to load user profile.', 'error');
+            }
+
+            // Show Message Function
+            function showMessage(message, type = 'success') {
+                messageBox.textContent = message;
+                messageBox.className = `message-box ${type === 'success' ? '' : 'error'} show`;
+                setTimeout(() => messageBox.classList.remove('show'), 3000);
+            }
+
+            // Collapsible Card Headers
+            document.querySelectorAll('.card-header').forEach(header => {
+                header.addEventListener('click', () => {
+                    const content = header.nextElementSibling;
+                    const icon = header.querySelector('i');
+                    content.classList.toggle('open');
+                    icon.classList.toggle('fa-chevron-down');
+                    icon.classList.toggle('fa-chevron-up');
+                });
+            });
+
+            // Sidebar Toggle
+            const hamburgerBtnMobile = document.getElementById('hamburgerBtnMobile');
+            const sidebar = document.getElementById('sidebar');
+            if (hamburgerBtnMobile && sidebar) {
+                hamburgerBtnMobile.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    sidebar.classList.toggle('open');
+                });
+                document.addEventListener('click', (e) => {
+                    if (sidebar.classList.contains('open') && !sidebar.contains(e.target) && !hamburgerBtnMobile.contains(e.target)) {
+                        sidebar.classList.remove('open');
+                    }
+                });
+            }
+
+            
+            async function getCalculatedBalance() {
+    try {
+        // Fetch all completed transactions relevant to the user (as initiator or recipient)
+        const { data, error } = await supabase
+            .from('transactions')
+            .select('amount, type, user_id, recipient_id, status') // Select status to handle 'request' type correctly
+            .or(`user_id.eq.${userId},recipient_id.eq.${userId}`)
+            .eq('status', 'completed'); // Only consider completed transactions for balance
+
+        if (error) {
+            console.error('Error fetching balance transactions for calculation:', error.message);
+            return 0; // Return 0 if there's an error fetching data
+        }
+
+        let balance = 0;
+        if (data) { // Ensure data is not null before iterating
+            data.forEach(tx => {
+                const amount = parseFloat(tx.amount);
+                // Determine if the transaction is an income or expense from the current user's perspective
+                if (tx.type === 'deposit' && tx.user_id === userId) {
+                    // Deposits are typically income initiated by the user
+                    balance += amount;
+                } else if (tx.type === 'product_sell' && tx.user_id === userId) {
+                    // Product sales are income for the user
+                    balance += amount;
+                } else if (tx.type === 'loan_received' && tx.user_id === userId) {
+                    // Loans received are income for the user
+                    balance += amount;
+                } else if (tx.type === 'transfer') {
+                    if (tx.recipient_id === userId) {
+                        // Incoming transfer (current user is recipient)
+                        // Applying fee for incoming transfer as per your `handleTransfer` logic
+                        balance += amount * (1 - TRANSACTION_FEE_RATE);
+                    } else if (tx.user_id === userId) {
+                        // Outgoing transfer (current user is initiator)
+                        balance -= amount;
+                    }
+                } else if (tx.type === 'request' && tx.user_id === userId && tx.status === 'completed') {
+                     // If a request was initiated by THIS user and was completed (i.e., accepted by the sender)
+                     // This means money was received by this user.
+                     balance += amount;
+                }
+                // All other types (withdrawal, bill_payment, loan_payment, product_buy) are expenses for the initiator
+                else if (tx.user_id === userId && ['withdrawal', 'bill_payment', 'loan_payment', 'insurance_payment', 'product_buy'].includes(tx.type)) {
+                    balance -= amount;
+                }
+            });
+        }
+        return balance;
+    } catch (error) {
+        console.error('Network error during balance calculation:', error);
+        return 0; // Return 0 in case of network or other unexpected errors
+    }
+}
+
+            // Handle Logout
+            async function handleLogout() {
+                await supabase.auth.signOut();
+                window.location.href = 'login.html';
+            }
+            const sidebarLogoutLink = document.getElementById('sidebarLogoutLink');
+            if (sidebarLogoutLink) sidebarLogoutLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                handleLogout();
+            });
+            const mobileLogoutLink = document.getElementById('mobileLogoutLink');
+            if (mobileLogoutLink) mobileLogoutLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                handleLogout();
+            });
+
+            // Stripe Card Errors
+            cardElement.addEventListener('change', function(event) {
+                const displayError = document.getElementById('card-errors');
+                displayError.textContent = event.error ? event.error.message : '';
+            });
+
+            // Debounce for Autocomplete
+            function debounce(func, wait) {
+                let timeout;
+                return function executedFunction(...args) {
+                    const later = () => {
+                        clearTimeout(timeout);
+                        func(...args);
+                    };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
+            }
+
+            // Fetch Wallet Balance
+            async function fetchWalletBalance() {
+            try {
+                // Use the new helper to get the accurate balance
+                const balance = await getCalculatedBalance();
+
+                walletBalanceElement.textContent = `$${balance.toFixed(2)}`;
+                walletBalanceElement.style.transform = 'scale(1.1)';
+                setTimeout(() => walletBalanceElement.style.transform = 'scale(1)', 300);
+
+                // Update progress ring (simplified: 0-100% based on activity)
+                const balanceProgress = document.getElementById('balanceProgress');
+                // Ensure balance is non-negative for progress bar calculation
+                // Cap at $1000 for 100% progress for example. Adjust '1000' as desired.
+                const activityPercent = Math.min(Math.max(0, balance / 1000) * 100, 100);
+                balanceProgress.setAttribute('stroke-dasharray', `${activityPercent}, 100`);
+
+                document.getElementById('aiSummaryText').innerHTML = `Your current wallet balance is <strong>$${balance.toFixed(2)}</strong>. Manage your funds below.`;
+            } catch (error) {
+                console.error('Error fetching balance for UI update:', error);
+                showMessage('Network error fetching balance.', 'error');
+                walletBalanceElement.textContent = '$0.00';
+            }
+        }
+            // Fetch Pending Requests
+            async function fetchPendingRequests() {
+                try {
+                    const { data, error } = await supabase
+                        .from('transactions')
+                        .select('id, amount, type, description, status, created_at, user_id')
+                        .eq('recipient_id', userId)
+                        .eq('type', 'request')
+                        .eq('status', 'pending')
+                        .order('created_at', { ascending: false });
+
+                    if (error) {
+                        console.error('Error fetching pending requests:', error.message);
+                        showMessage('Failed to load pending requests.', 'error');
+                        pendingRequestsContainer.innerHTML = '<p class="text-gray-500">Failed to load pending requests.</p>';
+                        return;
+                    }
+
+                    const pendingRequests = data || [];
+                    numPendingRequests.textContent = pendingRequests.length;
+                    const total = pendingRequests.reduce((sum, req) => sum + parseFloat(req.amount), 0);
+                    totalPendingAmount.textContent = `$${total.toFixed(2)}`;
+
+                    if (pendingRequests.length === 0) {
+                        pendingRequestsContainer.innerHTML = '<p class="text-gray-500 text-center">No pending requests.</p>';
+                        return;
+                    }
+
+                    const senderIds = [...new Set(pendingRequests.map(req => req.user_id))];
+                    const { data: users, error: userError } = await supabase
+                        .from('users')
+                        .select('id, full_name')
+                        .in('id', senderIds);
+
+                    if (userError) {
+                        console.error('Error fetching user names:', userError.message);
+                    }
+
+                    const userMap = users ? users.reduce((map, user) => ({ ...map, [user.id]: user.full_name }), {}) : {};
+
+                    pendingRequestsContainer.innerHTML = pendingRequests.map(req => `
+                        <div class="bg-white p-4 rounded-lg shadow-md mb-4 flex justify-between items-center">
+                            <div>
+                                <p><strong>Amount:</strong> $${parseFloat(req.amount).toFixed(2)}</p>
+                                <p><strong>From:</strong> ${userMap[req.user_id] || 'Unknown'} (ID: ${req.user_id})</p>
+                                <p><strong>Description:</strong> ${req.description || 'N/A'}</p>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="btn-primary-action text-xs px-3 py-1 accept-request-btn" data-request-id="${req.id}">
+                                    <i class="fas fa-check mr-1"></i>Accept
+                                </button>
+                                <button class="btn-danger-action text-xs px-3 py-1 delete-request-btn" data-request-id="${req.id}">
+                                    <i class="fas fa-times mr-1"></i>Decline
+                                </button>
+                            </div>
+                        </div>
+                    `).join('');
+
+                    pendingRequestsContainer.querySelectorAll('.accept-request-btn').forEach(btn => {
+                        btn.addEventListener('click', () => handleAcceptRequest(btn.dataset.requestId));
+                    });
+                    pendingRequestsContainer.querySelectorAll('.delete-request-btn').forEach(btn => {
+                        btn.addEventListener('click', () => handleDeclineRequest(btn.dataset.requestId));
+                    });
+                } catch (error) {
+                    console.error('Error fetching pending requests:', error);
+                    showMessage('Network error loading pending requests.', 'error');
+                    pendingRequestsContainer.innerHTML = '<p class="text-gray-500">Network error loading pending requests.</p>';
+                }
+            }
+
+            // Fetch Transaction History
+            async function fetchTransactionHistory() {
+                transactionTableBody.innerHTML = '<tr><td colspan="6" class="text-center text-gray-500 py-4">Loading transactions...</td></tr>';
+                noTransactionsMessage.classList.add('hidden');
+
+                try {
+                    const { data, error } = await supabase
+                        .from('transactions')
+                        .select('id, amount, type, description, status, created_at, recipient_id, user_id')
+                        .or(`user_id.eq.${userId},recipient_id.eq.${userId}`)
+                        .order('created_at', { ascending: false })
+                        .limit(50);
+
+                    if (error) {
+                        console.error('Error fetching transactions:', error.message);
+                        showMessage('Failed to load transactions.', 'error');
+                        transactionTableBody.innerHTML = `<tr><td colspan="6" class="text-center text-red-500 py-4">Failed to load transactions: ${error.message}</td></tr>`;
+                        return;
+                    }
+
+                    if (!data || data.length === 0) {
+                        noTransactionsMessage.classList.remove('hidden');
+                        transactionTableBody.innerHTML = '';
+                        return;
+                    }
+
+                    const recipientIds = [...new Set(data.map(tx => tx.recipient_id).filter(id => id))];
+                    const { data: users, error: userError } = await supabase
+                        .from('users')
+                        .select('id, full_name')
+                        .in('id', recipientIds);
+
+                    if (userError) {
+                        console.error('Error fetching user names:', userError.message);
+                    }
+
+                    const userMap = users ? users.reduce((map, user) => ({ ...map, [user.id]: user.full_name }), {}) : {};
+
+                    transactionTableBody.innerHTML = '';
+                    data.forEach(tx => {
+                        const typeClass = {
+                            'deposit': 'status-deposit',
+                            'withdrawal': 'status-withdrawal',
+                            'transfer': 'status-transfer',
+                            'request': 'status-request'
+                        }[(tx.type || '').toLowerCase()] || ''; // Added || '' to safely handle null/undefined tx.type
+                        const statusClass = {
+                            'completed': 'status-completed',
+                            'pending': 'status-pending',
+                            'failed': 'status-failed'
+                        }[(tx.status || '').toLowerCase()] || ''; // Added || '' to safely handle null/undefined tx.status
+
+                        const description = tx.recipient_id && userMap[tx.recipient_id]
+                            ? `${tx.description || ''} (To: ${userMap[tx.recipient_id]})`
+                            : tx.description || 'N/A';
+
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${new Date(tx.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</td>
+                            <td><span class="status-badge ${typeClass}">${(tx.type || '').toUpperCase()}</span></td>
+                            <td>$${parseFloat(tx.amount).toFixed(2)}</td>
+                            <td>${description}</td>
+                            <td><span class="status-badge ${statusClass}">${(tx.status || '').toUpperCase()}</span></td>
+                            <td>
+                                ${(tx.type || '').toLowerCase() === 'request' && tx.status === 'pending' && tx.recipient_id === userId ?
+                                    `<button class="btn-primary-action text-[0.765rem] px-2 py-1 accept-request-btn" data-request-id="${tx.id}"><i class="fas fa-check mr-1"></i>Accept</button>
+                                     <button class="btn-danger-action text-[0.765rem] px-2 py-1 delete-request-btn ml-1" data-request-id="${tx.id}"><i class="fas fa-times mr-1"></i>Decline</button>`
+                                    : ''
+                                }
+                            </td>
+                        `;
+                        transactionTableBody.appendChild(row);
+
+                        if ((tx.type || '').toLowerCase() === 'request' && tx.status === 'pending' && tx.recipient_id === userId) {
+                            row.querySelector('.accept-request-btn').addEventListener('click', () => handleAcceptRequest(tx.id));
+                            row.querySelector('.delete-request-btn').addEventListener('click', () => handleDeclineRequest(tx.id));
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error fetching transaction history:', error);
+                    showMessage('Network error while loading transactions.', 'error');
+                    transactionTableBody.innerHTML = '<tr><td colspan="6" class="text-center text-red-500 py-4">Network error while loading transactions.</td></tr>';
+                }
+            }
+
+            // Handle Recipient Search
+            async function handleRecipientSearch(event) {
+                const query = event.target.value.trim();
+                const suggestionsContainer = document.getElementById('recipientSuggestions');
+
+                if (query.length < 2) {
+                    suggestionsContainer.classList.add('hidden');
+                    suggestionsContainer.innerHTML = '';
+                    return;
+                }
+
+                try {
+                    const { data, error } = await supabase
+                        .from('users')
+                        .select('id, full_name, email')
+                        .or(`full_name.ilike.%${query}%,email.ilike.%${query}%,id.eq.${query}`)
+                        .neq('id', userId)
+                        .limit(5);
+
+                    if (error) {
+                        console.error('Error searching users:', error.message);
+                        showMessage('Error loading user suggestions.', 'error');
+                        suggestionsContainer.innerHTML = '<p class="p-2 text-gray-500">Error loading suggestions.</p>';
+                        return;
+                    }
+
+                    if (!data || data.length === 0) {
+                        suggestionsContainer.innerHTML = '<p class="p-2 text-gray-500">No users found.</p>';
+                        suggestionsContainer.classList.remove('hidden');
+                        return;
+                    }
+
+                    suggestionsContainer.innerHTML = data.map(user => `
+                        <div class="suggestion-item flex items-center" data-id="${user.id}" data-email="${user.email}">
+                            <i class="fas fa-user-circle mr-2 text-gray-500"></i>
+                            <div>${user.full_name} (ID: ${user.id}, Email: ${user.email})</div>
+                        </div>
+                    `).join('');
+                    suggestionsContainer.classList.remove('hidden');
+
+                    suggestionsContainer.querySelectorAll('.suggestion-item').forEach(item => {
+                        item.addEventListener('click', () => {
+                            document.getElementById('transferRecipient').value = item.dataset.id;
+                            suggestionsContainer.classList.add('hidden');
+                        });
+                    });
+                } catch (error) {
+                    console.error('Search error:', error);
+                    showMessage('Network error loading suggestions.', 'error');
+                    suggestionsContainer.innerHTML = '<p class="p-2 text-gray-500">Network error.</p>';
+                    suggestionsContainer.classList.remove('hidden');
+                }
+            }
+
+            // Handle Sender Search
+            async function handleSenderSearch(event) {
+                const query = event.target.value.trim();
+                const suggestionsContainer = document.getElementById('senderSuggestions');
+
+                if (query.length < 2) {
+                    suggestionsContainer.classList.add('hidden');
+                    suggestionsContainer.innerHTML = '';
+                    return;
+                }
+
+                try {
+                    const { data, error } = await supabase
+                        .from('users')
+                        .select('id, full_name, email')
+                        .or(`full_name.ilike.%${query}%,email.ilike.%${query}%,id.eq.${query}`)
+                        .neq('id', userId)
+                        .limit(5);
+
+                    if (error) {
+                        console.error('Error searching users:', error.message);
+                        showMessage('Error loading user suggestions.', 'error');
+                        suggestionsContainer.innerHTML = '<p class="p-2 text-gray-500">Error loading suggestions.</p>';
+                        return;
+                    }
+
+                    if (!data || data.length === 0) {
+                        suggestionsContainer.innerHTML = '<p class="p-2 text-gray-500">No users found.</p>';
+                        suggestionsContainer.classList.remove('hidden');
+                        return;
+                    }
+
+                    suggestionsContainer.innerHTML = data.map(user => `
+                        <div class="suggestion-item flex items-center" data-id="${user.id}" data-email="${user.email}">
+                            <i class="fas fa-user-circle mr-2 text-gray-500"></i>
+                            <div>${user.full_name} (ID: ${user.id}, Email: ${user.email})</div>
+                        </div>
+                    `).join('');
+                    suggestionsContainer.classList.remove('hidden');
+
+                    suggestionsContainer.querySelectorAll('.suggestion-item').forEach(item => {
+                        item.addEventListener('click', () => {
+                            document.getElementById('requestSender').value = item.dataset.id;
+                            suggestionsContainer.classList.add('hidden');
+                        });
+                    });
+                } catch (error) {
+                    console.error('Search error:', error);
+                    showMessage('Network error loading suggestions.', 'error');
+                    suggestionsContainer.innerHTML = '<p class="p-2 text-gray-500">Network error.</p>';
+                    suggestionsContainer.classList.remove('hidden');
+                }
+            }
+
+            // Handle Deposit
+            async function handleDeposit(event) {
+                event.preventDefault();
+                const amountInput = document.getElementById('depositAmount');
+                const amount = parseFloat(amountInput.value);
+                const submitBtn = document.getElementById('depositSubmitBtn');
+                const messageDiv = document.getElementById('depositMessage');
+
+                if (isNaN(amount) || amount < 1) {
+                    showMessage('Please enter a valid amount (minimum $1.00).', 'error');
+                    messageDiv.textContent = 'Minimum deposit is $1.00.';
+                    return;
+                }
+
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
+                messageDiv.textContent = '';
+
+                try {
+                    const { data, error } = await supabase.functions.invoke('create-payment-intent', {
+                        body: { amount: Math.round(amount * 100), user_id: userId }
+                    });
+
+                    if (error || !data.clientSecret) {
+                        throw new Error(error?.message || 'Could not create payment intent.');
+                    }
+
+                    const { paymentIntent, error: stripeError } = await stripe.confirmCardPayment(data.clientSecret, {
+                        payment_method: { card: cardElement }
+                    });
+
+                    if (stripeError) {
+                        throw new Error(stripeError.message);
+                    }
+
+                    if (paymentIntent.status === 'succeeded') {
+                        const { error: txError } = await supabase
+                            .from('transactions')
+                            .insert({
+                                user_id: userId,
+                                amount: amount,
+                                type: 'deposit',
+                                status: 'completed',
+                                description: `Deposit via Stripe (Payment Intent: ${paymentIntent.id})`,
+                                created_at: new Date().toISOString()
+                            });
+
+                        if (txError) {
+                            console.error('Error recording deposit:', txError.message);
+                            showMessage('Deposit processed, but failed to record in wallet.', 'error');
+                            messageDiv.textContent = 'Failed to record transaction.';
+                            return;
+                        }
+
+                        showMessage('Deposit successful!', 'success');
+                        messageDiv.textContent = 'Funds added successfully!';
+                        amountInput.value = '';
+                        cardElement.clear();
+                        await fetchWalletBalance();
+                        await fetchTransactionHistory();
+                    } else {
+                        throw new Error(`Payment status: ${paymentIntent.status}. Please try again.`);
+                    }
+                } catch (error) {
+                    console.error('Deposit error:', error);
+                    showMessage(`Deposit failed: ${error.message}`, 'error');
+                    messageDiv.textContent = `Error: ${error.message}`;
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-money-bill-wave mr-2"></i>Confirm Deposit';
+                }
+            }
+
+            // Handle Transfer
+            async function handleTransfer(event) {
+                event.preventDefault();
+                const recipientInput = document.getElementById('transferRecipient');
+                const amountInput = document.getElementById('transferAmount');
+                const recipient = recipientInput.value.trim();
+                const amount = parseFloat(amountInput.value);
+                const submitBtn = document.getElementById('transferSubmitBtn');
+                const messageDiv = document.getElementById('transferMessage');
+                const suggestionsContainer = document.getElementById('recipientSuggestions');
+
+                if (!recipient || isNaN(amount) || amount <= 0) {
+                    showMessage('Please enter a valid recipient and amount.', 'error');
+                    messageDiv.textContent = 'Invalid recipient or amount.';
+                    return;
+                }
+
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
+                messageDiv.textContent = '';
+                suggestionsContainer.classList.add('hidden');
+
+                try {
+                    const { data: recipientData, error: recipientError } = await supabase
+                        .from('users')
+                        .select('id, full_name')
+                        .or(`email.eq.${recipient},id.eq.${recipient},full_name.ilike.${recipient}`)
+                        .maybeSingle();
+
+                    if (recipientError || !recipientData) {
+                        console.error('Recipient lookup error:', recipientError?.message);
+                        showMessage('Recipient not found.', 'error');
+                        messageDiv.textContent = 'Recipient not found.';
+                        return;
+                    }
+
+                    const recipientId = recipientData.id;
+                    const recipientName = recipientData.full_name;
+                    if (recipientId === userId) {
+                        showMessage('Cannot transfer to yourself.', 'error');
+                        messageDiv.textContent = 'Cannot transfer to yourself.';
+                        return;
+                    }
+
+                    if (!confirm(`Send $${amount.toFixed(2)} to ${recipientName} (ID: ${recipientId})?`)) {
+                        return;
+                    }
+
+                    const { data: transactions, error: balanceError } = await supabase
+                        .from('transactions')
+                        .select('amount')
+                        .eq('user_id', userId)
+                        .in('status', ['completed']);
+
+                    if (balanceError) {
+                        throw new Error('Failed to check balance.');
+                    }
+
+                    const balance = transactions.reduce((sum, tx) => sum + parseFloat(tx.amount), 0);
+                    if (balance < amount) {
+                        showMessage('Insufficient balance for transfer.', 'error');
+                        messageDiv.textContent = 'Insufficient balance.';
+                        return;
+                    }
+
+                    const { error: txError } = await supabase
+                        .from('transactions')
+                        .insert([
+                            {
+                                user_id: userId,
+                                amount: -amount,
+                                type: 'transfer',
+                                status: 'completed',
+                                description: `Transfer to ${recipientName} (ID: ${recipientId})`,
+                                recipient_id: recipientId,
+                                created_at: new Date().toISOString()
+                            },
+                            {
+                                user_id: recipientId,
+                                amount: amount * (1 - TRANSACTION_FEE_RATE),
+                                type: 'transfer',
+                                status: 'completed',
+                                description: `Transfer from ${userName} (ID: ${userId})`,
+                                recipient_id: userId,
+                                created_at: new Date().toISOString()
+                            }
+                        ]);
+
+                    if (txError) {
+                        console.error('Error recording transfer:', txError.message);
+                        showMessage('Failed to record transfer.', 'error');
+                        messageDiv.textContent = 'Failed to record transfer.';
+                        return;
+                    }
+
+                    showMessage('Transfer successful!', 'success');
+                    messageDiv.textContent = 'Funds transferred successfully!';
+                    document.getElementById('transferForm').reset();
+                    await fetchWalletBalance();
+                    await fetchTransactionHistory();
+                    await fetchPendingRequests();
+                } catch (error) {
+                    console.error('Transfer error:', error);
+                    showMessage(`Transfer failed: ${error.message}`, 'error');
+                    messageDiv.textContent = `Error: ${error.message}`;
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Confirm Transfer';
+                }
+            }
+
+            // Handle Request Money
+            async function handleRequestMoney(event) {
+                event.preventDefault();
+                const senderInput = document.getElementById('requestSender');
+                const amountInput = document.getElementById('requestAmount');
+                const sender = senderInput.value.trim();
+                const amount = parseFloat(amountInput.value);
+                const submitBtn = document.getElementById('requestSubmitBtn');
+                const messageDiv = document.getElementById('requestMessage');
+                const suggestionsContainer = document.getElementById('senderSuggestions');
+
+                if (!sender || isNaN(amount) || amount <= 0) {
+                    showMessage('Please enter a valid sender and amount.', 'error');
+                    messageDiv.textContent = 'Invalid sender or amount.';
+                    return;
+                }
+
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Sending Request...';
+                messageDiv.textContent = '';
+                suggestionsContainer.classList.add('hidden');
+
+                try {
+                    const { data: senderData, error: senderError } = await supabase
+                        .from('users')
+                        .select('id, full_name')
+                        .or(`email.eq.${sender},id.eq.${sender},full_name.ilike.${sender}`)
+                        .maybeSingle();
+
+                    if (senderError || !senderData) {
+                        console.error('Sender lookup error:', senderError?.message);
+                        showMessage('Sender not found.', 'error');
+                        messageDiv.textContent = 'Sender not found.';
+                        return;
+                    }
+
+                    const senderId = senderData.id;
+                    const senderName = senderData.full_name;
+                    if (senderId === userId) {
+                        showMessage('Cannot request money from yourself.', 'error');
+                        messageDiv.textContent = 'Cannot request from yourself.';
+                        return;
+                    }
+
+                    const { error: txError } = await supabase
+                        .from('transactions')
+                        .insert({
+                            user_id: userId,
+                            amount: amount,
+                            type: 'request',
+                            status: 'pending',
+                            description: `Money request to ${senderName} (ID: ${senderId})`,
+                            recipient_id: senderId,
+                            created_at: new Date().toISOString()
+                        });
+
+                    if (txError) {
+                        console.error('Error creating request:', txError.message);
+                        showMessage('Failed to send request.', 'error');
+                        messageDiv.textContent = 'Failed to send request.';
+                        return;
+                    }
+
+                    showMessage('Request sent successfully!', 'success');
+                    messageDiv.textContent = 'Request sent successfully!';
+                    document.getElementById('requestForm').reset();
+                    await fetchPendingRequests();
+                    await fetchTransactionHistory();
+                } catch (error) {
+                    console.error('Request money error:', error);
+                    showMessage(`Request failed: ${error.message}`, 'error');
+                    messageDiv.textContent = `Error: ${error.message}`;
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-hand-holding-usd mr-2"></i>Send Request';
+                }
+            }
+
+            // Handle Accept Request
+            async function handleAcceptRequest(requestId) {
+                if (!confirm('Are you sure you want to accept this money request?')) return;
+
+                try {
+                    const { data: request, error: fetchError } = await supabase
+                        .from('transactions')
+                        .select('amount, user_id')
+                        .eq('id', requestId)
+                        .eq('status', 'pending')
+                        .eq('type', 'request')
+                        .eq('recipient_id', userId)
+                        .single();
+
+                    if (fetchError || !request) {
+                        console.error('Error fetching request:', fetchError?.message);
+                        showMessage('Request not found or already processed.', 'error');
+                        return;
+                    }
+
+                    const amount = parseFloat(request.amount);
+                    const requesterId = request.user_id;
+
+                    const { data: transactions, error: balanceError } = await supabase
+                        .from('transactions')
+                        .select('amount')
+                        .eq('user_id', userId)
+                        .in('status', ['completed']);
+
+                    if (balanceError) {
+                        throw new Error('Failed to check balance.');
+                    }
+
+                    const balance = transactions.reduce((sum, tx) => sum + parseFloat(tx.amount), 0);
+                    if (balance < amount) {
+                        showMessage('Insufficient balance to accept request.', 'error');
+                        return;
+                    }
+
+                    const { data: requesterData, error: requesterError } = await supabase
+                        .from('users')
+                        .select('full_name')
+                        .eq('id', requesterId)
+                        .single();
+
+                    if (requesterError) {
+                        console.error('Error fetching requester name:', requesterError.message);
+                    }
+
+                    const requesterName = requesterData?.full_name || 'Unknown';
+
+                    const { error: updateError } = await supabase
+                        .from('transactions')
+                        .insert([
+                            {
+                                user_id: userId,
+                                amount: -amount,
+                                type: 'transfer',
+                                status: 'completed',
+                                description: `Accepted money request ${requestId} to ${requesterName} (ID: ${requesterId})`,
+                                recipient_id: requesterId,
+                                created_at: new Date().toISOString()
+                            },
+                            {
+                                user_id: requesterId,
+                                amount: amount * (1 - TRANSACTION_FEE_RATE),
+                                type: 'transfer',
+                                status: 'completed',
+                                description: `Received from accepted request ${requestId} from ${userName} (ID: ${userId})`,
+                                recipient_id: userId,
+                                created_at: new Date().toISOString()
+                            }
+                        ]);
+
+                    if (updateError) {
+                        console.error('Error processing request:', updateError.message);
+                        showMessage('Failed to accept request.', 'error');
+                        return;
+                    }
+
+                    const { error: statusError } = await supabase
+                        .from('transactions')
+                        .update({ status: 'completed' })
+                        .eq('id', requestId);
+
+                    if (statusError) {
+                        console.error('Error updating request status:', statusError.message);
+                        showMessage('Request accepted, but status update failed.', 'error');
+                        return;
+                    }
+
+                    showMessage('Request accepted successfully!', 'success');
+                    await fetchWalletBalance();
+                    await fetchPendingRequests();
+                    await fetchTransactionHistory();
+                } catch (error) {
+                    console.error('Accept request error:', error);
+                    showMessage(`Failed to accept request: ${error.message}`, 'error');
+                }
+            }
+
+            // Handle Decline Request
+            async function handleDeclineRequest(requestId) {
+                if (!confirm('Are you sure you want to decline this money request?')) return;
+
+                try {
+                    const { error } = await supabase
+                        .from('transactions')
+                        .update({ status: 'failed' })
+                        .eq('id', requestId)
+                        .eq('status', 'pending')
+                        .eq('type', 'request')
+                        .eq('recipient_id', userId);
+
+                    if (error) {
+                        console.error('Error declining request:', error.message);
+                        showMessage('Failed to decline request.', 'error');
+                        return;
+                    }
+
+                    showMessage('Request declined successfully.', 'success');
+                    await fetchPendingRequests();
+                    await fetchTransactionHistory();
+                } catch (error) {
+                    console.error('Decline request error:', error);
+                    showMessage(`Failed to decline request: ${error.message}`, 'error');
+                }
+            }
+
+            // Handle Withdrawal
+            async function handleWithdrawal(event) {
+                event.preventDefault();
+                const amount = parseFloat(document.getElementById('withdrawalAmount').value);
+                const method = document.getElementById('withdrawalMethod').value;
+                const account = document.getElementById('withdrawalAccount').value.trim();
+                const submitBtn = document.getElementById('withdrawalSubmitBtn');
+                const messageDiv = document.getElementById('withdrawalMessage');
+
+                if (isNaN(amount) || amount < 1 || !method || !account) {
+                    showMessage('Please fill in all withdrawal details correctly.', 'error');
+                    messageDiv.textContent = 'Invalid withdrawal details.';
+                    return;
+                }
+
+                if (method === 'office_withdrawal' && account.length < 5) {
+                    showMessage('Please provide a valid reference for office withdrawal.', 'error');
+                    messageDiv.textContent = 'Reference must be at least 5 characters.';
+                    return;
+                }
+
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
+                messageDiv.textContent = '';
+
+                try {
+                    const { data: transactions, error: balanceError } = await supabase
+                        .from('transactions')
+                        .select('amount')
+                        .eq('user_id', userId)
+                        .in('status', ['completed']);
+
+                    if (balanceError) {
+                        throw new Error('Failed to check balance.');
+                    }
+
+                    const balance = transactions.reduce((sum, tx) => sum + parseFloat(tx.amount), 0);
+                    if (balance < amount) {
+                        showMessage('Insufficient balance for withdrawal.', 'error');
+                        messageDiv.textContent = 'Insufficient balance.';
+                        return;
+                    }
+
+                    const { error: txError } = await supabase
+                        .from('transactions')
+                        .insert({
+                            user_id: userId,
+                            amount: -amount,
+                            type: 'withdrawal',
+                            status: 'pending',
+                            description: `Withdrawal via ${method}: ${account}`,
+                            method: method,
+                            account: account,
+                            created_at: new Date().toISOString()
+                        });
+
+                    if (txError) {
+                        console.error('Error recording withdrawal:', txError.message);
+                        showMessage('Failed to process withdrawal.', 'error');
+                        messageDiv.textContent = 'Failed to process withdrawal.';
+                        return;
+                    }
+
+                    showMessage('Withdrawal request submitted successfully!', 'success');
+                    messageDiv.textContent = 'Withdrawal request submitted!';
+                    document.getElementById('withdrawalForm').reset();
+                    await fetchWalletBalance();
+                    await fetchTransactionHistory();
+                } catch (error) {
+                    console.error('Withdrawal error:', error);
+                    showMessage(`Withdrawal failed: ${error.message}`, 'error');
+                    messageDiv.textContent = `Error: ${error.message}`;
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Confirm Withdrawal';
+                }
+            }
+
+            // Event Listeners
+            document.getElementById('depositForm').addEventListener('submit', handleDeposit);
+            document.getElementById('transferForm').addEventListener('submit', handleTransfer);
+            document.getElementById('requestForm').addEventListener('submit', handleRequestMoney);
+            document.getElementById('withdrawalForm').addEventListener('submit', handleWithdrawal);
+            document.getElementById('transferRecipient').addEventListener('input', debounce(handleRecipientSearch, 300));
+            document.getElementById('requestSender').addEventListener('input', debounce(handleSenderSearch, 300));
+            document.getElementById('viewPendingRequestsBtn').addEventListener('click', () => {
+                const pendingContent = document.getElementById('pendingRequestsContent');
+                pendingContent.classList.add('open');
+                pendingContent.parentElement.querySelector('.fa-chevron-down').classList.replace('fa-chevron-down', 'fa-chevron-up');
+                pendingContent.scrollIntoView({ behavior: 'smooth' });
+            });
+
+            // Initial Data Fetches
+            await fetchWalletBalance();
+            await fetchPendingRequests();
+            await fetchTransactionHistory();
+        });
+    </script>
+</body>
+</html>

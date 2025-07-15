@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - nova7</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #F0F2F5; color: #1a202c; }
+        .main-content-area { margin-left: 260px; padding: 2rem; width: calc(100% - 260px); min-height: 100vh; }
+        .sidebar-nova7 { background-color: #004182; color: #E0F2FE; width: 260px; box-shadow: 2px 0 8px rgba(0,0,0,0.15); height: 100vh; position: fixed; top: 0; left: 0; padding-top: 1.5rem; transition: transform 0.3s ease-in-out; z-index: 40; display: flex; flex-direction: column; }
+        .sidebar-header { padding: 0 1.5rem 1rem 1.5rem; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #0053a0; margin-bottom: 0.75rem; }
+        .sidebar-logo-img { max-height: 120px; width: auto; filter: brightness(0) invert(1); }
+        .sidebar-nova7 .nav-link-sidebar { display: flex; align-items: center; padding: 0.75rem 1.5rem; border-radius: 6px; margin: 0.25rem 1rem; font-weight: 500; color: #E0F2FE; text-decoration: none; }
+        .sidebar-nova7 .nav-link-sidebar:hover { background-color: #0A66C2; }
+        .sidebar-nova7 .nav-link-sidebar.active { background-color: #FFFFFF; color: #0A66C2; font-weight: 600; }
+        .sidebar-nova7 .nav-link-sidebar i { width: 20px; margin-right: 0.75rem; text-align: center; }
+        .desktop-header { background-color: #FFFFFF; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); padding: 0.75rem 1.5rem; height: 60px; display: flex; align-items: center; justify-content: center; position: fixed; top: 0; width: calc(100% - 260px); z-index: 30; margin-left: 260px; }
+        .mobile-header { display: none; background-color: #FFFFFF; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); padding: 0 1rem; height: 60px; align-items: center; justify-content: space-between; position: fixed; top: 0; left: 0; right: 0; z-index: 50; }
+        .card-settings { background-color: #FFFFFF; border-radius: 12px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.07); padding: 2rem; max-width: 48rem; margin-left: auto; margin-right: auto; }
+        .setting-section { margin-bottom: 2.5rem; padding-bottom: 2rem; border-bottom: 1px solid #E2E8F0; }
+        .setting-section:last-child { border-bottom: none; padding-bottom: 0; margin-bottom: 0; }
+        .setting-label { display: block; font-weight: 500; color: #4A5568; margin-bottom: 0.5rem; font-size: 0.875rem; }
+        .form-input-styled { border: 1px solid #CBD5E0; border-radius: 8px; padding: 0.75rem 1rem; width: 100%; }
+        .btn-primary-action { background-color: #0A66C2; color: white; border-radius: 8px; padding: 0.75rem 1.5rem; font-weight: 600; border: none; cursor: pointer; }
+        .btn-primary-action:disabled { background-color: #A0AEC0; cursor: not-allowed; }
+        .image-preview { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; background-color: #e2e8f0; border: 2px solid #cbd5e0; }
+        .fingerprint-preview, .signature-preview { width: 80px; height: 80px; object-fit: contain; background-color: #e2e8f0; border: 2px solid #cbd5e0; border-radius: 8px; }
+        .message-success { color: #10B981; }
+        .message-error { color: #EF4444; }
+        .message-box { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background-color: #4CAF50; color: white; padding: 15px 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); z-index: 1000; display: none; opacity: 0; transition: opacity 0.5s ease-in-out; text-align: center; min-width: 250px; }
+        .message-box.error { background-color: #F44336; }
+        .message-box.show { display: block; opacity: 1; }
+        .loading-message { text-align: center; color: #4A5568; padding: 2rem; }
+        @media (max-width: 768px) {
+            .sidebar-nova7 { transform: translateX(-100%); height: 100vh; }
+            .sidebar-nova7.open { transform: translateX(0); }
+            .main-content-area { margin-left: 0; width: 100%; padding-top: calc(60px + 1.5rem); padding: 1rem; }
+            .desktop-header { display: none !important; }
+            .mobile-header { display: flex; }
+            .desktop-header { width: 100%; margin-left: 0; }
+            .card-settings { padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+    <div id="messageBox" class="message-box"></div>
+
+    <header class="mobile-header md:hidden">
+        <button id="hamburgerBtnMobile" class="p-2 text-gray-700 hover:text-blue-600">
+            <i class="fas fa-bars text-2xl"></i>
+        </button>
+        <a href="dashboard.html">
+            <img src="nova-logo.png" alt="nova7 Logo" class="header-nova7-logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+            <span style="display:none;" class="text-xl font-semibold text-gray-700">nova7</span>
+        </a>
+        <a href="#" id="mobileLogoutLink" class="p-2 text-gray-700 hover:text-blue-600">
+            <i class="fas fa-sign-out-alt text-xl"></i>
+        </a>
+    </header>
+
+    <aside id="sidebar" class="sidebar-nova7">
+        <div class="sidebar-header">
+            <a href="dashboard.html"><img src="nova-logo.png" alt="nova7 Logo" class="sidebar-logo-img" onerror="this.style.display='none';"></a>
+        </div>
+        <nav class="flex-grow">
+            <a href="dashboard.html" class="nav-link-sidebar"><i class="fas fa-tachometer-alt"></i>Dashboard</a>
+            <a href="view-transactions.html" class="nav-link-sidebar"><i class="fas fa-exchange-alt"></i>Transactions</a>
+            <a href="reports.html" class="nav-link-sidebar"><i class="fas fa-chart-pie"></i>Reports</a>
+            <a href="community.html" class="nav-link-sidebar"><i class="fas fa-users"></i>Community</a>
+            <a href="chatbot.html" class="nav-link-sidebar"><i class="fas fa-comments-dollar"></i>Chat Advisor</a>
+            <a href="marketplace.html" class="nav-link-sidebar"><i class="fas fa-store"></i>Marketplace</a>
+            <a href="settings.html" class="nav-link-sidebar active"><i class="fas fa-cog"></i>Settings</a>
+            <a href="wallet.html" class="nav-link-sidebar"><i class="fas fa-wallet"></i>Wallet</a>
+        </nav>
+        <div class="pb-4">
+            <a href="profile.html" class="nav-link-sidebar"><i class="fas fa-user-circle"></i>Profile</a>
+            <a href="#" id="sidebarLogoutLink" class="nav-link-sidebar"><i class="fas fa-sign-out-alt"></i>Logout</a>
+        </div>
+    </aside>
+
+    <main class="main-content-area">
+        <header class="desktop-header">
+            <h1 class="text-3xl font-bold text-gray-800">Settings</h1>
+        </header>
+
+        <div id="verificationMessage" class="card-settings hidden">
+            <div class="setting-section">
+                <h3 class="text-xl font-semibold">Please Verify Your Email</h3>
+                <div class="space-y-4 mt-4">
+                    <p class="text-sm text-gray-600">Your account is not yet verified. Please check your email for the verification link.</p>
+                    <button id="resendVerification" class="btn-primary-action mt-4">Resend Verification Email</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="settingsContent" class="hidden">
+            <div id="loadingMessage" class="loading-message">Loading profile data...</div>
+
+            <div id="personalInfoCard" class="card-settings hidden">
+                <div class="setting-section">
+                    <h3 class="text-xl font-semibold">Profile Information</h3>
+                    <div class="space-y-4 mt-4">
+                        <div>
+                            <label for="settingFullName" class="setting-label">Full Name</label>
+                            <input type="text" id="settingFullName" class="form-input-styled" placeholder="Your full name" required>
+                        </div>
+                        <div>
+                            <label for="settingFingerprint" class="setting-label">Fingerprint</label>
+                            <div class="flex items-center gap-4 mt-2">
+                                <img id="fingerprint-preview" class="fingerprint-preview" src="" alt="Fingerprint Preview">
+                                <label for="fingerprintInput" class="cursor-pointer bg-white py-2 px-4 border border-gray-300 rounded-md">
+                                    <span>Upload Fingerprint</span>
+                                    <input id="fingerprintInput" type="file" class="sr-only" accept="image/*">
+                                </label>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="settingSignature" class="setting-label">Signature</label>
+                            <div class="flex items-center gap-4 mt-2">
+                                <img id="signature-preview" class="signature-preview" src="" alt="Signature Preview">
+                                <label for="signatureInput" class="cursor-pointer bg-white py-2 px-4 border border-gray-300 rounded-md">
+                                    <span>Upload Signature</span>
+                                    <input id="signatureInput" type="file" class="sr-only" accept="image/*">
+                                </label>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="settingAddress" class="setting-label">Address (Optional)</label>
+                            <input type="text" id="settingAddress" class="form-input-styled" placeholder="123 Main St, Anytown, USA">
+                        </div>
+                        <div>
+                            <label for="settingDateOfBirth" class="setting-label">Date of Birth (Optional)</label>
+                            <input type="date" id="settingDateOfBirth" class="form-input-styled">
+                        </div>
+                        <div>
+                            <label class="setting-label">Profile Picture</label>
+                            <div class="flex items-center gap-4 mt-2">
+                                <img id="image-preview" class="image-preview" src="" alt="Profile Picture">
+                                <label for="profilePictureInput" class="cursor-pointer bg-white py-2 px-4 border border-gray-300 rounded-md">
+                                    <span>Change Picture</span>
+                                    <input id="profilePictureInput" type="file" class="sr-only" accept="image/*">
+                                </label>
+                            </div>
+                        </div>
+                        <div class="pt-4">
+                            <button type="button" id="updateProfileBtn" class="btn-primary-action"><i class="fas fa-save mr-2"></i>Save Profile</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="settingsMessage" class="text-sm text-center"></div>
+            </div>
+
+            <div id="accountSecurityCard" class="card-settings hidden">
+                <div class="setting-section">
+                    <h3 class="text-xl font-semibold">Account Security</h3>
+                    <div class="space-y-4 mt-4">
+                        <div>
+                            <label for="currentEmail" class="setting-label">Current Email</label>
+                            <input type="email" id="currentEmail" class="form-input-styled" value="Loading..." readonly>
+                        </div>
+                        <div>
+                            <label for="newEmail" class="setting-label">New Email Address</label>
+                            <input type="email" id="newEmail" class="form-input-styled" placeholder="Enter new email" required>
+                        </div>
+                        <button type="button" id="updateEmailBtn" class="btn-primary-action"><i class="fas fa-envelope mr-2"></i>Update Email</button>
+                    </div>
+                </div>
+                <div class="setting-section">
+                    <h3 class="text-xl font-semibold">Change Password</h3>
+                    <div class="space-y-4 mt-4">
+                        <div>
+                            <label for="newPassword" class="setting-label">New Password</label>
+                            <input type="password" id="newPassword" class="form-input-styled" placeholder="Enter new password" required>
+                        </div>
+                        <div>
+                            <label for="confirmNewPassword" class="setting-label">Confirm New Password</label>
+                            <input type="password" id="confirmNewPassword" class="form-input-styled" placeholder="Confirm new password" required>
+                        </div>
+                        <button type="button" id="updatePasswordBtn" class="btn-primary-action"><i class="fas fa-lock mr-2"></i>Update Password</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            const SUPABASE_URL = 'https://nvxqorudztbpwyanakdj.supabase.co';
+            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52eHFvcnVkenRicHd5YW5ha2RqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIzOTk5NTQsImV4cCI6MjA2Nzk3NTk1NH0.XvITDAnpEkjQTh4SCVOfwGKsaANS6tp58Up37SXwYRw';
+            const SUPABASE_PROFILE_BUCKET = 'profile-pictures';
+            const SUPABASE_FINGERPRINT_BUCKET = 'fingerprints';
+            const SUPABASE_SIGNATURE_BUCKET = 'signatures';
+            const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+            let currentUserId = null;
+
+            const messageBox = document.getElementById('messageBox');
+            const verificationMessage = document.getElementById('verificationMessage');
+            const settingsContent = document.getElementById('settingsContent');
+            const personalInfoCard = document.getElementById('personalInfoCard');
+            const accountSecurityCard = document.getElementById('accountSecurityCard');
+            const loadingMessage = document.getElementById('loadingMessage');
+            const resendButton = document.getElementById('resendVerification');
+            const imagePreview = document.getElementById('image-preview');
+            const fingerprintPreview = document.getElementById('fingerprint-preview');
+            const signaturePreview = document.getElementById('signature-preview');
+            const settingsMessage = document.getElementById('settingsMessage');
+
+            function showMessage(message, type = 'success', duration = 3000) {
+                messageBox.textContent = message;
+                messageBox.className = 'message-box show';
+                if (type === 'error') messageBox.classList.add('error');
+                else messageBox.classList.remove('error');
+                setTimeout(() => messageBox.classList.remove('show'), duration);
+            }
+
+            async function handleLogout() {
+                await supabase.auth.signOut();
+                window.location.href = 'login.html';
+            }
+
+            const sidebarLogoutLink = document.getElementById('sidebarLogoutLink');
+            if (sidebarLogoutLink) sidebarLogoutLink.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); });
+            const mobileLogoutLink = document.getElementById('mobileLogoutLink');
+            if (mobileLogoutLink) mobileLogoutLink.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); });
+
+            const hamburgerBtnMobile = document.getElementById('hamburgerBtnMobile');
+            const sidebar = document.getElementById('sidebar');
+            if (hamburgerBtnMobile && sidebar) {
+                hamburgerBtnMobile.addEventListener('click', (e) => { e.stopPropagation(); sidebar.classList.toggle('open'); });
+            }
+            document.addEventListener('click', (e) => {
+                if (sidebar && sidebar.classList.contains('open') && !sidebar.contains(e.target) && (!hamburgerBtnMobile || !hamburgerBtnMobile.contains(e.target))) {
+                    sidebar.classList.remove('open');
+                }
+            });
+
+            const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+            if (sessionError || !session) {
+                handleLogout();
+                return;
+            }
+
+            currentUserId = session.user.id;
+
+            if (session.user && !session.user.email_confirmed_at && session.user.email) {
+                verificationMessage.classList.remove('hidden');
+                settingsContent.classList.add('hidden');
+                showMessage(`Your account is not yet verified. Please check your email (${session.user.email}) for the verification link.`, 'error');
+
+                if (resendButton) {
+                    resendButton.addEventListener('click', async () => {
+                        resendButton.disabled = true;
+                        resendButton.textContent = 'Sending...';
+                        try {
+                            const { error } = await supabase.auth.resend({
+                                type: 'signup',
+                                email: session.user.email,
+                                options: { emailRedirectTo: 'http://www.lifeline-wdc.com/email-verification.html' }
+                            });
+                            if (error) {
+                                console.error('Resend error:', error.message);
+                                showMessage(`Failed to resend verification email: ${error.message}`, 'error');
+                            } else {
+                                showMessage(`Verification email resent to ${session.user.email}`, 'success');
+                            }
+                        } catch (err) {
+                            console.error('Unexpected resend error:', err);
+                            showMessage('Unexpected error. Please try again.', 'error');
+                        } finally {
+                            resendButton.disabled = false;
+                            resendButton.textContent = 'Resend Verification Email';
+                        }
+                    });
+                }
+                return;
+            }
+
+            verificationMessage.classList.add('hidden');
+            settingsContent.classList.remove('hidden');
+
+            try {
+                const { data: profile, error: profileError } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('id', currentUserId)
+                    .maybeSingle();
+
+                if (profileError) {
+                    console.error('Error fetching user profile:', profileError.message);
+                    showMessage(`Failed to load profile data: ${profileError.message}`, 'error');
+                    return;
+                }
+
+                document.getElementById('currentEmail').value = session.user.email || 'N/A';
+                document.getElementById('settingFullName').value = profile?.full_name || '';
+                document.getElementById('settingAddress').value = profile?.address || '';
+                document.getElementById('settingDateOfBirth').value = profile?.date_of_birth || '';
+
+                if (profile?.avatar_url) {
+                    imagePreview.src = profile.avatar_url;
+                } else {
+                    imagePreview.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(profile?.full_name || '')}&size=80&background=e2e8f0&color=64748b`;
+                }
+
+                if (profile?.fingerprint_url) {
+                    fingerprintPreview.src = profile.fingerprint_url;
+                } else {
+                    fingerprintPreview.src = 'https://picsum.photos/80/80?random=3';
+                }
+
+                if (profile?.signature_url) {
+                    signaturePreview.src = profile.signature_url;
+                } else {
+                    signaturePreview.src = 'https://picsum.photos/80/80?random=4';
+                }
+
+                loadingMessage.classList.add('hidden');
+                personalInfoCard.classList.remove('hidden');
+                accountSecurityCard.classList.remove('hidden');
+
+            } catch (error) {
+                console.error('Error fetching profile data:', error);
+                showMessage('Network error while loading profile data.', 'error');
+                loadingMessage.classList.add('hidden');
+                return;
+            }
+
+            async function uploadFile(file, bucket, filePath) {
+                if (file.size > 5 * 1024 * 1024) {
+                    showMessage('File size exceeds 5MB limit!', 'error');
+                    return null;
+                }
+
+                try {
+                    const { data: uploadData, error: uploadError } = await supabase.storage
+                        .from(bucket)
+                        .upload(filePath, file, {
+                            cacheControl: '3600',
+                            upsert: true
+                        });
+
+                    if (uploadError) {
+                        console.error(`Upload error (${bucket}):`, uploadError.message);
+                        showMessage(`Failed to upload file: ${uploadError.message}`, 'error');
+                        return null;
+                    }
+
+                    const { data: publicUrlData } = supabase.storage
+                        .from(bucket)
+                        .getPublicUrl(filePath);
+
+                    return publicUrlData.publicUrl;
+                } catch (error) {
+                    console.error(`Unexpected error during ${bucket} upload:`, error);
+                    showMessage('An error occurred while uploading the file.', 'error');
+                    return null;
+                }
+            }
+
+            document.getElementById('profilePictureInput').addEventListener('change', async (event) => {
+                const file = event.target.files[0];
+                if (!file) {
+                    showMessage('No file selected.', 'error');
+                    return;
+                }
+
+                imagePreview.src = URL.createObjectURL(file);
+                showMessage('Uploading profile picture...', 'success', 5000);
+
+                const fileExtension = file.name.split('.').pop();
+                const filePath = `${currentUserId}/avatar.${fileExtension}`;
+                const newAvatarUrl = await uploadFile(file, SUPABASE_PROFILE_BUCKET, filePath);
+
+                if (newAvatarUrl) {
+                    try {
+                        const { error: updateError } = await supabase
+                            .from('users')
+                            .update({ avatar_url: newAvatarUrl })
+                            .eq('id', currentUserId);
+
+                        if (updateError) {
+                            console.error('Error updating profile avatar_url:', updateError.message);
+                            showMessage(`Failed to update profile picture in database: ${updateError.message}`, 'error');
+                        } else {
+                            imagePreview.src = newAvatarUrl;
+                            showMessage('Profile picture updated successfully!');
+                        }
+                    } catch (error) {
+                        console.error('Unexpected error during profile picture update:', error);
+                        showMessage('An error occurred while updating the profile picture.', 'error');
+                    }
+                }
+                event.target.value = '';
+            });
+
+            document.getElementById('fingerprintInput').addEventListener('change', async (event) => {
+                const file = event.target.files[0];
+                if (!file) {
+                    showMessage('No file selected.', 'error');
+                    return;
+                }
+
+                fingerprintPreview.src = URL.createObjectURL(file);
+                showMessage('Uploading fingerprint...', 'success', 5000);
+
+                const fileExtension = file.name.split('.').pop();
+                const filePath = `${currentUserId}/fingerprint.${fileExtension}`;
+                const newFingerprintUrl = await uploadFile(file, SUPABASE_FINGERPRINT_BUCKET, filePath);
+
+                if (newFingerprintUrl) {
+                    try {
+                        const { error: updateError } = await supabase
+                            .from('users')
+                            .update({ fingerprint_url: newFingerprintUrl })
+                            .eq('id', currentUserId);
+
+                        if (updateError) {
+                            console.error('Error updating fingerprint_url:', updateError.message);
+                            showMessage(`Failed to update fingerprint in database: ${updateError.message}`, 'error');
+                        } else {
+                            fingerprintPreview.src = newFingerprintUrl;
+                            showMessage('Fingerprint updated successfully!');
+                        }
+                    } catch (error) {
+                        console.error('Unexpected error during fingerprint update:', error);
+                        showMessage('An error occurred while updating the fingerprint.', 'error');
+                    }
+                }
+                event.target.value = '';
+            });
+
+            document.getElementById('signatureInput').addEventListener('change', async (event) => {
+                const file = event.target.files[0];
+                if (!file) {
+                    showMessage('No file selected.', 'error');
+                    return;
+                }
+
+                signaturePreview.src = URL.createObjectURL(file);
+                showMessage('Uploading signature...', 'success', 5000);
+
+                const fileExtension = file.name.split('.').pop();
+                const filePath = `${currentUserId}/signature.${fileExtension}`;
+                const newSignatureUrl = await uploadFile(file, SUPABASE_SIGNATURE_BUCKET, filePath);
+
+                if (newSignatureUrl) {
+                    try {
+                        const { error: updateError } = await supabase
+                            .from('users')
+                            .update({ signature_url: newSignatureUrl })
+                            .eq('id', currentUserId);
+
+                        if (updateError) {
+                            console.error('Error updating signature_url:', updateError.message);
+                            showMessage(`Failed to update signature in database: ${updateError.message}`, 'error');
+                        } else {
+                            signaturePreview.src = newSignatureUrl;
+                            showMessage('Signature updated successfully!');
+                        }
+                    } catch (error) {
+                        console.error('Unexpected error during signature update:', error);
+                        showMessage('An error occurred while updating the signature.', 'error');
+                    }
+                }
+                event.target.value = '';
+            });
+
+            document.getElementById('updateProfileBtn').addEventListener('click', async function() {
+                const updateBtn = document.getElementById('updateProfileBtn');
+                updateBtn.disabled = true;
+                updateBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Saving...';
+                settingsMessage.textContent = '';
+
+                const fullName = document.getElementById('settingFullName').value.trim();
+                const address = document.getElementById('settingAddress').value.trim();
+                const dateOfBirth = document.getElementById('settingDateOfBirth').value;
+
+                if (!fullName) {
+                    showMessage('Full Name is required.', 'error');
+                    updateBtn.disabled = false;
+                    updateBtn.innerHTML = '<i class="fas fa-save mr-2"></i>Save Profile';
+                    return;
+                }
+
+                try {
+                    const updatedData = {
+                        full_name: fullName,
+                        address: address,
+                        date_of_birth: dateOfBirth,
+                        updated_at: new Date().toISOString()
+                    };
+
+                    const { data, error } = await supabase
+                        .from('users')
+                        .update(updatedData)
+                        .eq('id', currentUserId);
+
+                    if (error) {
+                        console.error('Error updating profile:', error.message);
+                        showMessage(`Failed to update profile: ${error.message}`, 'error');
+                    } else {
+                        showMessage('Profile saved successfully!', 'success');
+                    }
+                } catch (error) {
+                    console.error('Unexpected error during profile update:', error);
+                    showMessage('An error occurred while updating the profile.', 'error');
+                } finally {
+                    updateBtn.disabled = false;
+                    updateBtn.innerHTML = '<i class="fas fa-save mr-2"></i>Save Profile';
+                }
+            });
+
+            document.getElementById('updateEmailBtn').addEventListener('click', async function() {
+                const updateEmailBtn = document.getElementById('updateEmailBtn');
+                updateEmailBtn.disabled = true;
+                updateEmailBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Updating...';
+
+                const newEmail = document.getElementById('newEmail').value.trim();
+                const currentEmail = document.getElementById('currentEmail').value.trim();
+
+                if (!newEmail) {
+                    showMessage('New email address is required.', 'error');
+                    updateEmailBtn.disabled = false;
+                    updateEmailBtn.innerHTML = '<i class="fas fa-envelope mr-2"></i>Update Email';
+                    return;
+                }
+
+                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) {
+                    showMessage('Please enter a valid email address.', 'error');
+                    updateEmailBtn.disabled = false;
+                    updateEmailBtn.innerHTML = '<i class="fas fa-envelope mr-2"></i>Update Email';
+                    return;
+                }
+
+                if (newEmail === currentEmail) {
+                    showMessage('New email cannot be the same as current email.', 'error');
+                    updateEmailBtn.disabled = false;
+                    updateEmailBtn.innerHTML = '<i class="fas fa-envelope mr-2"></i>Update Email';
+                    return;
+                }
+
+                try {
+                    const { data, error } = await supabase.auth.updateUser({ email: newEmail });
+
+                    if (error) {
+                        console.error('Error updating email:', error.message);
+                        showMessage(`Failed to update email: ${error.message}`, 'error');
+                    } else {
+                        showMessage('Email update initiated. Please check your NEW email for a confirmation link!', 'success', 5000);
+                        document.getElementById('currentEmail').value = newEmail;
+                        document.getElementById('newEmail').value = '';
+                    }
+                } catch (error) {
+                    console.error('Unexpected error during email update:', error);
+                    showMessage('An error occurred while updating the email.', 'error');
+                } finally {
+                    updateEmailBtn.disabled = false;
+                    updateEmailBtn.innerHTML = '<i class="fas fa-envelope mr-2"></i>Update Email';
+                }
+            });
+
+            document.getElementById('updatePasswordBtn').addEventListener('click', async function() {
+                const updatePasswordBtn = document.getElementById('updatePasswordBtn');
+                updatePasswordBtn.disabled = true;
+                updatePasswordBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Updating...';
+
+                const newPassword = document.getElementById('newPassword').value;
+                const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+
+                if (!newPassword || !confirmNewPassword) {
+                    showMessage('Both password fields are required.', 'error');
+                    updatePasswordBtn.disabled = false;
+                    updatePasswordBtn.innerHTML = '<i class="fas fa-lock mr-2"></i>Update Password';
+                    return;
+                }
+
+                if (newPassword !== confirmNewPassword) {
+                    showMessage('Passwords do not match.', 'error');
+                    updatePasswordBtn.disabled = false;
+                    updatePasswordBtn.innerHTML = '<i class="fas fa-lock mr-2"></i>Update Password';
+                    return;
+                }
+
+                if (newPassword.length < 6) {
+                    showMessage('Password must be at least 6 characters long.', 'error');
+                    updatePasswordBtn.disabled = false;
+                    updatePasswordBtn.innerHTML = '<i class="fas fa-lock mr-2"></i>Update Password';
+                    return;
+                }
+
+                try {
+                    const { data, error } = await supabase.auth.updateUser({ password: newPassword });
+
+                    if (error) {
+                        console.error('Error updating password:', error.message);
+                        showMessage(`Failed to update password: ${error.message}`, 'error');
+                    } else {
+                        showMessage('Password updated successfully!');
+                        document.getElementById('newPassword').value = '';
+                        document.getElementById('confirmNewPassword').value = '';
+                    }
+                } catch (error) {
+                    console.error('Unexpected error during password update:', error);
+                    showMessage('An error occurred while updating the password.', 'error');
+                } finally {
+                    updatePasswordBtn.disabled = false;
+                    updatePasswordBtn.innerHTML = '<i class="fas fa-lock mr-2"></i>Update Password';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
