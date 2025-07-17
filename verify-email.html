@@ -1,87 +1,219 @@
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', async function () {
-        const SUPABASE_URL = 'https://nvxqorudztbpwyanakdj.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52cHFvcnVdenRicHd5YW5ha2RqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIzOTk5NTQsImV4cCI6MjA2Nzk3NTk1NH0.XvITDAnpEkjQTh4SCVOfwGKsaANS6tp58Up37SXwYRw';
-
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        const statusTitle = document.getElementById('statusTitle');
-        const statusMessage = document.getElementById('statusMessage');
-        const iconContainer = document.getElementById('iconContainer');
-        const resendButton = document.getElementById('resendButton');
-
-        function updateUI(title, message, iconClass, iconType = 'info', enableResend = false) {
-            statusTitle.textContent = title;
-            statusMessage.textContent = message;
-            iconContainer.innerHTML = `<i class="${iconClass} message-icon ${iconType}"></i>`;
-            resendButton.disabled = !enableResend;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Verification - NOVA7</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F3F2EF;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
         }
-
-        // Try to get user directly (after confirmation link click)
-        const { data: { user }, error } = await supabase.auth.getUser();
-
-        if (error) {
-            console.log("No user found after email verification link:", error.message);
-            updateUI(
-                "Email Confirmation Failed",
-                "We couldn't verify your email. Please try logging in or contact support.",
-                "fas fa-exclamation-triangle",
-                "error"
-            );
-            return;
+        .container {
+            background-color: #FFFFFF;
+            padding: 2.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
         }
-
-        if (user && user.email_confirmed_at) {
-            console.log("Email is verified:", user.email);
-            updateUI(
-                "Email Verified!",
-                "Your email has been successfully verified. Redirecting to your dashboard...",
-                "fas fa-check-circle",
-                "success"
-            );
-            setTimeout(() => {
-                window.location.href = "dashboard.html";
-            }, 3000);
-        } else {
-            console.log("User exists but email not yet verified:", user.email);
-            updateUI(
-                "Almost there!",
-                "Please check your inbox and click the confirmation link to verify your email.",
-                "fas fa-envelope-open-text",
-                "info",
-                true
-            );
+        .message-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
         }
+        .message-icon.info { color: #2563EB; } /* Blue */
+        .message-icon.success { color: #10B981; } /* Green */
+        .message-icon.error { color: #EF4444; } /* Red */
 
-        resendButton.addEventListener('click', async function () {
-            resendButton.disabled = true;
-            resendButton.textContent = 'Sending...';
+        .btn-action { /* Unified button style */
+            background-color: #0A66C2;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 20px;
+            font-weight: 600;
+            transition: background-color 0.2s;
+            border: none;
+            cursor: pointer;
+            margin-top: 1.5rem;
+            display: inline-block; /* For login link/button */
+        }
+        .btn-action:hover {
+            background-color: #004182;
+        }
+        .btn-action:disabled {
+            background-color: #A0AEC0;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="iconContainer" class="mb-4">
+            </div>
+        <h1 id="statusTitle" class="text-2xl font-bold text-gray-900 mb-3">Loading...</h1>
+        <p id="statusMessage" class="text-gray-700 mb-6">Checking your email verification status...</p>
+        <button id="mainActionButton" class="btn-action" style="display: none;">Resend Verification Email</button>
+    </div>
 
-            const { error } = await supabase.auth.resend({
-                type: 'signup',
-                email: user.email
-            });
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async function () {
+            const SUPABASE_URL = 'https://nvxqorudztbpwyanakdj.supabase.co';
+            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52cHFvcnVdenRicHd5YW5ha2RqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIzOTk5NTQsImV4cCI6MjA2Nzk3NTk1NH0.XvITDAnpEkjQTh4SCVOfwGKsaANS6tp58Up37SXwYRw';
 
-            if (error) {
+            const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+            const statusTitle = document.getElementById('statusTitle');
+            const statusMessage = document.getElementById('statusMessage');
+            const iconContainer = document.getElementById('iconContainer');
+            const mainActionButton = document.getElementById('mainActionButton'); // Renamed for dual purpose
+
+            // Function to update UI elements and button visibility/text
+            function updateUI(title, message, iconClass, iconType = 'info', buttonText = '', buttonAction = null, enableButton = false) {
+                if (statusTitle) statusTitle.textContent = title;
+                if (statusMessage) statusMessage.textContent = message;
+                if (iconContainer) iconContainer.innerHTML = `<i class="${iconClass} message-icon ${iconType}"></i>`;
+                
+                if (mainActionButton) {
+                    mainActionButton.textContent = buttonText;
+                    mainActionButton.style.display = enableButton ? 'inline-block' : 'none';
+                    mainActionButton.disabled = !enableButton;
+                    
+                    // Remove previous listeners to prevent multiple actions
+                    const oldButton = mainActionButton;
+                    const newButton = oldButton.cloneNode(true);
+                    oldButton.parentNode.replaceChild(newButton, oldButton);
+                    
+                    if (buttonAction) {
+                        newButton.addEventListener('click', buttonAction);
+                    }
+                }
+            }
+
+            // --- Core logic for handling email verification ---
+            try {
+                const { data: { user }, error } = await supabase.auth.getUser();
+
+                if (error) {
+                    console.log("Error getting user after email verification link:", error.message);
+                    updateUI(
+                        "Verification Failed",
+                        "We couldn't verify your email or the link has expired. Please try logging in or resend the link.",
+                        "fas fa-exclamation-triangle",
+                        "error",
+                        "Resend Verification Email",
+                        async () => { // Action for resend
+                            mainActionButton.disabled = true;
+                            mainActionButton.textContent = 'Sending...';
+                            const { error: resendError } = await supabase.auth.resend({
+                                type: 'signup',
+                                email: user ? user.email : '' // Use user's email if available
+                            });
+                            if (resendError) {
+                                updateUI("Resend Failed!", `Failed to resend: ${resendError.message}`, "fas fa-times-circle", "error", "Resend Verification Email", null, true);
+                            } else {
+                                updateUI("Email Sent!", `A new verification link has been sent.`, "fas fa-check-circle", "success", "Resend Verification Email", null, true);
+                            }
+                        },
+                        true // Enable resend button
+                    );
+                    return; // Stop further execution if no user or error
+                }
+
+                if (user && user.email_confirmed_at) {
+                    console.log("Email is already verified or successfully verified:", user.email);
+                    updateUI(
+                        "Email Verified!",
+                        "Your email has been successfully verified. You can now log in.",
+                        "fas fa-check-circle",
+                        "success",
+                        "Login Now", // Button text for success
+                        () => { window.location.href = "login.html"; }, // Action for login button
+                        true // Enable login button
+                    );
+                    // Clear URL hash after successful session setting and verification check
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                } else if (user) {
+                    // This case handles when the user is logged in, but their email_confirmed_at is null
+                    console.log("User logged in but email not yet confirmed:", user.email);
+                    updateUI(
+                        "Almost there!",
+                        `Please check your inbox (${user.email}) and click the confirmation link to verify your email.`,
+                        "fas fa-envelope-open-text",
+                        "info",
+                        "Resend Verification Email",
+                        async () => { // Action for resend
+                            mainActionButton.disabled = true;
+                            mainActionButton.textContent = 'Sending...';
+                            const { error: resendError } = await supabase.auth.resend({
+                                type: 'signup',
+                                email: user.email
+                            });
+                            if (resendError) {
+                                updateUI("Resend Failed!", `Failed to resend: ${resendError.message}`, "fas fa-times-circle", "error", "Resend Verification Email", null, true);
+                            } else {
+                                updateUI("Email Sent!", `A new verification link has been sent to ${user.email}.`, "fas fa-check-circle", "success", "Resend Verification Email", null, true);
+                            }
+                        },
+                        true // Enable resend button
+                    );
+                } else {
+                    // Fallback for cases where no user is found and no explicit error
+                    console.log("No user session found, and no explicit error. Please use email link.");
+                     updateUI(
+                        "Action Needed",
+                        "Please use the verification link sent to your email to confirm your account.",
+                        "fas fa-info-circle",
+                        "info",
+                        "", // No button text
+                        null, // No action
+                        false // Button disabled
+                    );
+                }
+            } catch (e) {
+                console.error("An unexpected error occurred during user retrieval:", e);
                 updateUI(
-                    "Resend Failed!",
-                    `Failed to resend verification email: ${error.message}`,
+                    "Error",
+                    "An unexpected error occurred. Please try again or contact support.",
                     "fas fa-times-circle",
                     "error",
-                    true
-                );
-            } else {
-                updateUI(
-                    "Email Sent!",
-                    `A new verification link has been sent to ${user.email}.`,
-                    "fas fa-check-circle",
-                    "success",
+                    "Resend Verification Email", // Provide resend option even on unexpected error
+                    async () => {
+                         mainActionButton.disabled = true;
+                         mainActionButton.textContent = 'Sending...';
+                         // Attempt to resend without knowing user email if no session is available from getUser()
+                         // This would typically require an email input from the user on the page itself,
+                         // but for this simplified logic, we just attempt if an email from a user object was briefly available.
+                         // For true robustness here, you'd add an input field if user is null.
+                         const emailForResend = prompt("Please enter your email to resend the verification link:");
+                         if (emailForResend) {
+                            const { error: resendError } = await supabase.auth.resend({
+                                type: 'signup',
+                                email: emailForResend
+                            });
+                            if (resendError) {
+                                updateUI("Resend Failed!", `Failed to resend: ${resendError.message}`, "fas fa-times-circle", "error", "Resend Verification Email", null, true);
+                            } else {
+                                updateUI("Email Sent!", `A new verification link has been sent to ${emailForResend}.`, "fas fa-check-circle", "success", "Resend Verification Email", null, true);
+                            }
+                         } else {
+                             updateUI("Resend Failed!", "Email required for resend.", "fas fa-times-circle", "error", "Resend Verification Email", null, true);
+                         }
+                         mainActionButton.textContent = 'Resend Verification Email';
+                    },
                     true
                 );
             }
-
-            resendButton.textContent = 'Resend Verification Email';
         });
-    });
-</script>
+    </script>
+</body>
+</html>
