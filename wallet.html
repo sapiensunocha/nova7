@@ -1038,10 +1038,17 @@
                 }
 
                 try {
+                    let orQueryString = `full_name.ilike.%${query}%,email.ilike.%${query}%`;
+                    // Basic check for UUID format to prevent 'invalid input syntax' error
+                    const isUUID = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(query);
+                    if (isUUID) {
+                        orQueryString += `,id.eq.${query}`;
+                    }
+
                     const { data, error } = await supabase
                         .from('users')
                         .select('id, full_name, email')
-                        .or(`full_name.ilike.%${query}%,email.ilike.%${query}%,id.eq.${query}`)
+                        .or(orQueryString) // Use the dynamically built query string
                         .neq('id', userId)
                         .limit(5);
 
@@ -1092,10 +1099,17 @@
                 }
 
                 try {
+                    let orQueryString = `full_name.ilike.%${query}%,email.ilike.%${query}%`;
+                    // Basic check for UUID format to prevent 'invalid input syntax' error
+                    const isUUID = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(query);
+                    if (isUUID) {
+                        orQueryString += `,id.eq.${query}`;
+                    }
+
                     const { data, error } = await supabase
                         .from('users')
                         .select('id, full_name, email')
-                        .or(`full_name.ilike.%${query}%,email.ilike.%${query}%,id.eq.${query}`)
+                        .or(orQueryString) // Use the dynamically built query string
                         .neq('id', userId)
                         .limit(5);
 
@@ -1207,6 +1221,81 @@
                 }
             }
 
+            // Handle Withdrawal
+            async function handleWithdrawal(event) {
+                event.preventDefault();
+                const amount = parseFloat(document.getElementById('withdrawalAmount').value);
+                const method = document.getElementById('withdrawalMethod').value;
+                const account = document.getElementById('withdrawalAccount').value.trim();
+                const submitBtn = document.getElementById('withdrawalSubmitBtn');
+                const messageDiv = document.getElementById('withdrawalMessage');
+
+                if (isNaN(amount) || amount < 1 || !method || !account) {
+                    showMessage('Please fill in all withdrawal details correctly.', 'error');
+                    messageDiv.textContent = 'Invalid withdrawal details.';
+                    return;
+                }
+
+                if (method === 'office_withdrawal' && account.length < 5) {
+                    showMessage('Please provide a valid reference for office withdrawal.', 'error');
+                    messageDiv.textContent = 'Reference must be at least 5 characters.';
+                    return;
+                }
+
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
+                messageDiv.textContent = '';
+
+                try {
+                    const { data: transactions, error: balanceError } = await supabase
+                        .from('transactions')
+                        .select('amount')
+                        .eq('user_id', userId)
+                        .in('status', ['completed']);
+
+                    if (balanceError) {
+                        throw new Error('Failed to check balance.');
+                    }
+
+                    const balance = transactions.reduce((sum, tx) => sum + parseFloat(tx.amount), 0);
+                    if (balance < amount) {
+                        showMessage('Insufficient balance for withdrawal.', 'error');
+                        messageDiv.textContent = 'Insufficient balance.';
+                        return;
+                    }
+
+                    const { error: txError } = await supabase
+                        .from('transactions')
+                        .insert({
+                            user_id: userId,
+                            amount: -amount,
+                            type: 'withdrawal',
+                            status: 'pending',
+                            description: `Withdrawal via ${method}: ${account}`,
+                            created_at: new Date().toISOString()
+                        });
+
+                    if (txError) {
+                        console.error('Error recording withdrawal:', txError.message);
+                        showMessage('Failed to process withdrawal.', 'error');
+                        messageDiv.textContent = 'Failed to process withdrawal.';
+                        return;
+                    }
+
+                    showMessage('Withdrawal request submitted successfully!', 'success');
+                    messageDiv.textContent = 'Withdrawal request submitted!';
+                    document.getElementById('withdrawalForm').reset();
+                    await fetchWalletBalance();
+                    await fetchTransactionHistory();
+                } catch (error) {
+                    console.error('Withdrawal error:', error);
+                    showMessage(`Withdrawal failed: ${error.message}`, 'error');
+                    messageDiv.textContent = `Error: ${error.message}`;
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Confirm Withdrawal';
+                }
+            }
             // Handle Transfer
             async function handleTransfer(event) {
                 event.preventDefault();
@@ -1576,8 +1665,6 @@
                             type: 'withdrawal',
                             status: 'pending',
                             description: `Withdrawal via ${method}: ${account}`,
-                            method: method,
-                            account: account,
                             created_at: new Date().toISOString()
                         });
 
