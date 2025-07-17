@@ -728,10 +728,10 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52eHFvcnVkenRicHd5YW5ha2RqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIzOTk5NTQsImV4cCI6MjA2Nzk3NTk1NH0.XvITDAnpEkjQTh4SCVOfwGKsaANS6tp58Up37SXwYRw';
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         const LOVE_AMOUNT = 1.00; // $1 per love
-
+    
         let currentUser = null;
         let currentBalance = 0;
-
+    
         document.addEventListener('DOMContentLoaded', async function() {
             // Check for active Supabase session
             const { data: { session }, error: sessionError } = await supabase.auth.getSession();
@@ -740,13 +740,13 @@
                 window.location.href = 'login.html';
                 return;
             }
-
+    
             currentUser = session.user;
             console.log("Current user:", currentUser);
-
+    
             // Fetch user profile
             await fetchUserProfile();
-
+    
             // Update user welcome in desktop header
             const desktopUserWelcomeElement = document.getElementById('desktopUserWelcome');
             if (desktopUserWelcomeElement && currentUser.full_name) {
@@ -754,7 +754,7 @@
             } else if (desktopUserWelcomeElement && currentUser.email) {
                 desktopUserWelcomeElement.textContent = `Welcome, ${currentUser.email.split('@')[0]}!`;
             }
-
+    
             // Update create post avatar
             const createPostAvatar = document.getElementById('createPostAvatar');
             if (createPostAvatar) {
@@ -763,23 +763,23 @@
                 } else if (currentUser.email) {
                     createPostAvatar.textContent = currentUser.email.charAt(0).toUpperCase();
                 }
-                if (currentUser.profile_picture_url) {
-                    createPostAvatar.innerHTML = `<img src="${currentUser.profile_picture_url}" alt="Profile" class="w-full h-full rounded-full object-cover">`;
+                if (currentUser.avatar_url) {
+                    createPostAvatar.innerHTML = `<img src="${currentUser.avatar_url}" alt="Profile" class="w-full h-full rounded-full object-cover">`;
                 } else {
                     createPostAvatar.innerHTML = `<span>${createPostAvatar.textContent}</span>`;
                 }
             }
-
+    
             await fetchUserBalance();
             await fetchPosts();
             await fetchMarketplaceHighlights();
-
+    
             // Event Listeners
             document.getElementById('submitPostBtn').addEventListener('click', createPost);
             document.getElementById('uploadImageBtn').addEventListener('click', () => document.getElementById('postImageUpload').click());
             document.getElementById('postImageUpload').addEventListener('change', previewImage);
             document.getElementById('removeImageBtn').addEventListener('click', removeImage);
-
+    
             const sidebarLogoutLink = document.getElementById('sidebarLogoutLink');
             if (sidebarLogoutLink) sidebarLogoutLink.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); });
             const mobileLogoutLink = document.getElementById('mobileLogoutLink');
@@ -800,7 +800,7 @@
                 });
             });
         });
-
+    
         async function handleLogout() {
             const { error } = await supabase.auth.signOut();
             if (error) {
@@ -810,16 +810,16 @@
                 window.location.href = 'login.html';
             }
         }
-
+    
         async function fetchUserProfile() {
             if (!currentUser || !currentUser.id) return;
             try {
                 const { data, error } = await supabase
                     .from('users')
-                    .select('full_name, profile_picture_url')
+                    .select('full_name, avatar_url, email')
                     .eq('id', currentUser.id)
                     .single();
-
+    
                 if (error) {
                     console.error("Error fetching user profile:", error.message);
                     if (error.code !== 'PGRST116') {
@@ -827,13 +827,14 @@
                     }
                 } else if (data) {
                     currentUser.full_name = data.full_name;
-                    currentUser.profile_picture_url = data.profile_picture_url;
+                    currentUser.avatar_url = data.avatar_url;
+                    currentUser.email = data.email;
                 }
             } catch (err) {
                 console.error("Unexpected error fetching user profile:", err);
             }
         }
-
+    
         async function fetchUserBalance() {
             if (!currentUser || !currentUser.id) {
                 console.warn("No current user to fetch balance for.");
@@ -845,13 +846,13 @@
                     .select('amount, type, user_id, recipient_id, status')
                     .or(`user_id.eq.${currentUser.id},recipient_id.eq.${currentUser.id}`)
                     .eq('status', 'completed');
-
+    
                 if (error) {
                     console.error("Supabase Error fetching transactions for balance:", error.message);
                     showMessage('Failed to load balance.', 'error');
                     return;
                 }
-
+    
                 let balance = 0;
                 if (transactions) {
                     transactions.forEach(tx => {
@@ -878,23 +879,23 @@
                 showMessage('Network error while fetching balance.', 'error');
             }
         }
-
+    
         async function createPost() {
             const postContent = document.getElementById('postContent').value;
             const postImageUpload = document.getElementById('postImageUpload');
             const imageFile = postImageUpload.files[0];
-
+    
             if (!postContent.trim() && !imageFile) {
                 showMessage('Post content or an image is required!', 'error');
                 return;
             }
-
+    
             if (!currentUser || !currentUser.id) {
                 showMessage('You must be logged in to create a post.', 'error');
                 handleLogout();
                 return;
             }
-
+    
             let imageUrl = null;
             if (imageFile) {
                 try {
@@ -905,14 +906,14 @@
                             cacheControl: '3600',
                             upsert: false
                         });
-
+    
                     if (uploadError) {
                         throw uploadError;
                     }
                     const { data: publicUrlData } = supabase.storage
                         .from('post-images')
                         .getPublicUrl(filePath);
-
+    
                     imageUrl = publicUrlData.publicUrl;
                     console.log("Uploaded image public URL:", imageUrl);
                 } catch (error) {
@@ -921,7 +922,7 @@
                     return;
                 }
             }
-
+    
             try {
                 const { data, error } = await supabase
                     .from('posts')
@@ -939,11 +940,11 @@
                     ])
                     .select()
                     .single();
-
+    
                 if (error) {
                     throw error;
                 }
-
+    
                 showMessage('Post created successfully!', 'success');
                 document.getElementById('postContent').value = '';
                 removeImage();
@@ -953,11 +954,11 @@
                 showMessage(`Failed to create post: ${error.message}`, 'error');
             }
         }
-
+    
         async function fetchPosts() {
             const postFeedDiv = document.getElementById('postFeed');
             postFeedDiv.innerHTML = '<p class="text-gray-500 text-center py-4" id="loadingPostsMessage">Loading posts...</p>';
-
+    
             try {
                 const { data: posts, error } = await supabase
                     .from('posts')
@@ -973,45 +974,51 @@
                         users (
                             id,
                             full_name,
-                            profile_picture_url
+                            email,
+                            avatar_url
                         ),
                         likes (user_id)
                     `)
                     .order('created_at', { ascending: false });
-
+    
                 if (error) {
                     throw error;
                 }
-
+    
+                console.log('Posts data:', posts); // Debug the response
+    
                 postFeedDiv.innerHTML = '';
-
+    
                 if (posts.length === 0) {
                     postFeedDiv.innerHTML = '<p class="text-gray-500 text-center py-4">No posts yet. Be the first to share!</p>';
                     return;
                 }
-
+    
                 posts.forEach(post => {
                     const isMyPost = currentUser && post.users && currentUser.id === post.users.id;
                     const isLikedByMe = post.likes && post.likes.some(like => like.user_id === currentUser.id);
-
+    
                     const postElement = document.createElement('div');
                     postElement.className = 'card-base post-card';
-
-                    const authorName = post.users ? post.users.full_name || 'Anonymous' : 'Anonymous';
-                    const authorAvatarUrl = post.users ? post.users.profile_picture_url : null;
-
+    
+                    const authorName = post.users
+                        ? post.users.full_name || post.users.email?.split('@')[0] || 'Anonymous'
+                        : 'Anonymous';
+                    const authorAvatarUrl = post.users ? post.users.avatar_url : null;
+    
                     const avatarHtml = authorAvatarUrl
                         ? `<img src="${authorAvatarUrl}" alt="Profile" class="w-full h-full rounded-full object-cover">`
                         : `<span>${authorName.charAt(0).toUpperCase()}</span>`;
-
+    
                     const postDate = new Date(post.created_at);
                     const formattedTime = timeDifference(new Date(), postDate);
-
-                    const mediaHtml = post.media_url ?
-                        `<div class="post-image">
-                            <img src="${post.media_url}" alt="Post image" loading="lazy">
-                        </div>` : '';
-
+    
+                    const mediaHtml = post.media_url
+                        ? `<div class="post-image">
+                             <img src="${post.media_url}" alt="Post image" loading="lazy">
+                           </div>`
+                        : '';
+    
                     postElement.innerHTML = `
                         <div class="post-header">
                             <div class="post-avatar">${avatarHtml}</div>
@@ -1054,7 +1061,7 @@
                             </div>
                             <div class="add-comment-area">
                                 <div class="comment-avatar" id="addCommentAvatar-${post.id}">
-                                    ${currentUser && currentUser.profile_picture_url ? `<img src="${currentUser.profile_picture_url}" alt="Profile">` : (currentUser && currentUser.full_name ? currentUser.full_name.charAt(0).toUpperCase() : (currentUser && currentUser.email ? currentUser.email.charAt(0).toUpperCase() : 'U'))}
+                                    ${currentUser && currentUser.avatar_url ? `<img src="${currentUser.avatar_url}" alt="Profile">` : (currentUser && currentUser.full_name ? currentUser.full_name.charAt(0).toUpperCase() : (currentUser && currentUser.email ? currentUser.email.charAt(0).toUpperCase() : 'U'))}
                                 </div>
                                 <textarea placeholder="Add a comment..." rows="1" class="comment-input" data-post-id="${post.id}"></textarea>
                                 <button class="btn-primary-action post-comment-btn" data-post-id="${post.id}">Post</button>
@@ -1062,28 +1069,28 @@
                         </div>
                     `;
                     postFeedDiv.appendChild(postElement);
-
+    
                     // Add event listeners
                     const likeButton = postElement.querySelector(`.like-btn[data-post-id="${post.id}"]`);
                     if (likeButton) {
                         likeButton.addEventListener('click', () => likePost(post.id, likeButton));
                     }
-
+    
                     const loveButton = postElement.querySelector(`.love-btn[data-post-id="${post.id}"]`);
                     if (loveButton) {
                         loveButton.addEventListener('click', () => lovePost(post.id, loveButton, post.users.id));
                     }
-
+    
                     const commentToggleButton = postElement.querySelector(`.comment-toggle-btn[data-post-id="${post.id}"]`);
                     if (commentToggleButton) {
                         commentToggleButton.addEventListener('click', () => toggleCommentsSection(post.id));
                     }
-
+    
                     const postCommentButton = postElement.querySelector(`.post-comment-btn[data-post-id="${post.id}"]`);
                     if (postCommentButton) {
                         postCommentButton.addEventListener('click', () => addComment(post.id, postElement.querySelector(`.comment-input[data-post-id="${post.id}"]`)));
                     }
-
+    
                     const postOptionsBtn = postElement.querySelector(`.post-options-btn[data-post-id="${post.id}"]`);
                     if (postOptionsBtn) {
                         postOptionsBtn.addEventListener('click', (e) => {
@@ -1106,17 +1113,17 @@
                 showMessage('Failed to load posts.', 'error');
             }
         }
-
+    
         async function likePost(postId, buttonElement) {
             if (!currentUser || !currentUser.id) {
                 showMessage('You must be logged in to like a post.', 'error');
                 return;
             }
-
+    
             const isCurrentlyLiked = buttonElement.classList.contains('liked');
             const likesCountElement = document.getElementById(`likesCount-${postId}`);
             let currentLikes = parseInt(likesCountElement.textContent);
-
+    
             try {
                 if (isCurrentlyLiked) {
                     const { error } = await supabase
@@ -1124,9 +1131,9 @@
                         .delete()
                         .eq('post_id', postId)
                         .eq('user_id', currentUser.id);
-
+    
                     if (error) throw error;
-
+    
                     buttonElement.classList.remove('liked');
                     likesCountElement.textContent = currentLikes - 1;
                     await supabase
@@ -1140,9 +1147,9 @@
                         .insert([
                             { post_id: postId, user_id: currentUser.id, created_at: new Date().toISOString() }
                         ]);
-
+    
                     if (error) throw error;
-
+    
                     buttonElement.classList.add('liked');
                     likesCountElement.textContent = currentLikes + 1;
                     await supabase
@@ -1156,7 +1163,7 @@
                 showMessage(`Failed to ${isCurrentlyLiked ? 'unlike' : 'like'} post: ${error.message}`, 'error');
             }
         }
-
+    
         async function lovePost(postId, buttonElement, postOwnerId) {
             if (!currentUser || !currentUser.id) {
                 showMessage('You must be logged in to love a post.', 'error');
@@ -1166,15 +1173,15 @@
                 showMessage("You cannot love your own post.", 'error');
                 return;
             }
-
+    
             if (currentBalance < LOVE_AMOUNT) {
                 showMessage('Insufficient balance to love this post. Please top up your wallet.', 'error');
                 return;
             }
-
+    
             buttonElement.disabled = true;
             buttonElement.textContent = 'Loving...';
-
+    
             try {
                 const { data: existingLove, error: checkError } = await supabase
                     .from('loves')
@@ -1182,7 +1189,7 @@
                     .eq('post_id', postId)
                     .eq('user_id', currentUser.id)
                     .maybeSingle();
-
+    
                 if (checkError) {
                     throw checkError;
                 }
@@ -1190,7 +1197,7 @@
                     showMessage('You have already loved this post.', 'error');
                     return;
                 }
-
+    
                 const { error: loveError } = await supabase
                     .from('loves')
                     .insert([
@@ -1201,11 +1208,11 @@
                             created_at: new Date().toISOString()
                         }
                     ]);
-
+    
                 if (loveError) {
                     throw loveError;
                 }
-
+    
                 const { error: txError } = await supabase
                     .from('transactions')
                     .insert([
@@ -1227,13 +1234,13 @@
                             created_at: new Date().toISOString()
                         }
                     ]);
-
+    
                 if (txError) {
                     console.error('Error recording love payment:', txError.message);
                     showMessage('Love added, but failed to record payment.', 'error');
                     return;
                 }
-
+    
                 const lovesCountElement = document.getElementById(`lovesCount-${postId}`);
                 let currentLoves = parseInt(lovesCountElement.textContent);
                 lovesCountElement.textContent = currentLoves + 1;
@@ -1241,7 +1248,7 @@
                     .from('posts')
                     .update({ loves_count: currentLoves + 1 })
                     .eq('id', postId);
-
+    
                 showMessage(`You loved this post for $${LOVE_AMOUNT.toFixed(2)}!`, 'success');
                 await fetchUserBalance();
             } catch (error) {
@@ -1252,7 +1259,7 @@
                 buttonElement.innerHTML = '<i class="fas fa-heart"></i>Love ($1)';
             }
         }
-
+    
         async function updatePostCounts(postId) {
             try {
                 const { data, error } = await supabase
@@ -1260,9 +1267,9 @@
                     .select('likes_count, loves_count, comments_count')
                     .eq('id', postId)
                     .single();
-
+    
                 if (error) throw error;
-
+    
                 if (data) {
                     document.getElementById(`likesCount-${postId}`).textContent = data.likes_count || 0;
                     document.getElementById(`lovesCount-${postId}`).textContent = data.loves_count || 0;
@@ -1272,11 +1279,11 @@
                 console.error(`Error updating counts for post ${postId}:`, error.message);
             }
         }
-
+    
         async function fetchComments(postId) {
             const commentsListDiv = document.getElementById(`commentsList-${postId}`);
             commentsListDiv.innerHTML = '<p class="text-gray-500 text-center py-2 text-sm">Loading comments...</p>';
-
+    
             try {
                 const { data: comments, error } = await supabase
                     .from('comments')
@@ -1287,35 +1294,38 @@
                         users (
                             id,
                             full_name,
-                            profile_picture_url
+                            email,
+                            avatar_url
                         )
                     `)
                     .eq('post_id', postId)
                     .order('created_at', { ascending: true });
-
+    
                 if (error) throw error;
-
+    
                 commentsListDiv.innerHTML = '';
-
+    
                 if (comments.length === 0) {
                     commentsListDiv.innerHTML = '<p class="text-gray-500 text-center py-2 text-sm">No comments yet.</p>';
                     return;
                 }
-
+    
                 comments.forEach(comment => {
                     const commentElement = document.createElement('div');
                     commentElement.className = 'comment';
-                    const commenterName = comment.users ? comment.users.full_name || 'Anonymous' : 'Anonymous';
-                    const commenterAvatarUrl = comment.users ? comment.users.profile_picture_url : null;
+                    const commenterName = comment.users
+                        ? comment.users.full_name || comment.users.email?.split('@')[0] || 'Anonymous'
+                        : 'Anonymous';
+                    const commenterAvatarUrl = comment.users ? comment.users.avatar_url : null;
                     const isMyComment = currentUser && comment.users && currentUser.id === comment.users.id;
-
+    
                     const avatarHtml = commenterAvatarUrl
                         ? `<img src="${commenterAvatarUrl}" alt="Profile">`
                         : `<span>${commenterName.charAt(0).toUpperCase()}</span>`;
-
+    
                     const commentDate = new Date(comment.created_at);
                     const formattedCommentTime = timeDifference(new Date(), commentDate);
-
+    
                     commentElement.innerHTML = `
                         <div class="comment-avatar">${avatarHtml}</div>
                         <div class="comment-content-wrapper">
@@ -1335,7 +1345,7 @@
                         </div>
                     `;
                     commentsListDiv.appendChild(commentElement);
-
+    
                     const commentOptionsBtn = commentElement.querySelector(`.comment-options-btn[data-comment-id="${comment.id}"]`);
                     if (commentOptionsBtn) {
                         commentOptionsBtn.addEventListener('click', (e) => {
@@ -1357,19 +1367,19 @@
                 commentsListDiv.innerHTML = `<p class="text-red-500 text-center py-2 text-sm">Failed to load comments: ${error.message}.</p>`;
             }
         }
-
+    
         async function addComment(postId, commentInput) {
             if (!currentUser || !currentUser.id) {
                 showMessage('You must be logged in to comment.', 'error');
                 return;
             }
-
+    
             const commentContent = commentInput.value.trim();
             if (!commentContent) {
                 showMessage('Comment cannot be empty.', 'error');
                 return;
             }
-
+    
             try {
                 const { data, error } = await supabase
                     .from('comments')
@@ -1381,9 +1391,9 @@
                             created_at: new Date().toISOString()
                         }
                     ]);
-
+    
                 if (error) throw error;
-
+    
                 const commentsCountElement = document.getElementById(`commentsCount-${postId}`);
                 let currentComments = parseInt(commentsCountElement.textContent);
                 commentsCountElement.textContent = currentComments + 1;
@@ -1391,7 +1401,7 @@
                     .from('posts')
                     .update({ comments_count: currentComments + 1 })
                     .eq('id', postId);
-
+    
                 showMessage('Comment added!', 'success');
                 commentInput.value = '';
                 fetchComments(postId);
@@ -1400,13 +1410,13 @@
                 showMessage(`Failed to add comment: ${error.message}`, 'error');
             }
         }
-
+    
         async function editPost(postId, currentContent) {
             const postElement = document.querySelector(`.post-card .post-options-btn[data-post-id="${postId}"]`).closest('.post-card');
             const postContentDiv = postElement.querySelector('.post-content');
-
+    
             document.getElementById(`postOptionsDropdown-${postId}`).classList.add('hidden');
-
+    
             const originalContent = postContentDiv.innerHTML;
             postContentDiv.innerHTML = `
                 <textarea class="w-full border border-blue-500 rounded-md p-2 text-sm" rows="4">${currentContent}</textarea>
@@ -1415,13 +1425,13 @@
                     <button class="btn-primary-action save-edit-post-btn">Save</button>
                 </div>
             `;
-
+    
             const textarea = postContentDiv.querySelector('textarea');
             const saveBtn = postContentDiv.querySelector('.save-edit-post-btn');
             const cancelBtn = postContentDiv.querySelector('.cancel-edit-post-btn');
-
+    
             textarea.focus();
-
+    
             saveBtn.addEventListener('click', async () => {
                 const newContent = textarea.value.trim();
                 if (!newContent) {
@@ -1434,9 +1444,9 @@
                         .update({ content: newContent, edited: true })
                         .eq('id', postId)
                         .eq('user_id', currentUser.id);
-
+    
                     if (error) throw error;
-
+    
                     showMessage('Post updated successfully!', 'success');
                     await fetchPosts();
                 } catch (error) {
@@ -1444,12 +1454,12 @@
                     showMessage(`Failed to update post: ${error.message}`, 'error');
                 }
             });
-
+    
             cancelBtn.addEventListener('click', () => {
                 postContentDiv.innerHTML = originalContent;
             });
         }
-
+    
         async function deletePost(postId, mediaUrl) {
             if (!confirm('Are you sure you want to delete this post?')) {
                 return;
@@ -1462,15 +1472,15 @@
                         console.warn("Could not delete image from storage:", storageError.message);
                     }
                 }
-
+    
                 const { error } = await supabase
                     .from('posts')
                     .delete()
                     .eq('id', postId)
                     .eq('user_id', currentUser.id);
-
+    
                 if (error) throw error;
-
+    
                 showMessage('Post deleted successfully!', 'success');
                 document.getElementById('postFeed').querySelector(`.post-card .post-options-btn[data-post-id="${postId}"]`).closest('.post-card').remove();
             } catch (error) {
@@ -1478,13 +1488,13 @@
                 showMessage(`Failed to delete post: ${error.message}`, 'error');
             }
         }
-
+    
         async function editComment(commentId, currentContent, commentElement) {
             const commentTextDiv = commentElement.querySelector('.comment-text');
             const originalCommentHtml = commentTextDiv.innerHTML;
-
+    
             document.getElementById(`commentOptionsDropdown-${commentId}`).classList.add('hidden');
-
+    
             commentTextDiv.innerHTML = `
                 <div class="edit-comment-area">
                     <textarea rows="2">${currentContent}</textarea>
@@ -1497,9 +1507,9 @@
             const textarea = commentTextDiv.querySelector('textarea');
             const saveBtn = commentTextDiv.querySelector('.save-btn');
             const cancelBtn = commentTextDiv.querySelector('.cancel-btn');
-
+    
             textarea.focus();
-
+    
             saveBtn.addEventListener('click', async () => {
                 const newContent = textarea.value.trim();
                 if (!newContent) {
@@ -1512,9 +1522,9 @@
                         .update({ content: newContent, edited: true })
                         .eq('id', commentId)
                         .eq('user_id', currentUser.id);
-
+    
                     if (error) throw error;
-
+    
                     showMessage('Comment updated successfully!', 'success');
                     commentTextDiv.innerHTML = newContent;
                 } catch (error) {
@@ -1522,12 +1532,12 @@
                     showMessage(`Failed to update comment: ${error.message}`, 'error');
                 }
             });
-
+    
             cancelBtn.addEventListener('click', () => {
                 commentTextDiv.innerHTML = originalCommentHtml;
             });
         }
-
+    
         async function deleteComment(commentId, postId) {
             if (!confirm('Are you sure you want to delete this comment?')) {
                 return;
@@ -1538,9 +1548,9 @@
                     .delete()
                     .eq('id', commentId)
                     .eq('user_id', currentUser.id);
-
+    
                 if (error) throw error;
-
+    
                 const commentsCountElement = document.getElementById(`commentsCount-${postId}`);
                 let currentComments = parseInt(commentsCountElement.textContent);
                 commentsCountElement.textContent = currentComments - 1;
@@ -1548,7 +1558,7 @@
                     .from('posts')
                     .update({ comments_count: currentComments - 1 })
                     .eq('id', postId);
-
+    
                 showMessage('Comment deleted successfully!', 'success');
                 fetchComments(postId);
             } catch (error) {
@@ -1556,12 +1566,12 @@
                 showMessage(`Failed to delete comment: ${error.message}`, 'error');
             }
         }
-
+    
         function previewImage(event) {
             const [file] = event.target.files;
             const imagePreview = document.getElementById('imagePreview');
             const imagePreviewContainer = document.getElementById('imagePreviewContainer');
-
+    
             if (file) {
                 imagePreview.src = URL.createObjectURL(file);
                 imagePreviewContainer.classList.remove('hidden');
@@ -1569,17 +1579,17 @@
                 removeImage();
             }
         }
-
+    
         function removeImage() {
             const imagePreview = document.getElementById('imagePreview');
             const imagePreviewContainer = document.getElementById('imagePreviewContainer');
             const postImageUpload = document.getElementById('postImageUpload');
-
+    
             imagePreview.src = '#';
             imagePreviewContainer.classList.add('hidden');
             postImageUpload.value = '';
         }
-
+    
         function toggleCommentsSection(postId) {
             const commentsSection = document.getElementById(`commentsSection-${postId}`);
             commentsSection.classList.toggle('hidden');
@@ -1587,7 +1597,7 @@
                 fetchComments(postId);
             }
         }
-
+    
         function togglePostOptionsDropdown(postId) {
             document.querySelectorAll('.post-options-dropdown:not(.hidden)').forEach(dropdown => {
                 if (dropdown.id !== `postOptionsDropdown-${postId}`) {
@@ -1596,7 +1606,7 @@
             });
             document.getElementById(`postOptionsDropdown-${postId}`).classList.toggle('hidden');
         }
-
+    
         function toggleCommentOptionsDropdown(commentId) {
             document.querySelectorAll('.comment-options-dropdown:not(.hidden)').forEach(dropdown => {
                 if (dropdown.id !== `commentOptionsDropdown-${commentId}`) {
@@ -1605,16 +1615,16 @@
             });
             document.getElementById(`commentOptionsDropdown-${commentId}`).classList.toggle('hidden');
         }
-
+    
         function timeDifference(current, previous) {
             const msPerMinute = 60 * 1000;
             const msPerHour = msPerMinute * 60;
             const msPerDay = msPerHour * 24;
             const msPerMonth = msPerDay * 30;
             const msPerYear = msPerDay * 365;
-
+    
             const elapsed = current - previous;
-
+    
             if (elapsed < msPerMinute) {
                 return Math.round(elapsed / 1000) + ' seconds ago';
             } else if (elapsed < msPerHour) {
@@ -1629,7 +1639,7 @@
                 return 'approximately ' + Math.round(elapsed / msPerYear) + ' years ago';
             }
         }
-
+    
         let messageTimeout;
         function showMessage(message, type = 'success') {
             const messageBox = document.getElementById('messageBox');
@@ -1640,32 +1650,32 @@
                 messageBox.classList.remove('show');
             }, 3000);
         }
-
+    
         async function fetchMarketplaceHighlights() {
             const marketplaceHighlightsDiv = document.getElementById('marketplaceHighlights');
             marketplaceHighlightsDiv.innerHTML = '<p class="text-xs text-gray-500">Loading marketplace items...</p>';
-
+    
             try {
                 const { data: items, error } = await supabase
                     .from('marketplace_items')
                     .select('title, price, image_url')
                     .limit(3)
                     .order('created_at', { ascending: false });
-
+    
                 if (error) throw error;
-
+    
                 if (items.length === 0) {
                     marketplaceHighlightsDiv.innerHTML = '<p class="text-xs text-gray-500">No marketplace items available yet.</p>';
                     return;
                 }
-
+    
                 let itemsHtml = '';
                 items.forEach(item => {
                     itemsHtml += `
                         <div class="marketplace-item">
-                            <img src="${item.image_url || 'https://via.placeholder.com/50x50?text=NoImg'}" alt="${item.name}" class="marketplace-item-img">
+                            <img src="${item.image_url || 'https://via.placeholder.com/50x50?text=NoImg'}" alt="${item.title}" class="marketplace-item-img">
                             <div class="marketplace-item-info">
-                                <p class="marketplace-item-name">${item.name}</p>
+                                <p class="marketplace-item-name">${item.title}</p>
                                 <p class="marketplace-item-price">$${parseFloat(item.price).toFixed(2)}</p>
                             </div>
                         </div>
