@@ -538,27 +538,28 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
+        
         document.addEventListener('DOMContentLoaded', async function() {
             // Supabase client initialization
             const SUPABASE_URL = 'https://nvxqorudztbpwyanakdj.supabase.co';
             const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52eHFvcnVkenRicHd5YW5ha2RqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIzOTk5NTQsImV4cCI6MjA2Nzk3NTk1NH0.XvITDAnpEkjQTh4SCVOfwGKsaANS6tp58Up37SXwYRw';
             const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             console.log("Supabase client initialized.");
-
+        
             const PRODUCT_IMAGE_BUCKET = 'nova7-marketplace-products';
             const TRANSACTION_FEE_RATE = 0.001; // 0.1% fee
             let currentPage = 1;
             let currentFilters = {};
             let userName = 'User';
             let userId = null;
-
+        
             // DOM elements
             const messageBox = document.getElementById('messageBox');
             const aiSummaryText = document.getElementById('aiSummaryText');
             const verificationMessage = document.getElementById('verificationMessage');
             const marketplaceContent = document.getElementById('marketplaceContent');
             const resendButton = document.getElementById('resendVerification');
-
+        
             // Function to show messages
             function showMessage(message, type = 'success', duration = 3000) {
                 messageBox.textContent = message;
@@ -572,20 +573,20 @@
                     messageBox.classList.remove('show');
                 }, duration);
             }
-
+        
             // Function to handle logout
             async function handleLogout() {
                 console.log("Marketplace: Logging out and redirecting to login.html");
                 await supabase.auth.signOut();
                 window.location.href = 'login.html';
             }
-
+        
             // Event listeners for logout links
             const sidebarLogoutLink = document.getElementById('sidebarLogoutLink');
             if (sidebarLogoutLink) sidebarLogoutLink.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); });
             const mobileLogoutLink = document.getElementById('mobileLogoutLink');
             if (mobileLogoutLink) mobileLogoutLink.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); });
-
+        
             // Mobile sidebar toggle
             const hamburgerBtnMobile = document.getElementById('hamburgerBtnMobile');
             const sidebar = document.getElementById('sidebar');
@@ -597,7 +598,7 @@
                     sidebar.classList.remove('open');
                 }
             });
-
+        
             // Fetch user session
             const { data: { session }, error: sessionError } = await supabase.auth.getSession();
             if (sessionError || !session) {
@@ -605,21 +606,20 @@
                 handleLogout();
                 return;
             }
-
+        
             const user = session.user;
             userId = user.id;
             console.log("Supabase User:", user);
-
+        
             // Check email verification status
             if (user && !user.email_confirmed_at && user.email) {
                 verificationMessage.classList.remove('hidden');
                 marketplaceContent.classList.add('hidden');
                 showMessage(
-                    verificationMessage.querySelector('.ai-summary-text'),
                     `Your account is not yet verified. Please check your email (${user.email}) for the verification link.`,
                     'error'
                 );
-
+        
                 // Resend verification email
                 if (resendButton) {
                     resendButton.addEventListener('click', async () => {
@@ -633,25 +633,13 @@
                             });
                             if (error) {
                                 console.error('Resend error:', error.message);
-                                showMessage(
-                                    verificationMessage.querySelector('.ai-summary-text'),
-                                    `Failed to resend verification email: ${error.message}`,
-                                    'error'
-                                );
+                                showMessage(`Failed to resend verification email: ${error.message}`, 'error');
                             } else {
-                                showMessage(
-                                    verificationMessage.querySelector('.ai-summary-text'),
-                                    `Verification email resent to ${user.email}`,
-                                    'success'
-                                );
+                                showMessage(`Verification email resent to ${user.email}`, 'success');
                             }
                         } catch (err) {
                             console.error('Unexpected resend error:', err);
-                            showMessage(
-                                verificationMessage.querySelector('.ai-summary-text'),
-                                'Unexpected error. Please try again.',
-                                'error'
-                            );
+                            showMessage('Unexpected error. Please try again.', 'error');
                         } finally {
                             resendButton.disabled = false;
                             resendButton.textContent = 'Resend Verification Email';
@@ -660,11 +648,11 @@
                 }
                 return;
             }
-
+        
             // Show marketplace content for verified users
             verificationMessage.classList.add('hidden');
             marketplaceContent.classList.remove('hidden');
-
+        
             try {
                 // Fetch user profile
                 const { data: profile, error: profileError } = await supabase
@@ -672,14 +660,14 @@
                     .select('full_name')
                     .eq('id', user.id)
                     .maybeSingle();
-
+        
                 if (profileError) {
                     console.error('Error fetching user profile:', profileError.message);
                     userName = 'User';
                 } else {
                     userName = profile?.full_name || 'User';
                 }
-
+        
                 // Update greeting
                 const greetingElement = document.getElementById('personalizedGreeting');
                 const desktopUserWelcomeElement = document.getElementById('desktopUserWelcome');
@@ -692,11 +680,11 @@
                     greetingElement.textContent = `${timeOfDayGreeting}, ${userName}!`;
                 }
                 if (desktopUserWelcomeElement) desktopUserWelcomeElement.textContent = `Welcome, ${userName}!`;
-
+        
                 // Initial fetch of marketplace items and price trends
                 fetchMarketplaceItems(currentPage, currentFilters);
                 renderPriceTrendChart();
-
+        
                 // Event listeners for form and filters
                 document.getElementById('postProductForm').addEventListener('submit', handlePostProduct);
                 document.getElementById('applyMarketFiltersBtn').addEventListener('click', () => {
@@ -708,12 +696,91 @@
                     currentPage = 1;
                     fetchMarketplaceItems(currentPage, currentFilters);
                 });
-
+        
             } catch (error) {
                 console.error('Marketplace: Error fetching data from Supabase:', error);
                 showMessage('Failed to load marketplace data. Please try again.', 'error');
             }
-
+        
+            // Helper function to check wallet balance
+            async function checkWalletBalance(userId, requiredAmount) {
+                try {
+                    const { data, error } = await supabase
+                        .from('wallets')
+                        .select('balance')
+                        .eq('user_id', userId)
+                        .single();
+        
+                    if (error) {
+                        console.error('Error fetching wallet balance:', error.message);
+                        return { sufficient: false, balance: 0 };
+                    }
+        
+                    const balance = data?.balance || 0;
+                    return { sufficient: balance >= requiredAmount, balance };
+                } catch (error) {
+                    console.error('Unexpected error checking wallet balance:', error);
+                    return { sufficient: false, balance: 0 };
+                }
+            }
+        
+            // Helper function to update wallet balance
+            async function updateWalletBalance(userId, amount) {
+                try {
+                    const { data: wallet, error: fetchError } = await supabase
+                        .from('wallets')
+                        .select('balance')
+                        .eq('user_id', userId)
+                        .single();
+        
+                    if (fetchError) {
+                        console.error('Error fetching wallet for update:', fetchError.message);
+                        return false;
+                    }
+        
+                    const newBalance = (wallet?.balance || 0) + amount;
+                    if (newBalance < 0) {
+                        return false; // Prevent negative balance
+                    }
+        
+                    const { error: updateError } = await supabase
+                        .from('wallets')
+                        .update({ balance: newBalance })
+                        .eq('user_id', userId);
+        
+                    if (updateError) {
+                        console.error('Error updating wallet balance:', updateError.message);
+                        return false;
+                    }
+        
+                    return true;
+                } catch (error) {
+                    console.error('Unexpected error updating wallet balance:', error);
+                    return false;
+                }
+            }
+        
+            // Helper function to notify seller
+            async function notifySeller(sellerId, productId, productName) {
+                try {
+                    const { error } = await supabase
+                        .from('notifications')
+                        .insert({
+                            user_id: sellerId,
+                            message: `A buyer has requested to purchase your product: ${productName}. Please confirm delivery.`,
+                            product_id: productId,
+                            created_at: new Date().toISOString(),
+                            status: 'pending'
+                        });
+        
+                    if (error) {
+                        console.error('Error sending notification to seller:', error.message);
+                    }
+                } catch (error) {
+                    console.error('Unexpected error sending notification:', error);
+                }
+            }
+        
             async function handlePostProduct(event) {
                 event.preventDefault();
                 const productImageInput = document.getElementById('productImageUpload');
@@ -723,7 +790,7 @@
                 const productDescription = document.getElementById('productDescription').value.trim();
                 const postProductBtn = document.getElementById('postProductBtn');
                 const messageDiv = document.getElementById('postProductMessage');
-
+        
                 if (!productImageInput.files.length) {
                     showMessage('Please upload a product image.', 'error');
                     return;
@@ -732,11 +799,11 @@
                     showMessage('Please fill in all product details correctly.', 'error');
                     return;
                 }
-
+        
                 postProductBtn.disabled = true;
                 postProductBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Posting...';
                 messageDiv.textContent = '';
-
+        
                 try {
                     // Upload product image to Supabase storage
                     const file = productImageInput.files[0];
@@ -745,15 +812,15 @@
                     const { data: uploadData, error: uploadError } = await supabase.storage
                         .from(PRODUCT_IMAGE_BUCKET)
                         .upload(`public/${fileName}`, file);
-
+        
                     if (uploadError) {
                         console.error('Image upload error:', uploadError.message);
                         showMessage('Failed to upload product image.', 'error');
                         return;
                     }
-
+        
                     const imageUrl = `${SUPABASE_URL}/storage/v1/object/public/${PRODUCT_IMAGE_BUCKET}/public/${fileName}`;
-
+        
                     // Insert product into Supabase
                     const { data, error } = await supabase
                         .from('products')
@@ -768,19 +835,19 @@
                         })
                         .select()
                         .single();
-
+        
                     if (error) {
                         console.error('Error posting product:', error.message);
                         showMessage(`Failed to post product: ${error.message}`, 'error');
                         return;
                     }
-
+        
                     showMessage('Product posted successfully!', 'success');
                     document.getElementById('postProductForm').reset();
                     productImageInput.value = '';
                     fetchMarketplaceItems(currentPage, currentFilters);
                     renderPriceTrendChart();
-
+        
                 } catch (error) {
                     console.error('Unexpected error posting product:', error);
                     showMessage('An error occurred while posting the product.', 'error');
@@ -789,23 +856,154 @@
                     postProductBtn.innerHTML = '<i class="fas fa-plus-circle mr-2"></i>Post Product';
                 }
             }
-
+        
+            async function handleBuyProduct(event) {
+                const productId = event.currentTarget.dataset.productId;
+                const productPrice = parseFloat(event.currentTarget.dataset.productPrice);
+                const sellerId = event.currentTarget.dataset.sellerId;
+                const buyButton = event.currentTarget;
+        
+                if (userId === sellerId) {
+                    showMessage('You cannot buy your own product.', 'error');
+                    return;
+                }
+        
+                const fee = productPrice * TRANSACTION_FEE_RATE;
+                const totalAmount = productPrice + fee;
+        
+                if (!confirm(`Are you sure you want to buy this product for $${totalAmount.toFixed(2)} (including ${TRANSACTION_FEE_RATE * 100}% fee)? Funds will be held until delivery is confirmed.`)) {
+                    return;
+                }
+        
+                buyButton.disabled = true;
+                buyButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
+        
+                try {
+                    // Check buyer's wallet balance
+                    const { sufficient, balance } = await checkWalletBalance(userId, totalAmount);
+                    if (!sufficient) {
+                        showMessage(`Insufficient funds. Your balance is $${balance.toFixed(2)}, but $${totalAmount.toFixed(2)} is required.`, 'error');
+                        return;
+                    }
+        
+                    // Deduct funds from buyer's wallet and hold in escrow
+                    const deductSuccess = await updateWalletBalance(userId, -totalAmount);
+                    if (!deductSuccess) {
+                        showMessage('Failed to process payment due to wallet error.', 'error');
+                        return;
+                    }
+        
+                    // Fetch product details for notification
+                    const { data: product, error: productError } = await supabase
+                        .from('products')
+                        .select('name')
+                        .eq('id', productId)
+                        .single();
+        
+                    if (productError) {
+                        console.error('Error fetching product details:', productError.message);
+                        showMessage('Failed to fetch product details.', 'error');
+                        // Refund buyer due to error
+                        await updateWalletBalance(userId, totalAmount);
+                        return;
+                    }
+        
+                    // Record pending transaction in escrow
+                    const { data: transaction, error: transactionError } = await supabase
+                        .from('transactions')
+                        .insert({
+                            user_id: userId,
+                            amount: -totalAmount,
+                            transaction_type: 'product_buy',
+                            description: `Purchase of product ID ${productId} (pending delivery)`,
+                            product_id: productId,
+                            status: 'pending',
+                            created_at: new Date().toISOString()
+                        })
+                        .select()
+                        .single();
+        
+                    if (transactionError) {
+                        console.error('Error recording transaction:', transactionError.message);
+                        showMessage('Purchase failed: Transaction error.', 'error');
+                        // Refund buyer
+                        await updateWalletBalance(userId, totalAmount);
+                        return;
+                    }
+        
+                    // Notify seller
+                    await notifySeller(sellerId, productId, product.name);
+        
+                    showMessage('Purchase request sent! Funds are held until the seller confirms delivery.', 'success');
+                    fetchMarketplaceItems(currentPage, currentFilters);
+        
+                } catch (error) {
+                    console.error('Error buying product:', error);
+                    showMessage('An error occurred during purchase.', 'error');
+                    // Attempt to refund buyer
+                    await updateWalletBalance(userId, totalAmount);
+                } finally {
+                    buyButton.disabled = false;
+                    buyButton.innerHTML = '<i class="fas fa-shopping-cart mr-2"></i>Buy Now';
+                }
+            }
+        
+            // Function to handle seller delivery confirmation
+            async function confirmDelivery(transactionId, productId, sellerId, buyerId, productPrice) {
+                try {
+                    // Update transaction status to completed
+                    const { error: updateError } = await supabase
+                        .from('transactions')
+                        .update({
+                            status: 'completed',
+                            description: `Purchase of product ID ${productId} (delivery confirmed)`,
+                            updated_at: new Date().toISOString()
+                        })
+                        .eq('id', transactionId);
+        
+                    if (updateError) {
+                        console.error('Error updating transaction status:', updateError.message);
+                        return false;
+                    }
+        
+                    // Transfer funds to seller
+                    const sellerCreditSuccess = await updateWalletBalance(sellerId, productPrice);
+                    if (!sellerCreditSuccess) {
+                        console.error('Error crediting seller wallet.');
+                        // Optionally, revert transaction status or handle manually
+                        return false;
+                    }
+        
+                    // Update notification status
+                    await supabase
+                        .from('notifications')
+                        .update({ status: 'completed' })
+                        .eq('product_id', productId)
+                        .eq('user_id', sellerId);
+        
+                    return true;
+                } catch (error) {
+                    console.error('Error confirming delivery:', error);
+                    return false;
+                }
+            }
+        
             async function fetchMarketplaceItems(page = 1, filters = {}) {
                 const productListingsDiv = document.getElementById('productListings');
                 const noProductsMessage = document.getElementById('noProductsMessage');
                 const paginationControls = document.getElementById('paginationControls');
                 const limit = 10;
-
+        
                 productListingsDiv.innerHTML = '<p class="md:col-span-full text-center text-gray-500 py-4">Loading products...</p>';
                 noProductsMessage.classList.add('hidden');
                 paginationControls.innerHTML = '';
-
+        
                 try {
                     let query = supabase
                         .from('products')
                         .select('id, name, description, price, category, image_url, seller_id, created_at', { count: 'exact' })
                         .range((page - 1) * limit, page * limit - 1);
-
+        
                     if (filters.search) {
                         query = query.or(`name.ilike.%${filters.search}%,description.ilike.%${filters.search}%`);
                     }
@@ -818,15 +1016,15 @@
                     } else {
                         query = query.order('created_at', { ascending: false });
                     }
-
+        
                     const { data: products, error, count } = await query;
-
+        
                     if (error) {
                         console.error('Error fetching products:', error.message);
                         productListingsDiv.innerHTML = `<p class="md:col-span-full text-center text-red-500 py-4">Failed to load products: ${error.message}</p>`;
                         return;
                     }
-
+        
                     productListingsDiv.innerHTML = '';
                     if (!products || products.length === 0) {
                         noProductsMessage.classList.remove('hidden');
@@ -841,24 +1039,24 @@
                                 <div class="product-info">
                                     <h3 class="product-title">${product.name}</h3>
                                     <p class="product-description">${product.description}</p>
-                                    <p class="product-price">$${parseFloat(product.price).toFixed(2)}</p>
+                                    <p class="product-price">$$  {parseFloat(product.price).toFixed(2)}</p>
                                     <button class="buy-button" data-product-id="${product.id}" data-product-price="${product.price}" data-seller-id="${product.seller_id}" ${product.seller_id === userId ? 'disabled' : ''}>
                                         <i class="fas fa-shopping-cart mr-2"></i>${product.seller_id === userId ? 'Your Product' : 'Buy Now'}
                                     </button>
                                 </div>
                             `;
                             productListingsDiv.appendChild(productCard);
-
+        
                             const buyButton = productCard.querySelector('.buy-button');
                             if (buyButton && !buyButton.disabled) {
                                 buyButton.addEventListener('click', handleBuyProduct);
                             }
                         });
-
+        
                         const totalPages = Math.ceil(count / limit);
                         renderPagination(totalPages, page);
                     }
-
+        
                     // Update summary message
                     if (aiSummaryText) {
                         const summaryMessage = products && products.length
@@ -866,86 +1064,17 @@
                             : `No products available in the Marketplace yet.`;
                         aiSummaryText.innerHTML = summaryMessage;
                     }
-
+        
                 } catch (error) {
                     console.error('Error fetching marketplace items:', error);
                     productListingsDiv.innerHTML = '<p class="md:col-span-full text-center text-red-500 py-4">Network error while loading products.</p>';
                 }
             }
-
-            async function handleBuyProduct(event) {
-                const productId = event.currentTarget.dataset.productId;
-                const productPrice = parseFloat(event.currentTarget.dataset.productPrice);
-                const sellerId = event.currentTarget.dataset.sellerId;
-                const buyButton = event.currentTarget;
-
-                if (confirm(`Are you sure you want to buy this product for $${productPrice.toFixed(2)}? A ${TRANSACTION_FEE_RATE * 100}% transaction fee will apply.`)) {
-                    buyButton.disabled = true;
-                    buyButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
-
-                    if (userId === sellerId) {
-                        showMessage('You cannot buy your own product.', 'error');
-                        buyButton.disabled = false;
-                        buyButton.innerHTML = '<i class="fas fa-shopping-cart mr-2"></i>Your Product';
-                        return;
-                    }
-
-                    try {
-                        const fee = productPrice * TRANSACTION_FEE_RATE;
-                        const totalAmount = productPrice + fee;
-
-                        // Record transaction in Supabase
-                        const { error: transactionError } = await supabase
-                            .from('transactions')
-                            .insert({
-                                user_id: userId,
-                                amount: -totalAmount,
-                                transaction_type: 'product_buy',
-                                description: `Purchase of product ID ${productId}`,
-                                created_at: new Date().toISOString()
-                            });
-
-                        if (transactionError) {
-                            console.error('Error recording transaction:', transactionError.message);
-                            showMessage(`Purchase failed: ${transactionError.message}`, 'error');
-                            return;
-                        }
-
-                        // Record seller's income
-                        const { error: sellerTransactionError } = await supabase
-                            .from('transactions')
-                            .insert({
-                                user_id: sellerId,
-                                amount: productPrice,
-                                transaction_type: 'product_sell',
-                                description: `Sale of product ID ${productId}`,
-                                created_at: new Date().toISOString()
-                            });
-
-                        if (sellerTransactionError) {
-                            console.error('Error recording seller transaction:', sellerTransactionError.message);
-                            showMessage('Purchase completed, but seller transaction failed.', 'error');
-                            return;
-                        }
-
-                        showMessage('Purchase completed successfully!', 'success');
-                        fetchMarketplaceItems(currentPage, currentFilters);
-                        renderPriceTrendChart();
-
-                    } catch (error) {
-                        console.error('Error buying product:', error);
-                        showMessage('An error occurred during purchase.', 'error');
-                    } finally {
-                        buyButton.disabled = false;
-                        buyButton.innerHTML = '<i class="fas fa-shopping-cart mr-2"></i>Buy Now';
-                    }
-                }
-            }
-
+        
             function renderPagination(totalPages, currentPageNum) {
                 const paginationControls = document.getElementById('paginationControls');
                 paginationControls.innerHTML = '';
-
+        
                 const prevButton = document.createElement('button');
                 prevButton.innerHTML = '<i class="fas fa-chevron-left"></i> Prev';
                 prevButton.disabled = currentPageNum === 1;
@@ -954,12 +1083,12 @@
                     fetchMarketplaceItems(currentPage, currentFilters);
                 });
                 paginationControls.appendChild(prevButton);
-
+        
                 const pageInfo = document.createElement('span');
                 pageInfo.classList.add('page-info');
                 pageInfo.textContent = `Page ${currentPageNum} of ${totalPages}`;
                 paginationControls.appendChild(pageInfo);
-
+        
                 const nextButton = document.createElement('button');
                 nextButton.innerHTML = 'Next <i class="fas fa-chevron-right"></i>';
                 nextButton.disabled = currentPageNum >= totalPages;
@@ -969,7 +1098,7 @@
                 });
                 paginationControls.appendChild(nextButton);
             }
-
+        
             async function renderPriceTrendChart() {
                 const noDataDiv = document.getElementById('priceTrendNoData');
                 const canvas = document.getElementById('priceTrendChart');
@@ -979,23 +1108,23 @@
                         .select('price, created_at')
                         .order('created_at', { ascending: true })
                         .limit(50);
-
+        
                     if (error) {
                         console.error('Error fetching product price trends:', error.message);
                         noDataDiv.classList.remove('hidden');
                         canvas.classList.add('hidden');
                         return;
                     }
-
+        
                     if (!products || products.length === 0) {
                         noDataDiv.classList.remove('hidden');
                         canvas.classList.add('hidden');
                         return;
                     }
-
+        
                     noDataDiv.classList.add('hidden');
                     canvas.classList.remove('hidden');
-
+        
                     const labels = products.map(p => new Date(p.created_at).toLocaleDateString());
                     const data = products.map(p => parseFloat(p.price) || 0);
                     const ctx = canvas.getContext('2d');
@@ -1019,17 +1148,10 @@
                             responsive: true,
                             maintainAspectRatio: false,
                             scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    title: { display: true, text: 'Price ($)' }
-                                },
-                                x: {
-                                    title: { display: true, text: 'Date' }
-                                }
+                                y: { beginAtZero: true, title: { display: true, text: 'Price ($)' } },
+                                x: { title: { display: true, text: 'Date' } }
                             },
-                            plugins: {
-                                legend: { position: 'top' }
-                            }
+                            plugins: { legend: { position: 'top' } }
                         }
                     });
                 } catch (error) {
