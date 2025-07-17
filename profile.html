@@ -44,7 +44,7 @@
         .sidebar-logo-img {
             max-height: 120px;
             width: auto;
-            filter: brightness(0) invert(1); /* Makes logo white */
+            filter: brightness(0) invert(1);
         }
         .sidebar-nova7 .nav-link-sidebar {
             display: flex;
@@ -73,19 +73,19 @@
 
         /* Main Content Area */
         .main-content-area {
-            margin-left: 260px; /* Space for fixed sidebar */
+            margin-left: 260px;
             padding: 1.5rem;
-            width: calc(100% - 260px); /* Adjust width for sidebar */
+            width: calc(100% - 260px);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            align-items: center; /* Center card horizontally */
-            flex-grow: 1; /* Allow it to grow and fill available space */
+            align-items: center;
+            flex-grow: 1;
         }
 
         /* Mobile Header */
         .mobile-header {
-            display: none; /* Hidden by default */
+            display: none;
             background-color: #FFFFFF;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             padding: 0 1rem;
@@ -111,19 +111,19 @@
             .main-content-area {
                 margin-left: 0;
                 width: 100%;
-                padding-top: calc(60px + 1.5rem); /* Adjust for fixed mobile header */
+                padding-top: calc(60px + 1.5rem);
             }
             .mobile-header {
-                display: flex; /* Show mobile header on small screens */
+                display: flex;
             }
         }
 
         /* Print button container */
         .print-button-container {
-            width: 100%; /* Take full width of main content area */
+            width: 100%;
             display: flex;
-            justify-content: flex-end; /* Align to the right */
-            margin-bottom: 1.5rem; /* Space below the button */
+            justify-content: flex-end;
+            margin-bottom: 1.5rem;
         }
 
         .print-button {
@@ -141,46 +141,45 @@
         }
 
         #id-card-container {
-            width: 800px; /* Fixed width for the card */
-            height: 475px; /* Fixed height for the card */
+            width: 800px;
+            height: 475px;
             background-color: white;
             border-radius: 16px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.15);
             padding: 24px;
             display: flex;
             flex-direction: column;
-            margin-bottom: 2rem; /* Space below the card */
-            overflow: hidden; /* Ensure content stays within bounds */
+            margin-bottom: 2rem;
+            overflow: hidden;
         }
-        @media (max-width: 850px) { /* Adjust for smaller screens to prevent overflow */
+        @media (max-width: 850px) {
             #id-card-container {
-                width: 95%; /* Make it responsive */
-                max-width: 800px; /* Max width for larger screens */
-                height: auto; /* Allow height to adjust */
-                min-height: 475px; /* Minimum height */
-                padding: 1rem; /* Reduce padding on smaller screens */
+                width: 95%;
+                max-width: 800px;
+                height: auto;
+                min-height: 475px;
+                padding: 1rem;
             }
             #id-card-body {
-                flex-direction: column; /* Stack columns on smaller screens */
+                flex-direction: column;
                 align-items: center;
                 gap: 1rem;
             }
             #id-card-left, #id-card-right {
                 width: 100%;
-                border: none; /* Remove borders when stacked */
+                border: none;
                 padding: 0;
             }
             #id-card-photo {
                 margin-bottom: 1rem;
             }
             #id-card-info {
-                grid-template-columns: 1fr; /* Single column for info on small screens */
+                grid-template-columns: 1fr;
             }
             #id-card-bottom-right-section {
                 margin-top: 1rem;
             }
         }
-
 
         #id-card-header {
             display: flex;
@@ -201,7 +200,7 @@
         #id-card-body {
             display: flex;
             flex-grow: 1;
-            padding-top: 0px; /* Adjusted padding */
+            padding-top: 0;
             gap: 24px;
         }
         #id-card-left {
@@ -211,55 +210,31 @@
             align-items: center;
             padding-right: 12px;
             border-right: 1px solid #e2e8f0;
-            justify-content: space-between; /* Space out photo, fingerprint, signature */
+            justify-content: space-between;
         }
         #id-card-photo {
             width: 150px;
-            height: 190px; /* Rectangular photo */
+            height: 220px; /* Increased height to use fingerprint space */
             background-color: #e2e8f0;
             border: 4px solid #004182;
-            border-radius: 8px; /* Slightly rounded corners for photo */
+            border-radius: 8px;
             overflow: hidden;
-            margin-bottom: 1.5rem; /* Space below photo */
+            margin-bottom: 1.5rem;
         }
         #id-card-photo img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
-        #id-card-fingerprint { /* New style for fingerprint area */
-            margin-top: auto; /* Pushes to the bottom, before signature */
+        #id-card-signature {
+            margin-top: auto;
             width: 100%;
             text-align: center;
             padding-top: 1rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        #id-card-fingerprint .label {
-            font-size: 10px;
-            color: #64748B;
-            display: block;
-            margin-top: 4px;
-        }
-        #id-card-fingerprint img { /* Style for fingerprint image */
-            width: 80px; /* Adjust size as needed */
-            height: 80px; /* Make it square */
-            object-fit: contain; /* Ensure the image fits without cropping */
-            border: 1px solid #9ca3af; /* A subtle border */
-            border-radius: 4px;
-            padding: 5px;
-            background-color: #f9fafb;
-        }
-        #id-card-signature { /* New style for signature line */
-            margin-top: 0.5rem; /* Space below fingerprint */
-            width: 100%;
-            text-align: center;
-            padding-top: 0.5rem;
-            border-top: 1px dashed #A0AEC0; /* Dashed line for signature */
+            border-top: 1px dashed #A0AEC0;
         }
         #id-card-signature .label {
-            font-size: 10px;
+            font-size: 12px; /* Slightly larger for better visibility */
             color: #64748B;
             display: block;
             margin-top: 4px;
@@ -267,21 +242,20 @@
         #id-card-right {
             flex-basis: 70%;
             display: flex;
-            flex-direction: column; /* Changed to column to allow unique code at bottom */
-            gap: 15px; /* Adjusted gap */
+            flex-direction: column;
+            gap: 15px;
             padding-left: 12px;
         }
         #id-card-info {
-            flex-grow: 1; /* Allow info grid to take available space */
+            flex-grow: 1;
             display: grid;
-            grid-template-columns: 1fr 1fr 140px; /* Two columns for info + QR column */
-            gap: 10px; /* Reduced gap to fit more fields */
+            grid-template-columns: 1fr 1fr 140px;
+            gap: 10px;
             font-family: 'Roboto Mono', monospace;
         }
-        /* Make QR column span rows for better vertical alignment */
         #id-card-qr-main {
-            grid-column: 3 / 4; /* Place in the third column */
-            grid-row: 1 / span 5; /* Span across multiple rows for vertical centering */
+            grid-column: 3 / 4;
+            grid-row: 1 / span 5;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -297,68 +271,64 @@
             max-height: 100%;
             display: block;
         }
-
         .info-field {
             display: flex;
             flex-direction: column;
-            padding: 1px 0; /* Reduced padding */
+            padding: 1px 0;
         }
         .info-field .label {
-            font-size: 9px; /* Slightly smaller label */
+            font-size: 9px;
             color: #64748B;
-            margin-bottom: 1px; /* Reduced margin */
+            margin-bottom: 1px;
             font-weight: 500;
         }
         .info-field .value {
-            font-size: 13px; /* Slightly smaller value */
+            font-size: 13px;
             font-weight: 500;
             color: #002868;
-            word-break: break-word; /* Prevents long text from overflowing */
+            word-break: break-word;
         }
         .info-field.full-width {
-            grid-column: 1 / 3; /* Spans across first two columns */
+            grid-column: 1 / 3;
         }
-        
-        #id-card-bottom-right-section { /* Container for Currency/Limit and Unique Code */
+        #id-card-bottom-right-section {
             display: flex;
-            align-items: flex-end; /* Align items to the bottom */
+            align-items: flex-end;
             gap: 15px;
-            margin-top: auto; /* Push this section to the bottom */
+            margin-top: auto;
             padding-top: 10px;
             width: 100%;
         }
-
-        #id-card-payment-details { /* New section for currency/limits */
+        #id-card-payment-details {
             display: flex;
             flex-direction: column;
-            justify-content: flex-end; /* Align content to the bottom */
+            justify-content: flex-end;
             gap: 5px;
-            flex-grow: 1; /* Allow it to take available space */
-            min-width: 100px; /* Ensure it has enough space */
-            /* Removed margin-bottom to bring fields up */
+            flex-grow: 1;
+            min-width: 100px;
         }
-        #id-card-unique-code { /* Now part of the QR section */
-            flex-grow: 1; /* Allow it to take remaining space */
+        #id-card-unique-code {
+            flex-grow: 1;
             font-family: 'Roboto Mono', monospace;
             font-weight: 700;
-            font-size: 14px; /* Slightly smaller for better fit */
+            font-size: 14px;
             color: #004182;
-            padding: 6px 10px; /* Adjusted padding */
+            padding: 6px 10px;
             background-color: #E0F2FE;
             border-radius: 8px;
             border: 1px solid #004182;
-            word-break: break-all; /* Ensure long codes wrap */
+            word-break: break-all;
             text-align: center;
-            min-width: 100px; /* Ensure it doesn't get too small */
+            min-width: 100px;
         }
         #id-card-unique-code .label {
-            font-size: 8px; /* Smaller label */
+            font-size: 8px;
             color: #4b5563;
             display: block;
             margin-bottom: 2px;
         }
         #id-card-footer {
-            margin-top: auto; /* Pushes footer to the bottom */
+            margin-top: auto;
             padding-top: 12px;
             text-align: center;
             font-size: 10px;
@@ -369,44 +339,39 @@
 
         /* Print Specific Styles for A5 Landscape */
         @page {
-            size: A5 landscape; /* Set page size to A5 and orientation to landscape */
-            margin: 0cm; /* No margin around the printout for full bleed or controlled padding */
+            size: A5 landscape;
+            margin: 0cm;
         }
         @media print {
             body {
-                background-color: white; /* Ensure white background for print */
+                background-color: white;
             }
             body > *:not(#id-card-container) {
-                display: none !important; /* Hide everything except the ID card container */
+                display: none !important;
                 visibility: hidden !important;
             }
-
             #id-card-container {
                 visibility: visible !important;
-                display: flex !important; /* Ensure flexbox is active for print layout */
+                display: flex !important;
                 position: absolute;
                 left: 0;
                 top: 0;
                 margin: 0;
-                width: 210mm; /* A5 landscape width */
-                height: 148mm; /* A5 landscape height */
+                width: 210mm;
+                height: 148mm;
                 box-shadow: none;
                 border-radius: 0;
-                padding: 10mm; /* Overall padding for the card content */
-                box-sizing: border-box; /* Include padding/border in width/height */
-                border: 1px solid #ccc; /* Optional: add a light border for cutting guide */
+                padding: 10mm;
+                box-sizing: border-box;
+                border: 1px solid #ccc;
             }
-
-            /* Ensure all internal elements are visible and laid out correctly */
             #id-card-header, #id-card-body, #id-card-footer,
             #id-card-left, #id-card-right, #id-card-info, #id-card-bottom-right-section,
-            #id-card-qr-main, #id-card-fingerprint, #id-card-signature, #id-card-unique-code, #id-card-payment-details,
+            #id-card-qr-main, #id-card-signature, #id-card-unique-code, #id-card-payment-details,
             .info-field, .info-field .label, .info-field .value {
                 visibility: visible !important;
-                display: flex !important; /* Ensure flex is applied for print layout */
+                display: flex !important;
             }
-            
-            /* Specific print layout adjustments for print */
             #id-card-header {
                 width: 100%;
                 font-size: 18px;
@@ -414,7 +379,7 @@
                 margin-bottom: 8mm;
             }
             #id-card-header h2 {
-                 font-size: 18px;
+                font-size: 18px;
             }
             #id-card-header img {
                 height: 30px;
@@ -425,55 +390,47 @@
                 justify-content: space-between;
                 align-items: flex-start;
                 padding-top: 0;
-                gap: 8mm; /* Reduced gap for print */
+                gap: 8mm;
             }
             #id-card-left {
                 padding-right: 8mm;
                 border-right: 1px solid #e2e8f0;
                 justify-content: space-between;
-                height: 100%; /* Take full height of body left section */
+                height: 100%;
             }
             #id-card-right {
                 padding-left: 8mm;
                 flex-direction: column;
                 justify-content: space-between;
                 height: 100%;
-                gap: 5mm; /* Smaller gap between sections */
+                gap: 5mm;
             }
             #id-card-info {
-                gap: 5mm; /* Smaller gap for print */
-                grid-template-columns: 1fr 1fr 38mm; /* Adjust QR column for print */
+                gap: 5mm;
+                grid-template-columns: 1fr 1fr 38mm;
             }
             .info-field {
-                padding: 0; /* No padding needed on print */
+                padding: 0;
             }
             #id-card-photo {
-                width: 40mm; /* Adjusted size for print */
-                height: 50mm; /* Adjusted size for print */
-                border-width: 1.5px; /* Thinner border for print */
+                width: 40mm;
+                height: 55mm; /* Increased for print */
+                border-width: 1.5px;
                 margin-bottom: 6mm;
             }
-            #id-card-fingerprint {
-                padding-top: 4mm;
-                margin-top: auto; /* Push above signature */
-            }
-            #id-card-fingerprint img {
-                width: 22mm; /* Adjusted size for print */
-                height: 22mm;
-            }
             #id-card-signature {
-                border-top: 1px dashed #A0AEC0; /* Keep dashed line for print */
-                margin-top: 4mm;
+                border-top: 1px dashed #A0AEC0;
+                margin-top: auto;
                 padding-top: 4mm;
             }
-            #id-card-fingerprint .label, #id-card-signature .label, .info-field .label {
-                font-size: 7.5px; /* Smaller label for print */
+            #id-card-signature .label, .info-field .label {
+                font-size: 7.5px;
             }
             .info-field .value {
-                font-size: 10.5px; /* Smaller values for print */
+                font-size: 10.5px;
             }
             #id-card-qr-main {
-                width: 38mm; /* Adjusted size for print */
+                width: 38mm;
                 height: 38mm;
                 min-width: 38mm;
                 min-height: 38mm;
@@ -491,7 +448,7 @@
                 font-size: 11px;
                 padding: 3mm 5mm;
             }
-             #id-card-unique-code .label {
+            #id-card-unique-code .label {
                 font-size: 7px;
             }
             #id-card-payment-details {
@@ -501,7 +458,7 @@
             #id-card-footer {
                 width: 100%;
                 text-align: center;
-                font-size: 6.5px; /* Smaller footer for print */
+                font-size: 6.5px;
                 padding-top: 6mm;
             }
         }
@@ -569,7 +526,7 @@
             <button id="printButton" class="print-button"><i class="fas fa-print mr-2"></i>Print ID Card</button>
         </div>
 
-        <div id="profileContent" class="hidden"> 
+        <div id="profileContent" class="hidden">
             <div id="id-card-container">
                 <div id="id-card-header">
                     <h2>NOVA7 IDENTITY CARD</h2>
@@ -578,11 +535,7 @@
                 <div id="id-card-body">
                     <div id="id-card-left">
                         <div id="id-card-photo">
-                            <img id="profile-photo-val" src="https://picsum.photos/150/190?random=1" alt="User Photo">
-                        </div>
-                        <div id="id-card-fingerprint">
-                            <img id="fingerprint-val" src="https://picsum.photos/80/80?random=2" alt="Fingerprint">
-                            <span class="label">FINGERPRINT</span>
+                            <img id="profile-photo-val" src="https://picsum.photos/150/220?random=1" alt="User Photo">
                         </div>
                         <div id="id-card-signature">
                             <span class="label">HOLDER SIGNATURE</span>
@@ -603,7 +556,6 @@
                             <div class="info-field"><span class="label">MEMBERSHIP LEVEL</span><span class="value" id="membership-val"></span></div>
                             <div class="info-field"><span class="label">KYC STATUS</span><span class="value" id="kyc-status-val"></span></div>
                             <div class="info-field"><span class="label">WALLET BALANCE</span><span class="value" id="balance-val"></span></div>
-
                             <div id="id-card-qr-main">
                                 <img id="qr-code-val" src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=Placeholder" alt="QR Code">
                             </div>
@@ -623,7 +575,6 @@
                 <div id="id-card-footer">This card is the property of nova7 Financial Services. If found, please return to nova7.</div>
             </div>
         </div>
-
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -631,8 +582,7 @@
         document.addEventListener('DOMContentLoaded', async function() {
             // Supabase client initialization
             const SUPABASE_URL = 'https://nvxqorudztbpwyanakdj.supabase.co';
-            // Use the provided ANON key
-            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52eHFvcnVkenRicHd5YW5ha2RqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIzOTk5NTQsImV4cCI6MjA2Nzk3NTk1NH0.XvITDAnpEkjQTh4SCVOfwGKsaANS6tp58Up37SXwYRw'; 
+            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52eHFvcnVkenRicHd5YW5ha2RqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIzOTk5NTQsImV4cCI6MjA2Nzk3NTk1NH0.XvITDAnpEkjQTh4SCVOfwGKsaANS6tp58Up37SXwYRw';
             const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             console.log("Supabase client initialized for Profile page.");
 
@@ -685,16 +635,16 @@
             profileContent.classList.remove('hidden');
 
             try {
-                // Fetch user profile from 'users' table (as per dashboard.html)
+                // Fetch user profile from 'users' table
                 const { data: profile, error: profileError } = await supabase
-                    .from('users') // Assuming 'users' table holds the main profile data
+                    .from('users')
                     .select('*')
                     .eq('id', currentUserId)
                     .single();
 
                 if (profileError) {
                     console.error('Error fetching user profile:', profileError.message);
-                    populateIdCard({}, session.user, '0.00'); // Populate with fallback data
+                    populateIdCard({}, session.user, '0.00');
                     return;
                 }
 
@@ -739,7 +689,7 @@
                 if (profile.avatar_url) {
                     profilePhotoVal.src = profile.avatar_url;
                 } else {
-                    profilePhotoVal.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&size=190&background=004182&color=fff`;
+                    profilePhotoVal.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&size=220&background=004182&color=fff`;
                 }
 
                 document.getElementById('surname-val').textContent = surname;
@@ -760,20 +710,13 @@
                 document.getElementById('phone-val').textContent = profile.phone_number || 'N/A';
                 document.getElementById('account-status-val').textContent = profile.account_status?.toUpperCase() || "ACTIVE";
                 document.getElementById('membership-val').textContent = profile.membership_level || 'Standard';
-                document.getElementById('kyc-status-val').textContent = profile.kyc_status?.toUpperCase() || 'PENDING'; 
-                document.getElementById('balance-val').textContent = balance; 
-
-                const fingerprintVal = document.getElementById('fingerprint-val');
-                if (profile.fingerprint_url) {
-                    fingerprintVal.src = profile.fingerprint_url;
-                } else {
-                    fingerprintVal.src = "https://picsum.photos/80/80?random=3"; // Using picsum for placeholder
-                }
+                document.getElementById('kyc-status-val').textContent = profile.kyc_status?.toUpperCase() || 'PENDING';
+                document.getElementById('balance-val').textContent = balance;
 
                 document.getElementById('unique-code-val').textContent = profile.unique_code || (user.id ? 'NOVA7-' + user.id.substring(0,6).toUpperCase() : 'N/A');
 
-                const walletAddress = profile.wallet_address || user.id; 
-                const qrDataForPayment = `https://nova7.vercel.app/pay/${walletAddress}`; 
+                const walletAddress = profile.wallet_address || user.id;
+                const qrDataForPayment = `https://nova7.vercel.app/pay/${walletAddress}`;
                 document.getElementById('qr-code-val').src = `https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(qrDataForPayment)}`;
 
                 document.getElementById('currency-val').textContent = profile.currency_type || 'USD';
