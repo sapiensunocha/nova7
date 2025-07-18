@@ -74,6 +74,42 @@
         .message-error {
             color: #EF4444;
         }
+        /* Modal specific styles */
+        .policy-modal {
+            background-color: #FFFFFF;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            padding: 2.5rem;
+            max-width: 800px;
+            max-height: 90vh; /* Max height for scrollability */
+            overflow-y: auto; /* Enable vertical scrolling */
+            position: relative;
+        }
+        .policy-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000; /* Ensure it's on top of everything */
+        }
+        .policy-modal-close-button {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #718096; /* Gray close button */
+        }
+        .policy-modal-close-button:hover {
+            color: #4A5568;
+        }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen p-4">
@@ -128,11 +164,37 @@
                     </a>
                 </p>
             </div>
+            
+            <div class="text-sm text-center mt-4">
+                <a href="#" id="viewPrivacy" class="link-linkedin">Privacy Policy</a>
+                <span class="text-gray-600 mx-2">|</span>
+                <a href="#" id="viewTerms" class="link-linkedin">Terms of Service</a>
+            </div>
         </div>
 
         <p class="text-xs text-gray-500 text-center mt-8">
             &copy; <span id="currentYear"></span> nova7. All rights reserved.
         </p>
+    </div>
+
+    <div id="privacy-modal" class="policy-modal-overlay hidden">
+        <div class="policy-modal">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-4">Privacy Policy</h2>
+            <div id="privacy-content" class="text-gray-700 text-sm leading-relaxed">
+                Loading...
+            </div>
+            <button class="policy-modal-close-button" onclick="document.getElementById('privacy-modal').classList.add('hidden');">&times;</button>
+        </div>
+    </div>
+
+    <div id="terms-modal" class="policy-modal-overlay hidden">
+        <div class="policy-modal">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-4">Terms of Service</h2>
+            <div id="terms-content" class="text-gray-700 text-sm leading-relaxed">
+                Loading...
+            </div>
+            <button class="policy-modal-close-button" onclick="document.getElementById('terms-modal').classList.add('hidden');">&times;</button>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -223,6 +285,65 @@
                         loginButton.textContent = "Sign In";
                     }
                 }
+            });
+
+            // Modal logic for Privacy Policy and Terms of Service
+            const viewTermsLink = document.getElementById('viewTerms');
+            const viewPrivacyLink = document.getElementById('viewPrivacy');
+
+            async function showPolicyModal(policyType, policyUrl) {
+                const modalId = `${policyType}-modal`;
+                const modal = document.getElementById(modalId);
+                const contentDiv = document.getElementById(`${policyType}-content`);
+
+                // Show the modal
+                modal.classList.remove('hidden');
+                contentDiv.innerHTML = 'Loading...'; // Reset content and show loading
+
+                try {
+                    const response = await fetch(policyUrl);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const htmlContent = await response.text();
+
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(htmlContent, 'text/html');
+                    const mainContent = doc.querySelector('.container'); 
+                    if (mainContent) {
+                        // Remove elements that are not suitable for a modal view
+                        mainContent.querySelector('header')?.remove();
+                        mainContent.querySelector('footer')?.remove();
+                        mainContent.querySelector('script')?.remove();
+                        mainContent.querySelector('.table-of-contents')?.remove(); 
+                        
+                        // Set the extracted content
+                        contentDiv.innerHTML = mainContent.innerHTML;
+                        // Ensure images load correctly if paths are relative
+                        contentDiv.querySelectorAll('img').forEach(img => {
+                            if (img.src.startsWith('nova-logo.png')) { // Replace with actual path logic if needed
+                                img.src = 'nova-logo.png'; // Ensure correct path for modal view
+                            }
+                        });
+                    } else {
+                        contentDiv.innerHTML = "Error: Could not load policy content.";
+                        console.error("Could not find .container in policy HTML for modal.");
+                    }
+
+                } catch (error) {
+                    console.error('Error loading policy content:', error);
+                    contentDiv.innerHTML = 'Failed to load policy content. Please try again later.';
+                }
+            }
+
+            viewTermsLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                showPolicyModal('terms', 'terms-of-service.html');
+            });
+
+            viewPrivacyLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                showPolicyModal('privacy', 'privacy-policy.html');
             });
         });
     </script>

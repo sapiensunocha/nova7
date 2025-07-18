@@ -755,61 +755,48 @@
                 });
             }
 
-            
             async function getCalculatedBalance() {
-    try {
-        // Fetch all completed transactions relevant to the user (as initiator or recipient)
-        const { data, error } = await supabase
-            .from('transactions')
-            .select('amount, type, user_id, recipient_id, status') // Select status to handle 'request' type correctly
-            .or(`user_id.eq.${userId},recipient_id.eq.${userId}`)
-            .eq('status', 'completed'); // Only consider completed transactions for balance
+                try {
+                    const { data, error } = await supabase
+                        .from('transactions')
+                        .select('amount, transaction_type, user_id, recipient_id, status')
+                        .or(`user_id.eq.${userId},recipient_id.eq.${userId}`)
+                        .eq('status', 'completed');
 
-        if (error) {
-            console.error('Error fetching balance transactions for calculation:', error.message);
-            return 0; // Return 0 if there's an error fetching data
-        }
-
-        let balance = 0;
-        if (data) { // Ensure data is not null before iterating
-            data.forEach(tx => {
-                const amount = parseFloat(tx.amount);
-                // Determine if the transaction is an income or expense from the current user's perspective
-                if (tx.type === 'deposit' && tx.user_id === userId) {
-                    // Deposits are typically income initiated by the user
-                    balance += amount;
-                } else if (tx.type === 'product_sell' && tx.user_id === userId) {
-                    // Product sales are income for the user
-                    balance += amount;
-                } else if (tx.type === 'loan_received' && tx.user_id === userId) {
-                    // Loans received are income for the user
-                    balance += amount;
-                } else if (tx.type === 'transfer') {
-                    if (tx.recipient_id === userId) {
-                        // Incoming transfer (current user is recipient)
-                        // Applying fee for incoming transfer as per your `handleTransfer` logic
-                        balance += amount * (1 - TRANSACTION_FEE_RATE);
-                    } else if (tx.user_id === userId) {
-                        // Outgoing transfer (current user is initiator)
-                        balance -= amount;
+                    if (error) {
+                        console.error('Error fetching balance transactions for calculation:', error.message);
+                        return 0;
                     }
-                } else if (tx.type === 'request' && tx.user_id === userId && tx.status === 'completed') {
-                     // If a request was initiated by THIS user and was completed (i.e., accepted by the sender)
-                     // This means money was received by this user.
-                     balance += amount;
+
+                    let balance = 0;
+                    if (data) {
+                        data.forEach(tx => {
+                            const amount = parseFloat(tx.amount);
+                            if (tx.transaction_type === 'deposit' && tx.user_id === userId) {
+                                balance += amount;
+                            } else if (tx.transaction_type === 'product_sell' && tx.user_id === userId) {
+                                balance += amount;
+                            } else if (tx.transaction_type === 'loan_received' && tx.user_id === userId) {
+                                balance += amount;
+                            } else if (tx.transaction_type === 'transfer') {
+                                if (tx.recipient_id === userId) {
+                                    balance += amount * (1 - TRANSACTION_FEE_RATE);
+                                } else if (tx.user_id === userId) {
+                                    balance -= amount;
+                                }
+                            } else if (tx.transaction_type === 'money_request' && tx.user_id === userId && tx.status === 'completed') {
+                                balance += amount;
+                            } else if (tx.user_id === userId && ['withdrawal', 'bill_payment', 'loan_payment', 'insurance_payment', 'product_buy'].includes(tx.transaction_type)) {
+                                balance -= amount;
+                            }
+                        });
+                    }
+                    return balance;
+                } catch (error) {
+                    console.error('Network error during balance calculation:', error);
+                    return 0;
                 }
-                // All other types (withdrawal, bill_payment, loan_payment, product_buy) are expenses for the initiator
-                else if (tx.user_id === userId && ['withdrawal', 'bill_payment', 'loan_payment', 'insurance_payment', 'product_buy'].includes(tx.type)) {
-                    balance -= amount;
-                }
-            });
-        }
-        return balance;
-    } catch (error) {
-        console.error('Network error during balance calculation:', error);
-        return 0; // Return 0 in case of network or other unexpected errors
-    }
-}
+            }
 
             // Handle Logout
             async function handleLogout() {
@@ -848,36 +835,30 @@
 
             // Fetch Wallet Balance
             async function fetchWalletBalance() {
-            try {
-                // Use the new helper to get the accurate balance
-                const balance = await getCalculatedBalance();
-
-                walletBalanceElement.textContent = `$${balance.toFixed(2)}`;
-                walletBalanceElement.style.transform = 'scale(1.1)';
-                setTimeout(() => walletBalanceElement.style.transform = 'scale(1)', 300);
-
-                // Update progress ring (simplified: 0-100% based on activity)
-                const balanceProgress = document.getElementById('balanceProgress');
-                // Ensure balance is non-negative for progress bar calculation
-                // Cap at $1000 for 100% progress for example. Adjust '1000' as desired.
-                const activityPercent = Math.min(Math.max(0, balance / 1000) * 100, 100);
-                balanceProgress.setAttribute('stroke-dasharray', `${activityPercent}, 100`);
-
-                document.getElementById('aiSummaryText').innerHTML = `Your current wallet balance is <strong>$${balance.toFixed(2)}</strong>. Manage your funds below.`;
-            } catch (error) {
-                console.error('Error fetching balance for UI update:', error);
-                showMessage('Network error fetching balance.', 'error');
-                walletBalanceElement.textContent = '$0.00';
+                try {
+                    const balance = await getCalculatedBalance();
+                    walletBalanceElement.textContent = `$${balance.toFixed(2)}`;
+                    walletBalanceElement.style.transform = 'scale(1.1)';
+                    setTimeout(() => walletBalanceElement.style.transform = 'scale(1)', 300);
+                    const balanceProgress = document.getElementById('balanceProgress');
+                    const activityPercent = Math.min(Math.max(0, balance / 1000) * 100, 100);
+                    balanceProgress.setAttribute('stroke-dasharray', `${activityPercent}, 100`);
+                    document.getElementById('aiSummaryText').innerHTML = `Your current wallet balance is <strong>$${balance.toFixed(2)}</strong>. Manage your funds below.`;
+                } catch (error) {
+                    console.error('Error fetching balance for UI update:', error);
+                    showMessage('Network error fetching balance.', 'error');
+                    walletBalanceElement.textContent = '$0.00';
+                }
             }
-        }
+
             // Fetch Pending Requests
             async function fetchPendingRequests() {
                 try {
                     const { data, error } = await supabase
                         .from('transactions')
-                        .select('id, amount, type, description, status, created_at, user_id')
+                        .select('id, amount, transaction_type, description, status, created_at, user_id')
                         .eq('recipient_id', userId)
-                        .eq('type', 'request')
+                        .eq('transaction_type', 'money_request')
                         .eq('status', 'pending')
                         .order('created_at', { ascending: false });
 
@@ -910,7 +891,9 @@
 
                     const userMap = users ? users.reduce((map, user) => ({ ...map, [user.id]: user.full_name }), {}) : {};
 
-                    pendingRequestsContainer.innerHTML = pendingRequests.map(req => `
+                    pendingRequestsContainer.innerHTML = pendingRequests
+                        .filter(req => req.transaction_type === 'money_request')
+                        .map(req => `
                         <div class="bg-white p-4 rounded-lg shadow-md mb-4 flex justify-between items-center">
                             <div>
                                 <p><strong>Amount:</strong> $${parseFloat(req.amount).toFixed(2)}</p>
@@ -929,10 +912,18 @@
                     `).join('');
 
                     pendingRequestsContainer.querySelectorAll('.accept-request-btn').forEach(btn => {
-                        btn.addEventListener('click', () => handleAcceptRequest(btn.dataset.requestId));
+                        btn.addEventListener('click', () => {
+                            if (!btn.disabled) {
+                                handleAcceptRequest(btn.dataset.requestId);
+                            }
+                        });
                     });
                     pendingRequestsContainer.querySelectorAll('.delete-request-btn').forEach(btn => {
-                        btn.addEventListener('click', () => handleDeclineRequest(btn.dataset.requestId));
+                        btn.addEventListener('click', () => {
+                            if (!btn.disabled) {
+                                handleDeclineRequest(btn.dataset.requestId);
+                            }
+                        });
                     });
                 } catch (error) {
                     console.error('Error fetching pending requests:', error);
@@ -949,7 +940,7 @@
                 try {
                     const { data, error } = await supabase
                         .from('transactions')
-                        .select('id, amount, type, description, status, created_at, recipient_id, user_id')
+                        .select('id, amount, transaction_type, description, status, created_at, recipient_id, user_id')
                         .or(`user_id.eq.${userId},recipient_id.eq.${userId}`)
                         .order('created_at', { ascending: false })
                         .limit(50);
@@ -985,13 +976,13 @@
                             'deposit': 'status-deposit',
                             'withdrawal': 'status-withdrawal',
                             'transfer': 'status-transfer',
-                            'request': 'status-request'
-                        }[(tx.type || '').toLowerCase()] || ''; // Added || '' to safely handle null/undefined tx.type
+                            'money_request': 'status-request'
+                        }[(tx.transaction_type || '').toLowerCase()] || '';
                         const statusClass = {
                             'completed': 'status-completed',
                             'pending': 'status-pending',
                             'failed': 'status-failed'
-                        }[(tx.status || '').toLowerCase()] || ''; // Added || '' to safely handle null/undefined tx.status
+                        }[(tx.status || '').toLowerCase()] || '';
 
                         const description = tx.recipient_id && userMap[tx.recipient_id]
                             ? `${tx.description || ''} (To: ${userMap[tx.recipient_id]})`
@@ -1000,12 +991,12 @@
                         const row = document.createElement('tr');
                         row.innerHTML = `
                             <td>${new Date(tx.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</td>
-                            <td><span class="status-badge ${typeClass}">${(tx.type || '').toUpperCase()}</span></td>
+                            <td><span class="status-badge ${typeClass}">${(tx.transaction_type || '').toUpperCase()}</span></td>
                             <td>$${parseFloat(tx.amount).toFixed(2)}</td>
                             <td>${description}</td>
                             <td><span class="status-badge ${statusClass}">${(tx.status || '').toUpperCase()}</span></td>
                             <td>
-                                ${(tx.type || '').toLowerCase() === 'request' && tx.status === 'pending' && tx.recipient_id === userId ?
+                                ${(tx.transaction_type || '').toLowerCase() === 'money_request' && tx.status === 'pending' && tx.recipient_id === userId ?
                                     `<button class="btn-primary-action text-[0.765rem] px-2 py-1 accept-request-btn" data-request-id="${tx.id}"><i class="fas fa-check mr-1"></i>Accept</button>
                                      <button class="btn-danger-action text-[0.765rem] px-2 py-1 delete-request-btn ml-1" data-request-id="${tx.id}"><i class="fas fa-times mr-1"></i>Decline</button>`
                                     : ''
@@ -1014,9 +1005,17 @@
                         `;
                         transactionTableBody.appendChild(row);
 
-                        if ((tx.type || '').toLowerCase() === 'request' && tx.status === 'pending' && tx.recipient_id === userId) {
-                            row.querySelector('.accept-request-btn').addEventListener('click', () => handleAcceptRequest(tx.id));
-                            row.querySelector('.delete-request-btn').addEventListener('click', () => handleDeclineRequest(tx.id));
+                        if ((tx.transaction_type || '').toLowerCase() === 'money_request' && tx.status === 'pending' && tx.recipient_id === userId) {
+                            row.querySelector('.accept-request-btn').addEventListener('click', () => {
+                                if (!row.querySelector('.accept-request-btn').disabled) {
+                                    handleAcceptRequest(tx.id);
+                                }
+                            });
+                            row.querySelector('.delete-request-btn').addEventListener('click', () => {
+                                if (!row.querySelector('.delete-request-btn').disabled) {
+                                    handleDeclineRequest(tx.id);
+                                }
+                            });
                         }
                     });
                 } catch (error) {
@@ -1039,7 +1038,6 @@
 
                 try {
                     let orQueryString = `full_name.ilike.%${query}%,email.ilike.%${query}%`;
-                    // Basic check for UUID format to prevent 'invalid input syntax' error
                     const isUUID = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(query);
                     if (isUUID) {
                         orQueryString += `,id.eq.${query}`;
@@ -1048,7 +1046,7 @@
                     const { data, error } = await supabase
                         .from('users')
                         .select('id, full_name, email')
-                        .or(orQueryString) // Use the dynamically built query string
+                        .or(orQueryString)
                         .neq('id', userId)
                         .limit(5);
 
@@ -1100,7 +1098,6 @@
 
                 try {
                     let orQueryString = `full_name.ilike.%${query}%,email.ilike.%${query}%`;
-                    // Basic check for UUID format to prevent 'invalid input syntax' error
                     const isUUID = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(query);
                     if (isUUID) {
                         orQueryString += `,id.eq.${query}`;
@@ -1109,7 +1106,7 @@
                     const { data, error } = await supabase
                         .from('users')
                         .select('id, full_name, email')
-                        .or(orQueryString) // Use the dynamically built query string
+                        .or(orQueryString)
                         .neq('id', userId)
                         .limit(5);
 
@@ -1189,7 +1186,7 @@
                             .insert({
                                 user_id: userId,
                                 amount: amount,
-                                type: 'deposit',
+                                transaction_type: 'deposit',
                                 status: 'completed',
                                 description: `Deposit via Stripe (Payment Intent: ${paymentIntent.id})`,
                                 created_at: new Date().toISOString()
@@ -1247,19 +1244,9 @@
                 messageDiv.textContent = '';
 
                 try {
-                    const { data: transactions, error: balanceError } = await supabase
-                        .from('transactions')
-                        .select('amount')
-                        .eq('user_id', userId)
-                        .in('status', ['completed']);
-
-                    if (balanceError) {
-                        throw new Error('Failed to check balance.');
-                    }
-
-                    const balance = transactions.reduce((sum, tx) => sum + parseFloat(tx.amount), 0);
+                    const balance = await getCalculatedBalance();
                     if (balance < amount) {
-                        showMessage('Insufficient balance for withdrawal.', 'error');
+                        showMessage('Insufficient balance for withdrawal. Please top up your account.', 'error');
                         messageDiv.textContent = 'Insufficient balance.';
                         return;
                     }
@@ -1269,7 +1256,7 @@
                         .insert({
                             user_id: userId,
                             amount: -amount,
-                            type: 'withdrawal',
+                            transaction_type: 'withdrawal',
                             status: 'pending',
                             description: `Withdrawal via ${method}: ${account}`,
                             created_at: new Date().toISOString()
@@ -1296,6 +1283,7 @@
                     submitBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Confirm Withdrawal';
                 }
             }
+
             // Handle Transfer
             async function handleTransfer(event) {
                 event.preventDefault();
@@ -1344,19 +1332,9 @@
                         return;
                     }
 
-                    const { data: transactions, error: balanceError } = await supabase
-                        .from('transactions')
-                        .select('amount')
-                        .eq('user_id', userId)
-                        .in('status', ['completed']);
-
-                    if (balanceError) {
-                        throw new Error('Failed to check balance.');
-                    }
-
-                    const balance = transactions.reduce((sum, tx) => sum + parseFloat(tx.amount), 0);
+                    const balance = await getCalculatedBalance();
                     if (balance < amount) {
-                        showMessage('Insufficient balance for transfer.', 'error');
+                        showMessage('Insufficient balance for transfer. Please top up your account.', 'error');
                         messageDiv.textContent = 'Insufficient balance.';
                         return;
                     }
@@ -1367,7 +1345,7 @@
                             {
                                 user_id: userId,
                                 amount: -amount,
-                                type: 'transfer',
+                                transaction_type: 'transfer',
                                 status: 'completed',
                                 description: `Transfer to ${recipientName} (ID: ${recipientId})`,
                                 recipient_id: recipientId,
@@ -1376,7 +1354,7 @@
                             {
                                 user_id: recipientId,
                                 amount: amount * (1 - TRANSACTION_FEE_RATE),
-                                type: 'transfer',
+                                transaction_type: 'transfer',
                                 status: 'completed',
                                 description: `Transfer from ${userName} (ID: ${userId})`,
                                 recipient_id: userId,
@@ -1456,7 +1434,7 @@
                         .insert({
                             user_id: userId,
                             amount: amount,
-                            transaction_type: 'request',
+                            transaction_type: 'money_request',
                             status: 'pending',
                             description: `Money request to ${senderName} (ID: ${senderId})`,
                             recipient_id: senderId,
@@ -1495,7 +1473,7 @@
                         .select('amount, user_id')
                         .eq('id', requestId)
                         .eq('status', 'pending')
-                        .eq('type', 'request')
+                        .eq('transaction_type', 'money_request')
                         .eq('recipient_id', userId)
                         .single();
 
@@ -1508,19 +1486,9 @@
                     const amount = parseFloat(request.amount);
                     const requesterId = request.user_id;
 
-                    const { data: transactions, error: balanceError } = await supabase
-                        .from('transactions')
-                        .select('amount')
-                        .eq('user_id', userId)
-                        .in('status', ['completed']);
-
-                    if (balanceError) {
-                        throw new Error('Failed to check balance.');
-                    }
-
-                    const balance = transactions.reduce((sum, tx) => sum + parseFloat(tx.amount), 0);
+                    const balance = await getCalculatedBalance();
                     if (balance < amount) {
-                        showMessage('Insufficient balance to accept request.', 'error');
+                        showMessage('Insufficient balance to accept request. Please top up your account.', 'error');
                         return;
                     }
 
@@ -1542,7 +1510,7 @@
                             {
                                 user_id: userId,
                                 amount: -amount,
-                                type: 'transfer',
+                                transaction_type: 'transfer',
                                 status: 'completed',
                                 description: `Accepted money request ${requestId} to ${requesterName} (ID: ${requesterId})`,
                                 recipient_id: requesterId,
@@ -1551,7 +1519,7 @@
                             {
                                 user_id: requesterId,
                                 amount: amount * (1 - TRANSACTION_FEE_RATE),
-                                type: 'transfer',
+                                transaction_type: 'transfer',
                                 status: 'completed',
                                 description: `Received from accepted request ${requestId} from ${userName} (ID: ${userId})`,
                                 recipient_id: userId,
@@ -1568,7 +1536,8 @@
                     const { error: statusError } = await supabase
                         .from('transactions')
                         .update({ status: 'completed' })
-                        .eq('id', requestId);
+                        .eq('id', requestId)
+                        .eq('transaction_type', 'money_request');
 
                     if (statusError) {
                         console.error('Error updating request status:', statusError.message);
@@ -1596,7 +1565,7 @@
                         .update({ status: 'failed' })
                         .eq('id', requestId)
                         .eq('status', 'pending')
-                        .eq('type', 'request')
+                        .eq('transaction_type', 'money_request')
                         .eq('recipient_id', userId);
 
                     if (error) {
@@ -1611,82 +1580,6 @@
                 } catch (error) {
                     console.error('Decline request error:', error);
                     showMessage(`Failed to decline request: ${error.message}`, 'error');
-                }
-            }
-
-            // Handle Withdrawal
-            async function handleWithdrawal(event) {
-                event.preventDefault();
-                const amount = parseFloat(document.getElementById('withdrawalAmount').value);
-                const method = document.getElementById('withdrawalMethod').value;
-                const account = document.getElementById('withdrawalAccount').value.trim();
-                const submitBtn = document.getElementById('withdrawalSubmitBtn');
-                const messageDiv = document.getElementById('withdrawalMessage');
-
-                if (isNaN(amount) || amount < 1 || !method || !account) {
-                    showMessage('Please fill in all withdrawal details correctly.', 'error');
-                    messageDiv.textContent = 'Invalid withdrawal details.';
-                    return;
-                }
-
-                if (method === 'office_withdrawal' && account.length < 5) {
-                    showMessage('Please provide a valid reference for office withdrawal.', 'error');
-                    messageDiv.textContent = 'Reference must be at least 5 characters.';
-                    return;
-                }
-
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
-                messageDiv.textContent = '';
-
-                try {
-                    const { data: transactions, error: balanceError } = await supabase
-                        .from('transactions')
-                        .select('amount')
-                        .eq('user_id', userId)
-                        .in('status', ['completed']);
-
-                    if (balanceError) {
-                        throw new Error('Failed to check balance.');
-                    }
-
-                    const balance = transactions.reduce((sum, tx) => sum + parseFloat(tx.amount), 0);
-                    if (balance < amount) {
-                        showMessage('Insufficient balance for withdrawal.', 'error');
-                        messageDiv.textContent = 'Insufficient balance.';
-                        return;
-                    }
-
-                    const { error: txError } = await supabase
-                        .from('transactions')
-                        .insert({
-                            user_id: userId,
-                            amount: -amount,
-                            type: 'withdrawal',
-                            status: 'pending',
-                            description: `Withdrawal via ${method}: ${account}`,
-                            created_at: new Date().toISOString()
-                        });
-
-                    if (txError) {
-                        console.error('Error recording withdrawal:', txError.message);
-                        showMessage('Failed to process withdrawal.', 'error');
-                        messageDiv.textContent = 'Failed to process withdrawal.';
-                        return;
-                    }
-
-                    showMessage('Withdrawal request submitted successfully!', 'success');
-                    messageDiv.textContent = 'Withdrawal request submitted!';
-                    document.getElementById('withdrawalForm').reset();
-                    await fetchWalletBalance();
-                    await fetchTransactionHistory();
-                } catch (error) {
-                    console.error('Withdrawal error:', error);
-                    showMessage(`Withdrawal failed: ${error.message}`, 'error');
-                    messageDiv.textContent = `Error: ${error.message}`;
-                } finally {
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Confirm Withdrawal';
                 }
             }
 

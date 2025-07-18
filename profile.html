@@ -16,8 +16,6 @@
             flex-direction: column;
             min-height: 100vh;
         }
-
-        /* Sidebar Styles - Consistent with other pages */
         .sidebar-nova7 {
             background-color: #004182;
             color: #E0F2FE;
@@ -70,8 +68,6 @@
             margin-right: 0.75rem;
             text-align: center;
         }
-
-        /* Main Content Area */
         .main-content-area {
             margin-left: 260px;
             padding: 1.5rem;
@@ -82,8 +78,6 @@
             align-items: center;
             flex-grow: 1;
         }
-
-        /* Mobile Header */
         .mobile-header {
             display: none;
             background-color: #FFFFFF;
@@ -98,8 +92,6 @@
             right: 0;
             z-index: 50;
         }
-
-        /* Mobile sidebar specific styles */
         @media (max-width: 768px) {
             .sidebar-nova7 {
                 transform: translateX(-100%);
@@ -117,15 +109,12 @@
                 display: flex;
             }
         }
-
-        /* Print button container */
         .print-button-container {
             width: 100%;
             display: flex;
             justify-content: flex-end;
             margin-bottom: 1.5rem;
         }
-
         .print-button {
             background-color: #16A34A;
             color: white;
@@ -139,7 +128,6 @@
         .print-button:hover {
             background-color: #15803D;
         }
-
         #id-card-container {
             width: 800px;
             height: 475px;
@@ -180,7 +168,6 @@
                 margin-top: 1rem;
             }
         }
-
         #id-card-header {
             display: flex;
             justify-content: space-between;
@@ -214,7 +201,7 @@
         }
         #id-card-photo {
             width: 150px;
-            height: 220px; /* Increased height to use fingerprint space */
+            height: 220px;
             background-color: #e2e8f0;
             border: 4px solid #004182;
             border-radius: 8px;
@@ -234,7 +221,7 @@
             border-top: 1px dashed #A0AEC0;
         }
         #id-card-signature .label {
-            font-size: 12px; /* Slightly larger for better visibility */
+            font-size: 12px;
             color: #64748B;
             display: block;
             margin-top: 4px;
@@ -336,8 +323,6 @@
             border-top: 1px solid #e2e8f0;
             padding-top: 16px;
         }
-
-        /* Print Specific Styles for A5 Landscape */
         @page {
             size: A5 landscape;
             margin: 0cm;
@@ -414,7 +399,7 @@
             }
             #id-card-photo {
                 width: 40mm;
-                height: 55mm; /* Increased for print */
+                height: 55mm;
                 border-width: 1.5px;
                 margin-bottom: 6mm;
             }
@@ -525,7 +510,6 @@
         <div class="print-button-container">
             <button id="printButton" class="print-button"><i class="fas fa-print mr-2"></i>Print ID Card</button>
         </div>
-
         <div id="profileContent" class="hidden">
             <div id="id-card-container">
                 <div id="id-card-header">
@@ -576,33 +560,24 @@
             </div>
         </div>
     </main>
-
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         document.addEventListener('DOMContentLoaded', async function() {
-            // Supabase client initialization
             const SUPABASE_URL = 'https://nvxqorudztbpwyanakdj.supabase.co';
             const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52eHFvcnVkenRicHd5YW5ha2RqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIzOTk5NTQsImV4cCI6MjA2Nzk3NTk1NH0.XvITDAnpEkjQTh4SCVOfwGKsaANS6tp58Up37SXwYRw';
             const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             console.log("Supabase client initialized for Profile page.");
-
             const profileContent = document.getElementById('profileContent');
             let currentUserId = null;
-
-            // Function to handle logout
             async function handleLogout() {
                 console.log("Profile: Logging out and redirecting to login.html");
                 await supabase.auth.signOut();
                 window.location.href = 'login.html';
             }
-
-            // Event listeners for logout links
             const sidebarLogoutLink = document.getElementById('sidebarLogoutLink');
             if (sidebarLogoutLink) sidebarLogoutLink.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); });
             const mobileLogoutLink = document.getElementById('mobileLogoutLink');
             if (mobileLogoutLink) mobileLogoutLink.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); });
-
-            // Mobile sidebar toggle
             const hamburgerBtnMobile = document.getElementById('hamburgerBtnMobile');
             const sidebar = document.getElementById('sidebar');
             if (hamburgerBtnMobile && sidebar) {
@@ -613,60 +588,42 @@
                     sidebar.classList.remove('open');
                 }
             });
-
-            // Print button functionality
             document.getElementById('printButton').addEventListener('click', () => {
                 window.print();
             });
-
-            // --- Authentication Gate and Data Fetch ---
             const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-
             if (sessionError || !session) {
                 console.log("Profile: No active Supabase session found. Redirecting to login.");
                 window.location.href = 'login.html';
                 return;
             }
-
             currentUserId = session.user.id;
             console.log("Current Supabase User ID:", currentUserId);
-
-            // If a session exists, show the profile content and fetch data
             profileContent.classList.remove('hidden');
-
             try {
-                // Fetch user profile from 'users' table
                 const { data: profile, error: profileError } = await supabase
                     .from('users')
                     .select('*')
                     .eq('id', currentUserId)
                     .single();
-
                 if (profileError) {
                     console.error('Error fetching user profile:', profileError.message);
                     populateIdCard({}, session.user, '0.00');
                     return;
                 }
-
                 const balance = (profile.balance !== undefined && profile.balance !== null) ? parseFloat(profile.balance).toFixed(2) : '0.00';
-                
                 populateIdCard(profile, session.user, `$${balance}`);
-
             } catch (error) {
                 console.error("Error during profile data fetch or processing:", error);
                 populateIdCard({}, session.user, '$0.00');
             }
-
-            // Function to populate ID card data
             function populateIdCard(profileData, userAuthData, balance) {
                 const user = userAuthData || {};
                 const profile = profileData || {};
-
                 const fullName = profile.full_name || user.email?.split('@')[0] || 'Jane Doe';
                 const nameParts = fullName.split(" ");
                 const givenNames = nameParts.length > 1 ? nameParts.slice(0, -1).join(" ") : nameParts[0] || "Jane";
                 const surname = nameParts.length > 1 ? nameParts[nameParts.length - 1] : "Doe";
-
                 let age = 'N/A';
                 if (profile.date_of_birth) {
                     try {
@@ -682,47 +639,33 @@
                         console.error("Could not calculate age from date:", profile.date_of_birth);
                     }
                 }
-
                 const formatDate = (dateStr) => dateStr ? new Date(dateStr).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase() : 'N/A';
-
                 const profilePhotoVal = document.getElementById('profile-photo-val');
                 if (profile.avatar_url) {
                     profilePhotoVal.src = profile.avatar_url;
                 } else {
                     profilePhotoVal.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&size=220&background=004182&color=fff`;
                 }
-
                 document.getElementById('surname-val').textContent = surname;
                 document.getElementById('givennames-val').textContent = givenNames;
                 document.getElementById('account-val').textContent = profile.account_number || user.id?.substring(0, 8).toUpperCase() || '00000000';
                 document.getElementById('dob-val').textContent = formatDate(profile.date_of_birth);
                 document.getElementById('age-val').textContent = age;
                 document.getElementById('member-since-val').textContent = formatDate(profile.member_since || user.created_at);
-                
-                let fullAddress = [];
-                if (profile.address_street) fullAddress.push(profile.address_street);
-                if (profile.address_city) fullAddress.push(profile.address_city);
-                if (profile.address_province) fullAddress.push(profile.address_province);
-                if (profile.address_country) fullAddress.push(profile.address_country);
-                document.getElementById('address-val').textContent = fullAddress.length > 0 ? fullAddress.join(', ') : 'Not Provided';
-
+                document.getElementById('address-val').textContent = profile.address || 'Not Provided';
                 document.getElementById('email-val').textContent = user.email || 'N/A';
                 document.getElementById('phone-val').textContent = profile.phone_number || 'N/A';
                 document.getElementById('account-status-val').textContent = profile.account_status?.toUpperCase() || "ACTIVE";
                 document.getElementById('membership-val').textContent = profile.membership_level || 'Standard';
                 document.getElementById('kyc-status-val').textContent = profile.kyc_status?.toUpperCase() || 'PENDING';
                 document.getElementById('balance-val').textContent = balance;
-
                 document.getElementById('unique-code-val').textContent = profile.unique_code || (user.id ? 'NOVA7-' + user.id.substring(0,6).toUpperCase() : 'N/A');
-
                 const walletAddress = profile.wallet_address || user.id;
                 const qrDataForPayment = `https://nova7.vercel.app/pay/${walletAddress}`;
                 document.getElementById('qr-code-val').src = `https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(qrDataForPayment)}`;
-
                 document.getElementById('currency-val').textContent = profile.currency_type || 'USD';
                 document.getElementById('limit-val').textContent = profile.payment_limit || '$5,000';
             }
-
             console.log("Profile page scripts attached and execution started.");
         });
     </script>

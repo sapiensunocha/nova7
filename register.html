@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - nova7</title>
+    <title>Register - NOVA7</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -110,18 +110,89 @@
         border-radius: 0 6px 6px 0;
         flex-grow: 1;
       }
+
+      /* Modal Specific Styles */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.6);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+      }
+      .modal-overlay.open {
+        opacity: 1;
+        visibility: visible;
+      }
+      .modal-container {
+        background-color: #ffffff;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 800px;
+        max-height: 90vh; /* Limit modal height */
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        transform: translateY(20px);
+        transition: transform 0.3s ease-in-out;
+      }
+      .modal-overlay.open .modal-container {
+        transform: translateY(0);
+      }
+      .modal-header {
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid #E2E8F0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .modal-header h3 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #2D3748;
+      }
+      .modal-body {
+        padding: 2rem;
+        overflow-y: auto; /* Enable scrolling for content */
+        flex-grow: 1;
+      }
+      .modal-footer {
+        padding: 1.5rem 2rem;
+        border-top: 1px solid #E2E8F0;
+        text-align: right;
+      }
+      .btn-modal-accept {
+        background-color: #0A66C2;
+        color: white;
+        border-radius: 20px;
+        padding: 10px 20px;
+        font-weight: 600;
+        transition: background-color 0.2s;
+        border: none;
+        cursor: pointer;
+      }
+      .btn-modal-accept:hover {
+        background-color: #004182;
+      }
     </style>
   </head>
   <body class="flex items-center justify-center min-h-screen p-4">
     <div class="w-full max-w-md">
       <div class="nova7-logo-container">
-        <img src="nova-logo.png" alt="nova7 Logo" class="nova7-logo"
+        <img src="nova-logo.png" alt="NOVA7 Logo" class="nova7-logo"
              onerror="this.style.display='none'; document.getElementById('fallbackAppName').style.display='block';">
-        <h1 id="fallbackAppName" class="text-3xl font-bold text-gray-800" style="display:none;">nova7</h1>
+        <h1 id="fallbackAppName" class="text-3xl font-bold text-gray-800" style="display:none;">NOVA7</h1>
       </div>
       <div class="card-linkedin">
         <h2 class="text-2xl font-semibold text-gray-900 text-center mb-2">Create Your Account</h2>
-        <p class="text-sm text-gray-600 text-center mb-8">Join nova7 for disaster protection.</p>
+        <p class="text-sm text-gray-600 text-center mb-8">Join NOVA7 for disaster protection.</p>
         <form id="registerForm" class="space-y-6">
           <div>
             <label for="fullName" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
@@ -389,12 +460,27 @@
             <input type="password" name="confirmPassword" id="confirmPassword" required
                    class="form-input-linkedin w-full" placeholder="Confirm your password" />
           </div>
+
+          <div>
+            <label for="agreeTerms" class="block text-sm font-medium text-gray-700 mb-1">
+              <input type="checkbox" name="agreeTerms" id="agreeTerms" required class="mr-2" />
+              I agree to the <a href="#" id="viewTerms" class="link-linkedin">Terms of Service</a>
+            </label>
+          </div>
+          <div>
+            <label for="agreePrivacy" class="block text-sm font-medium text-gray-700 mb-1">
+              <input type="checkbox" name="agreePrivacy" id="agreePrivacy" required class="mr-2" />
+              I have read and agree to the <a href="#" id="viewPrivacy" class="link-linkedin">Privacy Policy</a>
+            </label>
+          </div>
+          
           <div>
             <label for="dataConsent" class="block text-sm font-medium text-gray-700 mb-1">
               <input type="checkbox" name="dataConsent" id="dataConsent" required class="mr-2" />
               I consent to sharing my data for disaster response and analytics
             </label>
           </div>
+          
           <div id="messageDiv" class="text-sm text-center font-medium pt-1"></div>
           <div id="resendContainer" class="text-center mt-2 hidden">
             <button id="resendNow" class="btn-resend mt-4">Resend Verification Email</button>
@@ -411,8 +497,22 @@
         </div>
       </div>
       <p class="text-xs text-gray-500 text-center mt-8">
-        © <span id="currentYear"></span> nova7. All rights reserved.
+        © <span id="currentYear"></span> NOVA7. All rights reserved.
       </p>
+    </div>
+
+    <div id="policyModal" class="modal-overlay">
+      <div class="modal-container">
+        <div class="modal-header">
+          <h3 id="modalTitle"></h3>
+          </div>
+        <div class="modal-body" id="modalBody">
+          <p class="text-center text-gray-500">Loading policy...</p>
+        </div>
+        <div class="modal-footer">
+          <button id="modalAcceptBtn" class="btn-modal-accept">Accept</button>
+        </div>
+      </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -434,6 +534,16 @@
         const paymentNetworkSelect = document.getElementById('paymentNetwork');
         const passwordInput = document.getElementById('password');
         const confirmPasswordInput = document.getElementById('confirmPassword');
+        const agreeTermsCheckbox = document.getElementById('agreeTerms');
+        const agreePrivacyCheckbox = document.getElementById('agreePrivacy');
+
+        // Modal elements
+        const policyModal = document.getElementById('policyModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalBody = document.getElementById('modalBody');
+        const modalAcceptBtn = document.getElementById('modalAcceptBtn');
+
+        let currentCheckboxToUpdate = null; // To track which checkbox to check after modal acceptance
 
         // Country to dialing code mapping
         const countryCodes = {
@@ -491,7 +601,6 @@
           "Tanzania": ["M-Pesa", "Tigo Pesa", "Airtel Money", "Halopesa", "Bank Account"],
           "Rwanda": ["MTN Mobile Money", "Airtel Money", "Bank Account"],
           "Zimbabwe": ["EcoCash", "OneMoney", "Telecash", "Bank Account"],
-          "Zambia": ["MTN Mobile Money", "Airtel Money", "Zamtel Kwacha", "Bank Account"],
           "default": ["Bank Account", "PayPal", "Other"]
         };
 
@@ -532,6 +641,59 @@
 
         let lastSignupAttempt = 0;
 
+        // Modal Functions
+        async function openPolicyModal(title, url, checkboxElement) {
+          modalTitle.textContent = title;
+          modalBody.innerHTML = '<p class="text-center text-gray-500">Loading policy...</p>'; // Show loading
+          policyModal.classList.add('open');
+          currentCheckboxToUpdate = checkboxElement; // Store which checkbox to update
+
+          try {
+            const response = await fetch(url);
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const htmlContent = await response.text();
+            // Extract only the content of the main container if available
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(htmlContent, 'text/html');
+            const containerContent = doc.querySelector('.container'); // Assuming policy files have a .container
+            if (containerContent) {
+                modalBody.innerHTML = containerContent.innerHTML;
+            } else {
+                modalBody.innerHTML = htmlContent; // Fallback to full content if .container not found
+            }
+          } catch (error) {
+            console.error(`Failed to load policy from ${url}:`, error);
+            modalBody.innerHTML = `<p class="text-red-500 text-center">Failed to load policy. Please try again later.</p>`;
+          }
+        }
+
+        function closePolicyModal() {
+          policyModal.classList.remove('open');
+          currentCheckboxToUpdate = null;
+        }
+
+        // Event Listeners for policy links
+        document.getElementById('viewTerms').addEventListener('click', function(e) {
+            e.preventDefault();
+            openPolicyModal('Terms of Service for NOVA7', 'terms-of-service.html', agreeTermsCheckbox);
+        });
+
+        document.getElementById('viewPrivacy').addEventListener('click', function(e) {
+            e.preventDefault();
+            openPolicyModal('Privacy Policy for NOVA7', 'privacy-policy.html', agreePrivacyCheckbox);
+        });
+
+        // Event listener for modal's "Accept" button
+        modalAcceptBtn.addEventListener('click', function() {
+            if (currentCheckboxToUpdate) {
+                currentCheckboxToUpdate.checked = true;
+            }
+            closePolicyModal();
+        });
+
+
         registerForm.addEventListener('submit', async function (event) {
           event.preventDefault();
           const now = Date.now();
@@ -560,14 +722,17 @@
             email: document.getElementById('email').value.trim(),
             password: passwordInput.value,
             confirmPassword: confirmPasswordInput.value,
+            agreeTerms: agreeTermsCheckbox.checked, // New
+            agreePrivacy: agreePrivacyCheckbox.checked, // New
             dataConsent: document.getElementById('dataConsent').checked
           };
 
           // Client-side validation
           if (!formData.fullName || !formData.dateOfBirth || !formData.country || !formData.paymentNetwork ||
               !formData.mobileMoney || !formData.province || !formData.city || !formData.address ||
-              !formData.phoneNumber || !formData.password || !formData.confirmPassword || !formData.dataConsent) {
-            showMessage('Please fill in all required fields and consent to data sharing.', 'error');
+              !formData.phoneNumber || !formData.password || !formData.confirmPassword || !formData.dataConsent ||
+              !formData.agreeTerms || !formData.agreePrivacy) { // Added new checkboxes to validation
+            showMessage('Please fill in all required fields and agree to the terms and policies.', 'error');
             registerButton.disabled = false;
             registerButton.textContent = 'Sign Up';
             return;
@@ -651,7 +816,7 @@
                   city: formData.city,
                   address: formData.address,
                   data_consent: formData.dataConsent,
-                  password_hash: 'set-by-auth'
+                  password_hash: 'set-by-auth' // This is just a placeholder, password hash is handled by Supabase Auth
                 }
               ]);
 

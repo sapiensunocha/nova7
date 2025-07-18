@@ -548,6 +548,50 @@
                 }, duration);
             }
 
+            // Function to calculate balance (copied from wallet.html)
+            async function getCalculatedBalance(userId) {
+                try {
+                    const { data, error } = await supabase
+                        .from('transactions')
+                        .select('amount, transaction_type, user_id, recipient_id, status')
+                        .or(`user_id.eq.${userId},recipient_id.eq.${userId}`)
+                        .eq('status', 'completed');
+
+                    if (error) {
+                        console.error('Error fetching balance transactions for calculation:', error.message);
+                        return 0;
+                    }
+
+                    let balance = 0;
+                    if (data) {
+                        data.forEach(tx => {
+                            const amount = parseFloat(tx.amount);
+                            if (tx.transaction_type === 'deposit' && tx.user_id === userId) {
+                                balance += amount;
+                            } else if (tx.transaction_type === 'product_sell' && tx.user_id === userId) {
+                                balance += amount;
+                            } else if (tx.transaction_type === 'loan_received' && tx.user_id === userId) {
+                                balance += amount;
+                            } else if (tx.transaction_type === 'transfer') {
+                                if (tx.recipient_id === userId) {
+                                    balance += amount * (1 - TRANSACTION_FEE_RATE);
+                                } else if (tx.user_id === userId) {
+                                    balance -= amount;
+                                }
+                            } else if (tx.transaction_type === 'money_request' && tx.user_id === userId && tx.status === 'completed') {
+                                balance += amount;
+                            } else if (tx.user_id === userId && ['withdrawal', 'bill_payment', 'loan_payment', 'insurance_payment', 'product_buy'].includes(tx.transaction_type)) {
+                                balance -= amount;
+                            }
+                        });
+                    }
+                    return balance;
+                } catch (error) {
+                    console.error('Network error during balance calculation:', error);
+                    return 0;
+                }
+            }
+
             // Function to handle logout
             async function handleLogout() {
                 console.log("Marketplace: Logging out and redirecting to login.html");
@@ -812,13 +856,14 @@
                                     <button class="buy-button" data-product-id="${product.id}" data-product-price="${product.price}" data-seller-id="${product.seller_id}" ${product.seller_id === userId ? 'disabled' : ''}>
                                         <i class="fas fa-shopping-cart mr-2"></i>${product.seller_id === userId ? 'Your Product' : 'Buy Now'}
                                     </button>
+                                    <div id="buyMessage-${product.id}" class="text-sm text-center mt-2"></div>
                                 </div>
                             `;
                             productListingsDiv.appendChild(productCard);
 
                             const buyButton = productCard.querySelector('.buy-button');
                             if (buyButton && !buyButton.disabled) {
-                                buyButton.addEventListener('click', handleBuyProduct);
+                                buyButton.addEventListener('click', (event) => handleBuyProduct(event, product.id, product.price, product.seller_id));
                             }
                         });
 
@@ -840,76 +885,95 @@
                 }
             }
 
-            async function handleBuyProduct(event) {
-                const productId = event.currentTarget.dataset.productId;
-                const productPrice = parseFloat(event.currentTarget.dataset.productPrice);
-                const sellerId = event.currentTarget.dataset.sellerId;
+            async function handleBuyProduct(event, productId, productPrice, sellerId) {
                 const buyButton = event.currentTarget;
+                const messageDiv = document.getElementById(`buyMessage-${productId}`);
+                const totalAmount = productPrice * (1 + TRANSACTION_FEE_RATE);
 
-                if (!confirm(`Are you sure you want to buy this product for $${productPrice.toFixed(2)}? A ${TRANSACTION_FEE_RATE * 100}% transaction fee will apply.`)) {
+                if (!confirm(`Are you sure you want to buy this product for $${totalAmount.toFixed(2)} (including ${TRANSACTION_FEE_RATE * 100}% fee)?`)) {
                     return;
                 }
 
                 buyButton.disabled = true;
                 buyButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
+                if (messageDiv) messageDiv.textContent = '';
 
                 try {
                     if (userId === sellerId) {
                         showMessage('You cannot buy your own product.', 'error');
+                        if (messageDiv) messageDiv.textContent = 'Cannot buy your own product.';
                         return;
                     }
 
-                    const fee = productPrice * TRANSACTION_FEE_RATE;
-                    const totalAmount = productPrice + fee;
+                    // Check buyer's balance
+                    const balance = await getCalculatedBalance(userId);
+                    if (balance < totalAmount) {
+                        showMessage('Insufficient balance. Please top up your account.', 'error');
+                        if (messageDiv) messageDiv.textContent = 'Insufficient balance.';
+                        return;
+                    }
 
-                    const { error: transactionError } = await supabase
+                    // Insert buyer's transaction (debit)
+                    const { error: buyerTransactionError } = await supabase
                         .from('transactions')
                         .insert({
                             user_id: userId,
                             amount: -totalAmount,
                             transaction_type: 'product_buy',
+                            status: 'completed',
                             description: `Purchase of product ID ${productId}`,
+                            product_id: productId,
                             created_at: new Date().toISOString()
                         });
 
-                    if (transactionError) {
-                        console.error('Error recording transaction:', transactionError.message);
-                        showMessage(`Purchase failed: ${transactionError.message}`, 'error');
+                    if (buyerTransactionError) {
+                        console.error('Error recording buyer transaction:', buyerTransactionError.message);
+                        showMessage(`Purchase failed: ${buyerTransactionError.message}`, 'error');
+                        if (messageDiv) messageDiv.textContent = `Error: ${buyerTransactionError.message}`;
                         return;
                     }
 
+                    // Insert seller's transaction (credit)
                     const { error: sellerTransactionError } = await supabase
                         .from('transactions')
                         .insert({
-                            user_id: sellerId,
+                            recipient_id: sellerId,
                             amount: productPrice,
                             transaction_type: 'product_sell',
-                            description: `Sale of product ID ${productId}`,
+                            status: 'completed',
+                            description: `Sale of product ID ${productId} to user ID: ${userId}`,
+                            product_id: productId,
                             created_at: new Date().toISOString()
                         });
 
                     if (sellerTransactionError) {
                         console.error('Error recording seller transaction:', sellerTransactionError.message);
                         showMessage('Purchase completed, but seller transaction failed.', 'error');
+                        if (messageDiv) messageDiv.textContent = 'Failed to credit seller.';
                         return;
                     }
 
-                    const { error: deleteProductError } = await supabase
+                    // Update product status instead of deleting
+                    const { error: updateProductError } = await supabase
                         .from('products')
-                        .delete()
+                        .update({ status: 'sold' })
                         .eq('id', productId);
 
-                    if (deleteProductError) {
-                        console.error('Error deleting product:', deleteProductError.message);
-                        showMessage('Purchase completed, but product removal failed. Contact support.', 'error', 5000);
+                    if (updateProductError) {
+                        console.error('Error updating product status:', updateProductError.message);
+                        showMessage('Purchase completed, but product status update failed.', 'error');
+                        if (messageDiv) messageDiv.textContent = 'Failed to update product status.';
+                        return;
                     }
 
                     showMessage('Purchase completed successfully!', 'success');
+                    if (messageDiv) messageDiv.textContent = 'Purchase completed successfully!';
                     fetchMarketplaceItems(currentPage, currentFilters);
 
                 } catch (error) {
                     console.error('Error buying product:', error);
-                    showMessage('An error occurred during purchase.', 'error');
+                    showMessage(`Purchase failed: ${error.message}`, 'error');
+                    if (messageDiv) messageDiv.textContent = `Error: ${error.message}`;
                 } finally {
                     buyButton.disabled = false;
                     buyButton.innerHTML = '<i class="fas fa-shopping-cart mr-2"></i>Buy Now';

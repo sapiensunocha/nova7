@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - nova7</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="./dist/output.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
       body {
@@ -372,7 +373,6 @@
         </div>
       </div>
     </main>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
       document.addEventListener('DOMContentLoaded', async function() {
         // Supabase client initialization
@@ -381,6 +381,7 @@
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         console.log("Supabase client initialized.");
 
+        const TRANSACTION_FEE_RATE = 0.001; // 0.1% fee
         const aiSummaryText = document.getElementById('aiSummaryText');
         const verificationMessage = document.getElementById('verificationMessage');
         const dashboardContent = document.getElementById('dashboardContent');
@@ -393,6 +394,50 @@
         function showMessage(element, message, type = 'success') {
           element.innerHTML = message;
           element.className = `ai-summary-text ${type === 'success' ? 'text-green-600' : 'text-red-600'}`;
+        }
+
+        // Function to calculate balance
+        async function getCalculatedBalance(userId) {
+          try {
+            const { data, error } = await supabase
+              .from('transactions')
+              .select('amount, transaction_type, user_id, recipient_id, status')
+              .or(`user_id.eq.${userId},recipient_id.eq.${userId}`)
+              .eq('status', 'completed');
+
+            if (error) {
+              console.error('Error fetching balance transactions for calculation:', error.message);
+              return 0;
+            }
+
+            let balance = 0;
+            if (data) {
+              data.forEach(tx => {
+                const amount = parseFloat(tx.amount);
+                if (tx.transaction_type === 'deposit' && tx.user_id === userId) {
+                  balance += amount;
+                } else if (tx.transaction_type === 'product_sell' && tx.recipient_id === userId) {
+                  balance += amount * (1 - TRANSACTION_FEE_RATE);
+                } else if (tx.transaction_type === 'loan_received' && tx.user_id === userId) {
+                  balance += amount;
+                } else if (tx.transaction_type === 'transfer') {
+                  if (tx.recipient_id === userId) {
+                    balance += amount * (1 - TRANSACTION_FEE_RATE);
+                  } else if (tx.user_id === userId) {
+                    balance -= amount;
+                  }
+                } else if (tx.transaction_type === 'money_request' && tx.user_id === userId && tx.status === 'completed') {
+                  balance += amount;
+                } else if (tx.user_id === userId && ['withdrawal', 'bill_payment', 'loan_payment', 'insurance_payment', 'product_buy'].includes(tx.transaction_type)) {
+                  balance -= amount;
+                }
+              });
+            }
+            return balance;
+          } catch (error) {
+            console.error('Network error during balance calculation:', error);
+            return 0;
+          }
         }
 
         // Function to handle logout
@@ -517,8 +562,9 @@
           // Fetch recent transactions from 'transactions' table
           const { data: transactions, error: transactionsError } = await supabase
             .from('transactions')
-            .select('amount, transaction_type, created_at')
-            .eq('user_id', user.id)
+            .select('amount, transaction_type, created_at, user_id, recipient_id, status')
+            .or(`user_id.eq.${user.id},recipient_id.eq.${user.id}`)
+            .eq('status', 'completed')
             .order('created_at', { ascending: false })
             .limit(100);
 
@@ -530,18 +576,22 @@
             recentTransactions = transactions || [];
           }
 
-          // Calculate financial metrics
+          // Calculate financial metrics using getCalculatedBalance
+          userBalance = await getCalculatedBalance(user.id);
+
+          // Calculate total income and expenses for display
           let totalIncome = 0;
           let totalExpenses = 0;
           recentTransactions.forEach(t => {
-            const amount = parseFloat(t.amount) || 0;
-            if (amount > 0 && ['deposit', 'transfer_received', 'product_sell', 'loan_received'].includes(t.transaction_type)) {
+            const amount = parseFloat(t.amount);
+            if (t.user_id === user.id && ['deposit', 'loan_received', 'money_request'].includes(t.transaction_type) && amount > 0) {
               totalIncome += amount;
-            } else if (amount < 0 && (t.transaction_type.startsWith('withdrawal') || ['transfer_sent', 'product_buy', 'insurance_payment'].includes(t.transaction_type))) {
+            } else if (t.recipient_id === user.id && ['product_sell', 'transfer'].includes(t.transaction_type)) {
+              totalIncome += amount * (1 - TRANSACTION_FEE_RATE);
+            } else if (t.user_id === user.id && ['withdrawal', 'transfer', 'product_buy', 'insurance_payment', 'bill_payment', 'loan_payment'].includes(t.transaction_type) && amount < 0) {
               totalExpenses += Math.abs(amount);
             }
           });
-          userBalance = totalIncome - totalExpenses;
 
           document.getElementById('totalIncomeDisplay').textContent = `$${totalIncome.toFixed(2)}`;
           document.getElementById('totalExpensesDisplay').textContent = `$${totalExpenses.toFixed(2)}`;
@@ -581,7 +631,7 @@
 
         // Chart rendering functions
         function renderSalesTrendChart(transactions) {
-          const salesData = transactions.filter(t => t.transaction_type === 'product_sell');
+          const salesData = transactions.filter(t => t.transaction_type === 'product_sell' && t.recipient_id === user.id);
           const labels = salesData.map(t => new Date(t.created_at).toLocaleDateString());
           const data = salesData.map(t => parseFloat(t.amount));
           const ctx = document.getElementById('salesTrendChart').getContext('2d');
@@ -611,12 +661,13 @@
         }
 
         function renderExpenseBreakdownChart(transactions) {
-          const expenseData = transactions.filter(t => ['product_buy', 'transfer_sent', 'insurance_payment'].includes(t.transaction_type) || t.transaction_type.startsWith('withdrawal'));
+          const expenseData = transactions.filter(t => ['product_buy', 'transfer', 'insurance_payment'].includes(t.transaction_type) && t.user_id === user.id || (t.transaction_type === 'withdrawal' && t.user_id === user.id));
           const categories = ['Product Buy', 'Withdrawal', 'Transfer Sent', 'Insurance Payment'];
           const data = categories.map(cat => {
             return expenseData.filter(t => {
               const normalizedType = t.transaction_type.toLowerCase().replace(' ', '_');
-              if (cat === 'Withdrawal') return normalizedType.startsWith('withdrawal');
+              if (cat === 'Withdrawal') return normalizedType === 'withdrawal';
+              if (cat === 'Transfer Sent') return normalizedType === 'transfer' && t.user_id === user.id;
               return normalizedType === cat.toLowerCase().replace(' ', '_');
             }).reduce((sum, t) => sum + Math.abs(parseFloat(t.amount)), 0);
           });
@@ -660,7 +711,7 @@
         function renderCashFlowChart(transactions) {
           const cashFlowData = transactions.map(t => ({
             date: new Date(t.created_at).toLocaleDateString(),
-            amount: parseFloat(t.amount)
+            amount: t.user_id === user.id ? parseFloat(t.amount) : (t.recipient_id === user.id ? parseFloat(t.amount) * (1 - TRANSACTION_FEE_RATE) : 0)
           }));
           const aggregatedCashFlow = cashFlowData.reduce((acc, current) => {
             acc[current.date] = (acc[current.date] || 0) + current.amount;
