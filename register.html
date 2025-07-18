@@ -536,6 +536,8 @@
         const confirmPasswordInput = document.getElementById('confirmPassword');
         const agreeTermsCheckbox = document.getElementById('agreeTerms');
         const agreePrivacyCheckbox = document.getElementById('agreePrivacy');
+        const dateOfBirthInput = document.getElementById('dateOfBirth');
+
 
         // Modal elements
         const policyModal = document.getElementById('policyModal');
@@ -601,6 +603,7 @@
           "Tanzania": ["M-Pesa", "Tigo Pesa", "Airtel Money", "Halopesa", "Bank Account"],
           "Rwanda": ["MTN Mobile Money", "Airtel Money", "Bank Account"],
           "Zimbabwe": ["EcoCash", "OneMoney", "Telecash", "Bank Account"],
+          "Zambia": ["MTN Mobile Money", "Airtel Money", "Zamtel Kwacha", "Bank Account"],
           "default": ["Bank Account", "PayPal", "Other"]
         };
 
@@ -722,8 +725,8 @@
             email: document.getElementById('email').value.trim(),
             password: passwordInput.value,
             confirmPassword: confirmPasswordInput.value,
-            agreeTerms: agreeTermsCheckbox.checked, // New
-            agreePrivacy: agreePrivacyCheckbox.checked, // New
+            agreeTerms: agreeTermsCheckbox.checked,
+            agreePrivacy: agreePrivacyCheckbox.checked,
             dataConsent: document.getElementById('dataConsent').checked
           };
 
@@ -731,11 +734,26 @@
           if (!formData.fullName || !formData.dateOfBirth || !formData.country || !formData.paymentNetwork ||
               !formData.mobileMoney || !formData.province || !formData.city || !formData.address ||
               !formData.phoneNumber || !formData.password || !formData.confirmPassword || !formData.dataConsent ||
-              !formData.agreeTerms || !formData.agreePrivacy) { // Added new checkboxes to validation
+              !formData.agreeTerms || !formData.agreePrivacy) {
             showMessage('Please fill in all required fields and agree to the terms and policies.', 'error');
             registerButton.disabled = false;
             registerButton.textContent = 'Sign Up';
             return;
+          }
+
+          // Date of Birth Validation: User must be at least 13 years old
+          const dob = new Date(formData.dateOfBirth);
+          const today = new Date();
+          let age = today.getFullYear() - dob.getFullYear();
+          const m = today.getMonth() - dob.getMonth();
+          if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+              age--;
+          }
+          if (age < 13) {
+              showMessage('You must be at least 13 years old to register.', 'error');
+              registerButton.disabled = false;
+              registerButton.textContent = 'Sign Up';
+              return;
           }
 
           if (formData.password !== formData.confirmPassword) {
@@ -745,12 +763,32 @@
             return;
           }
 
-          if (formData.password.length < 6) {
-            showMessage('Password must be at least 6 characters long.', 'error');
-            registerButton.disabled = false;
-            registerButton.textContent = 'Sign Up';
-            return;
+          // Password Strength Validation
+          const password = formData.password;
+          const passwordErrors = [];
+          if (password.length < 8) {
+              passwordErrors.push('at least 8 characters long');
           }
+          if (!/[A-Z]/.test(password)) {
+              passwordErrors.push('at least one uppercase letter');
+          }
+          if (!/[a-z]/.test(password)) {
+              passwordErrors.push('at least one lowercase letter');
+          }
+          if (!/[0-9]/.test(password)) {
+              passwordErrors.push('at least one number');
+          }
+          if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~` ]/.test(password)) { // Includes space
+              passwordErrors.push('at least one special character (e.g., !@#$%)');
+          }
+
+          if (passwordErrors.length > 0) {
+              showMessage(`Password must be: ${passwordErrors.join(', ')}.`, 'error');
+              registerButton.disabled = false;
+              registerButton.textContent = 'Sign Up';
+              return;
+          }
+
 
           const fullPhoneNumber = `${phoneCodeSpan.textContent}${formData.phoneNumber}`;
           if (!formData.email && !fullPhoneNumber) {
