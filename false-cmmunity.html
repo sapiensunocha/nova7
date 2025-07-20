@@ -1,0 +1,1902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community Hub - nova7</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F0F2F5;
+            color: #1a202c;
+        }
+        /* Sidebar Styles */
+        .sidebar-nova7 {
+            background-color: #004182;
+            color: #E0F2FE;
+            width: 260px;
+            box-shadow: 2px 0 8px rgba(0,0,0,0.15);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding-top: 1rem;
+            transition: transform 0.3s ease-in-out;
+            z-index: 40;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar-header {
+            padding: 0.75rem 1.5rem 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid #0053a0;
+            margin-bottom: 0.75rem;
+        }
+        .sidebar-logo-img {
+            max-height: 120px;
+            width: auto;
+            filter: brightness(0) invert(1);
+        }
+        .sidebar-nova7 .nav-link-sidebar {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            margin: 0.25rem 1rem;
+            font-weight: 500;
+            color: #E0F2FE;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .sidebar-nova7 .nav-link-sidebar:hover {
+            background-color: #0A66C2;
+            color: #FFFFFF;
+        }
+        .sidebar-nova7 .nav-link-sidebar.active {
+            background-color: #FFFFFF;
+            color: #0A66C2;
+            font-weight: 600;
+        }
+        .sidebar-nova7 .nav-link-sidebar i {
+            width: 20px;
+            margin-right: 0.75rem;
+            text-align: center;
+        }
+        /* Main Content Styles */
+        .main-content {
+            margin-left: 260px;
+            padding: 1.5rem;
+            width: calc(100% - 260px);
+            min-height: 100vh;
+            transition: margin-left 0.3s ease-in-out;
+        }
+        /* Mobile Header */
+        .mobile-header {
+            display: none;
+            background-color: #FFFFFF;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 0 1rem;
+            height: 60px;
+            align-items: center;
+            justify-content: space-between;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+        }
+        .nova7-logo-header {
+            max-height: 36px;
+            width: auto;
+        }
+        .mobile-menu-button {
+            background: none;
+            border: none;
+            color: #1a202c;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        /* User Profile in Header */
+        .user-profile-header {
+            display: flex;
+            align-items: center;
+        }
+        .user-profile-header img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 0.75rem;
+            object-fit: cover;
+        }
+        .user-profile-header .user-info {
+            cursor: pointer;
+        }
+        .user-profile-header .user-info:hover span {
+            text-decoration: underline;
+        }
+        .user-profile-header span {
+            font-weight: 600;
+            color: #1a202c;
+        }
+        .user-profile-header #userBalance {
+            font-size: 0.875rem;
+            color: #4A5568;
+            margin-left: 0.5rem;
+        }
+        /* Community Grid Layout */
+        .community-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            padding: 1.5rem;
+        }
+        @media (min-width: 1024px) {
+            .community-grid {
+                grid-template-columns: 2fr 1fr;
+            }
+        }
+        /* Post Creation Card */
+        .post-create-card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.07);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .post-create-card textarea {
+            width: 100%;
+            min-height: 100px;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            padding: 0.75rem;
+            resize: vertical;
+            font-size: 1rem;
+            transition: border-color 0.2s ease;
+        }
+        .post-create-card textarea:focus {
+            outline: none;
+            border-color: #0A66C2;
+            box-shadow: 0 0 0 3px rgba(10, 102, 194, 0.1);
+        }
+        .post-create-card button {
+            padding: 0.6rem 1.25rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.2s ease;
+        }
+        .post-create-card .btn-primary {
+            background-color: #0A66C2;
+            color: white;
+        }
+        .post-create-card .btn-primary:hover {
+            background-color: #004182;
+        }
+        .media-upload-area {
+            border: 2px dashed #E2E8F0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            color: #4A5568;
+            background-color: #F9FAFB;
+            transition: border-color 0.2s ease, background-color 0.2s ease;
+        }
+        .media-upload-area:hover {
+            border-color: #0A66C2;
+            background-color: #F0F2F5;
+        }
+        .media-upload-area.uploading {
+            border-color: #0A66C2;
+            background-color: #E0F2FE;
+        }
+        .media-upload-area .upload-icon {
+            font-size: 2rem;
+            color: #0A66C2;
+        }
+        .media-preview-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .media-preview-item {
+            position: relative;
+            flex: 0 0 auto;
+            max-width: 200px;
+        }
+        .media-preview {
+            max-width: 100%;
+            max-height: 150px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+        .media-preview.video {
+            max-height: 200px;
+        }
+        .remove-media-btn {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background-color: rgba(0,0,0,0.7);
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background-color 0.2s ease;
+        }
+        .remove-media-btn:hover {
+            background-color: rgba(0,0,0,0.9);
+        }
+        .upload-progress {
+            margin-top: 0.5rem;
+            height: 4px;
+            background-color: #E2E8F0;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        .upload-progress-bar {
+            height: 100%;
+            background-color: #0A66C2;
+            width: 0;
+            transition: width 0.3s ease;
+        }
+        /* Post Card */
+        .post-card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.07);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        .post-card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .post-card-header img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 0.75rem;
+            object-fit: cover;
+            cursor: pointer; /* Make avatar clickable */
+        }
+        .post-card-author-info strong {
+            display: block;
+            font-weight: 700;
+            color: #1a202c;
+            cursor: pointer; /* Make name clickable */
+        }
+        .post-card-author-info strong:hover {
+            text-decoration: underline;
+        }
+        .post-card-author-info span {
+            font-size: 0.875rem;
+            color: #718096;
+        }
+        .post-content {
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+        .post-content img, .post-content video {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+        .post-actions {
+            display: flex;
+            gap: 1rem;
+            border-top: 1px solid #E2E8F0;
+            padding-top: 1rem;
+            margin-top: 1rem;
+        }
+        .post-action-button {
+            background: none;
+            border: none;
+            color: #718096;
+            cursor: pointer;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: color 0.2s ease;
+        }
+        .post-action-button:hover {
+            color: #0A66C2;
+        }
+        .post-action-button.liked {
+            color: #0A66C2;
+            font-weight: 600;
+        }
+        .post-action-button.loved {
+            color: #DC3545;
+            font-weight: 600;
+        }
+        /* Comments Section */
+        .comments-section {
+            border-top: 1px solid #E2E8F0;
+            padding-top: 1rem;
+            margin-top: 1rem;
+            display: none;
+        }
+        .comment-input-area {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .comment-input-area input {
+            flex-grow: 1;
+            padding: 0.6rem 0.75rem;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+        }
+        .comment-input-area button {
+            background-color: #0A66C2;
+            color: white;
+            padding: 0.6rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .comment-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+            background-color: #F9FAFB;
+            padding: 0.75rem;
+            border-radius: 8px;
+        }
+        .comment-item img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            margin-right: 0.6rem;
+            object-fit: cover;
+        }
+        .comment-content-wrapper {
+            flex-grow: 1;
+        }
+        .comment-author {
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 0.2rem;
+        }
+        .comment-text {
+            font-size: 0.95rem;
+            color: #2D3748;
+            line-height: 1.4;
+        }
+        .comment-meta {
+            font-size: 0.8rem;
+            color: #A0AEC0;
+            margin-top: 0.2rem;
+        }
+        /* Right Sidebar Styles */
+        .right-sidebar {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.07);
+            padding: 1.5rem;
+        }
+        .right-sidebar h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 1.25rem;
+            text-align: center;
+        }
+        .marketplace-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            transition: background-color 0.2s ease;
+        }
+        .marketplace-item:hover {
+            background-color: #F9FAFB;
+        }
+        .marketplace-item img {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            object-fit: cover;
+            margin-right: 0.75rem;
+        }
+        .item-details strong {
+            display: block;
+            font-weight: 600;
+            color: #1a202c;
+        }
+        .item-details span {
+            font-size: 0.9rem;
+            color: #0A66C2;
+            font-weight: 700;
+        }
+        /* Message Floating Action Button (FAB) */
+        .message-fab {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background-color: #0A66C2;
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            z-index: 50;
+        }
+        .message-fab:hover {
+            background-color: #004182;
+        }
+        /* Message Modal */
+        .message-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 60;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .message-modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        .message-modal-content {
+            background-color: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 900px;
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .message-modal-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #E2E8F0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1a202c;
+        }
+        .message-modal-header button {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #718096;
+        }
+        .message-modal-body {
+            flex-grow: 1;
+            display: flex;
+            overflow: hidden;
+        }
+        .message-sidebar {
+            width: 300px;
+            border-right: 1px solid #E2E8F0;
+            display: flex;
+            flex-direction: column;
+            background-color: #F9FAFB;
+        }
+        .message-search-bar {
+            padding: 1rem;
+            border-bottom: 1px solid #E2E8F0;
+        }
+        .message-search-bar input {
+            width: 100%;
+            padding: 0.6rem 0.75rem;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+        }
+        .message-list {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 0.5rem 0;
+        }
+        .message-list-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .message-list-item:hover,
+        .message-list-item.active {
+            background-color: #E0F2FE;
+        }
+        .message-list-item img {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            margin-right: 0.75rem;
+            object-fit: cover;
+        }
+        .message-list-item-info strong {
+            display: block;
+            font-weight: 600;
+            color: #1a202c;
+        }
+        .message-list-item-info span {
+            font-size: 0.85rem;
+            color: #718096;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 180px;
+        }
+        .chat-area {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+            overflow: hidden;
+        }
+        .chat-area-header {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: #1a202c;
+            border-bottom: 1px solid #E2E8F0;
+            padding-bottom: 0.75rem;
+        }
+        .chat-window {
+            flex-grow: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column-reverse;
+            padding-right: 0.5rem;
+        }
+        .chat-message {
+            max-width: 70%;
+            margin-bottom: 0.75rem;
+            display: flex;
+        }
+        .chat-message .chat-bubble {
+            padding: 0.75rem 1rem;
+            border-radius: 1.25rem;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+        .chat-message.self {
+            align-self: flex-end;
+            justify-content: flex-end;
+        }
+        .chat-message.self .chat-bubble {
+            background-color: #0A66C2;
+            color: white;
+            border-bottom-right-radius: 0.25rem;
+        }
+        .chat-message.other {
+            align-self: flex-start;
+            justify-content: flex-start;
+        }
+        .chat-message.other .chat-bubble {
+            background-color: #E2E8F0;
+            color: #1a202c;
+            border-bottom-left-radius: 0.25rem;
+        }
+        .chat-input-area {
+            display: flex;
+            margin-top: 1rem;
+            gap: 0.5rem;
+        }
+        .chat-input-area input {
+            flex-grow: 1;
+            padding: 0.75rem 1rem;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+        }
+        .chat-input-area button {
+            background-color: #0A66C2;
+            color: white;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .chat-input-area button:hover {
+            background-color: #004182;
+        }
+        /* Message Box Notification */
+        .message-box {
+            position: fixed;
+            bottom: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .message-box.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        .message-box.success { background-color: #28a745; }
+        .message-box.error { background-color: #dc3545; }
+        .message-box.info { background-color: #17a2b8; }
+        /* LinkedIn-style Search Bar */
+        .search-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background-color: #F0F2F5; /* Light grey background */
+            border-radius: 8px;
+            padding: 0.25rem 0.5rem;
+            max-width: 600px;
+            margin: 0 auto 1.5rem auto;
+            border: 1px solid #D1D5DB; /* Subtle border */
+        }
+        .search-container.focused {
+            border-color: #0A66C2;
+            box-shadow: 0 0 0 2px rgba(10, 102, 194, 0.2);
+        }
+        .search-bar-input-wrapper {
+            display: flex;
+            align-items: center;
+            flex-grow: 1;
+            background-color: white; /* White background for input */
+            border-radius: 6px;
+            padding: 0.5rem 1rem;
+            border: 1px solid #E2E8F0; /* Inner border */
+            transition: border-color 0.2s ease;
+        }
+        .search-bar-input-wrapper:focus-within {
+             border-color: #0A66C2;
+        }
+        .search-bar-container i {
+            color: #6B7280; /* Darker grey icon */
+            margin-right: 0.75rem;
+            font-size: 1rem;
+        }
+        .search-bar-container input {
+            background: none;
+            border: none;
+            outline: none;
+            width: 100%;
+            font-size: 0.95rem; /* Slightly larger font */
+            color: #1A202C;
+            font-family: 'Inter', sans-serif;
+        }
+        .search-bar-container input::placeholder {
+            color: #9CA3AF; /* Lighter placeholder text */
+        }
+        .search-filter-dropdown {
+            position: relative;
+            z-index: 10;
+        }
+        .search-filter-button {
+            background-color: #0A66C2;
+            color: white;
+            padding: 0.6rem 1rem;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background-color 0.2s ease;
+        }
+        .search-filter-button:hover {
+            background-color: #004182;
+        }
+        .search-filter-options {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            min-width: 120px;
+            padding: 0.5rem 0;
+            margin-top: 0.5rem;
+            display: none;
+        }
+        .search-filter-options.show {
+            display: block;
+        }
+        .search-filter-options div {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            color: #1a202c;
+            font-weight: 500;
+            transition: background-color 0.2s ease;
+        }
+        .search-filter-options div:hover {
+            background-color: #F0F2F5;
+        }
+        .search-filter-options div.active {
+            background-color: #E0F2FE;
+            color: #0A66C2;
+        }
+
+        /* Profile Modal */
+        .profile-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 70;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .profile-modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        .profile-modal-content {
+            background-color: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            padding: 2rem;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            position: relative;
+            text-align: center;
+            animation: fadeInScale 0.3s ease-out;
+        }
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        .profile-modal-close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #718096;
+        }
+        .profile-modal-content img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 1.5rem;
+            border: 4px solid #0A66C2;
+        }
+        .profile-modal-content h3 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 0.5rem;
+        }
+        .profile-modal-content p {
+            font-size: 1rem;
+            color: #4A5568;
+            margin-bottom: 0.75rem;
+        }
+        .profile-modal-content .profile-balance {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #0A66C2;
+            margin-top: 1rem;
+        }
+
+
+        @media (max-width: 768px) {
+            .sidebar-nova7 {
+                transform: translateX(-100%);
+            }
+            .sidebar-nova7.open {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+                padding-top: calc(60px + 1rem);
+            }
+            .mobile-header {
+                display: flex;
+            }
+            .message-modal-content {
+                width: 100%;
+                height: 100%;
+                border-radius: 0;
+            }
+            .message-modal-body {
+                flex-direction: column;
+            }
+            .message-sidebar {
+                width: 100%;
+                height: 250px;
+                border-right: none;
+                border-bottom: 1px solid #E2E8F0;
+            }
+            .chat-area {
+                padding: 1rem;
+            }
+            .chat-message {
+                max-width: 90%;
+            }
+            .search-container {
+                margin: 0 1rem;
+                max-width: none;
+            }
+            .search-filter-button {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.9rem;
+            }
+            .profile-modal-content {
+                width: 95%;
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+    <header class="mobile-header md:hidden">
+        <button class="mobile-menu-button" id="mobileMenuButton">
+            <i class="fas fa-bars text-2xl"></i>
+        </button>
+        <div class="search-container flex-grow mr-2" id="mobileSearchContainer">
+            <div class="search-bar-input-wrapper">
+                <i class="fas fa-search"></i>
+                <input type="text" id="mobileSearchBar" placeholder="Search posts, people, or keywords...">
+            </div>
+            <div class="search-filter-dropdown">
+                <button class="search-filter-button" id="mobileSearchFilterButton">
+                    Posts <i class="fas fa-chevron-down text-xs"></i>
+                </button>
+                <div class="search-filter-options" id="mobileSearchFilterOptions">
+                    <div data-filter-type="posts" class="active">Posts</div>
+                    <div data-filter-type="people">People</div>
+                </div>
+            </div>
+        </div>
+        <div class="user-profile-header">
+            <img id="mobileAvatar" src="https://via.placeholder.com/50" alt="User Avatar">
+            <div class="user-info" id="mobileUserInfo">
+                <span id="mobileUsername">Guest</span>
+            </div>
+        </div>
+    </header>
+    <aside id="sidebar" class="sidebar-nova7">
+        <div class="sidebar-header">
+            <a href="dashboard.html" class="flex items-center">
+                <img src="nova-logo.png" alt="nova7 Logo" class="sidebar-logo-img"
+                     onerror="this.style.display='none';">
+            </a>
+        </div>
+        <nav class="flex-grow">
+            <a href="dashboard.html" class="nav-link-sidebar">
+                <i class="fas fa-tachometer-alt"></i>Dashboard
+            </a>
+            <a href="view-transactions.html" class="nav-link-sidebar">
+                <i class="fas fa-exchange-alt"></i>Transactions
+            </a>
+            <a href="reports.html" class="nav-link-sidebar">
+                <i class="fas fa-chart-pie"></i>Reports
+            </a>
+            <a href="community.html" class="nav-link-sidebar active">
+                <i class="fas fa-users"></i>Community
+            </a>
+            <a href="chatbot.html" class="nav-link-sidebar">
+                <i class="fas fa-comments-dollar"></i>Chat Advisor
+            </a>
+            <a href="resources.html" class="nav-link-sidebar">
+                <i class="fas fa-book-open"></i>Resources
+            </a>
+            <a href="settings.html" class="nav-link-sidebar">
+                <i class="fas fa-cog"></i>Settings
+            </a>
+            <a href="wallet.html" class="nav-link-sidebar">
+                <i class="fas fa-wallet"></i>Wallet
+            </a>
+            <a href="profile.html" class="nav-link-sidebar">
+                <i class="fas fa-user-circle"></i>Profile
+            </a>
+            <a href="#" id="sidebarLogoutLink" class="nav-link-sidebar">
+                <i class="fas fa-sign-out-alt"></i>Logout
+            </a>
+        </nav>
+    </aside>
+    <main class="main-content">
+        <div class="hidden md:block">
+            <div class="search-container" id="desktopSearchContainer">
+                <div class="search-bar-input-wrapper">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="desktopSearchBar" placeholder="Search posts, people, or keywords...">
+                </div>
+                <div class="search-filter-dropdown">
+                    <button class="search-filter-button" id="desktopSearchFilterButton">
+                        Posts <i class="fas fa-chevron-down text-xs"></i>
+                    </button>
+                    <div class="search-filter-options" id="desktopSearchFilterOptions">
+                        <div data-filter-type="posts" class="active">Posts</div>
+                        <div data-filter-type="people">People</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="user-profile-header hidden md:flex items-center justify-end mb-6">
+            <img id="desktopAvatar" src="https://via.placeholder.com/50" alt="User Avatar">
+            <div class="user-info cursor-pointer" id="desktopUserInfo">
+                <span id="desktopUsername" class="text-lg">Guest User</span>
+                <span id="userBalance" class="block">Balance: $0.00</span>
+            </div>
+        </div>
+        <div class="community-grid">
+            <div>
+                <h1 class="text-3xl font-bold text-center md:text-left text-gray-800 mb-6">Community Hub</h1>
+                <div class="post-create-card">
+                    <h2 class="text-xl font-semibold text-gray-700 mb-4">Create New Post</h2>
+                    <form id="createPostForm">
+                        <textarea id="postContent" placeholder="Share your thoughts or updates with the community..." class="mb-4"></textarea>
+                        <div class="media-upload-area mb-4" id="mediaUploadArea">
+                            <input type="file" id="mediaInput" accept="image/*,video/*" multiple class="hidden">
+                            <label for="mediaInput" class="cursor-pointer flex flex-col items-center">
+                                <i class="fas fa-cloud-upload-alt upload-icon mb-2"></i>
+                                <span>Drag & Drop or Click to Upload Images/Videos</span>
+                                <span class="text-sm text-gray-500">Supports multiple images and videos</span>
+                            </label>
+                            <div class="upload-progress hidden" id="uploadProgress">
+                                <div class="upload-progress-bar" id="uploadProgressBar"></div>
+                            </div>
+                        </div>
+                        <div id="mediaPreviewContainer" class="media-preview-container"></div>
+                        <button type="submit" class="btn-primary">Post</button>
+                    </form>
+                </div>
+                <section id="communityFeed">
+                    <p class="text-center text-gray-500">Loading posts...</p>
+                </section>
+            </div>
+            <aside class="right-sidebar">
+                <h3>Marketplace Highlights</h3>
+                <div id="marketplaceHighlights">
+                    <p class="text-center text-gray-500">No marketplace items available.</p>
+                </div>
+            </aside>
+        </div>
+    </main>
+    <div class="message-fab" id="messageFab">
+        <i class="fas fa-comment-dots"></i>
+    </div>
+    <div class="message-modal-overlay" id="messageModalOverlay">
+        <div class="message-modal-content">
+            <header class="message-modal-header">
+                <h3>Messages</h3>
+                <button id="closeMessageModalButton"><i class="fas fa-times"></i></button>
+            </header>
+            <div class="message-modal-body">
+                <div class="message-sidebar">
+                    <div class="message-search-bar">
+                        <input type="text" id="chatUserSearch" placeholder="Search users...">
+                    </div>
+                    <div class="message-list" id="chatUserList">
+                        <div class="message-list-item">
+                            <img src="https://via.placeholder.com/50" alt="User Avatar">
+                            <div class="message-list-item-info">
+                                <strong>Jane Doe</strong>
+                                <span>Last message snippet...</span>
+                            </div>
+                        </div>
+                        <div class="message-list-item">
+                            <img src="https://via.placeholder.com/50" alt="User Avatar">
+                            <div class="message-list-item-info">
+                                <strong>John Smith</strong>
+                                <span>Another message preview...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="chat-area flex-grow">
+                    <div class="chat-area-header" id="activeChatHeader">Select a chat</div>
+                    <div class="chat-window" id="chatWindow">
+                        <div class="chat-message other">
+                            <div class="chat-bubble">Hello! How can I help you?</div>
+                        </div>
+                        <div class="chat-message self">
+                            <div class="chat-bubble">I need some assistance with my account.</div>
+                        </div>
+                    </div>
+                    <div class="chat-input-area">
+                        <input type="text" id="chatInput" placeholder="Type your message...">
+                        <button id="sendChatMessageButton"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="profile-modal-overlay" id="profileModalOverlay">
+        <div class="profile-modal-content">
+            <button class="profile-modal-close-btn" id="closeProfileModalButton"><i class="fas fa-times"></i></button>
+            <img id="profileModalAvatar" src="https://via.placeholder.com/120" alt="User Avatar">
+            <h3 id="profileModalName"></h3>
+            <p id="profileModalEmail" class="text-sm text-gray-600"></p>
+            <p id="profileModalBio" class="text-base text-gray-700 mt-2"></p>
+            <p id="profileModalBalance" class="profile-balance hidden">Balance: $0.00</p>
+            <div class="mt-4 flex justify-center gap-4">
+                <button class="btn-primary py-2 px-4 rounded-full text-sm" id="profileModalConnectBtn">Connect</button>
+                <button class="btn-primary bg-gray-300 text-gray-800 hover:bg-gray-400 py-2 px-4 rounded-full text-sm" id="profileModalMessageBtn">Message</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="messageBox" class="message-box"></div>
+    <script>
+        // Mock Current User and Other Users for UI
+        let currentUser = {
+            id: 'mock-user-id-123',
+            email: 'nova7.user@example.com',
+            user_metadata: {
+                full_name: 'Nova7 User',
+                avatar_url: 'https://images.unsplash.com/photo-1535713875002-d1d0cfd80889?q=80&w=1780&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+                bio: 'Passionate about financial tech and community building. Always learning and sharing insights!',
+                balance: 7890.12 // Added balance to current user metadata
+            }
+        };
+
+        const mockOtherUsers = {
+            'mock-user-alpha': {
+                id: 'mock-user-alpha',
+                full_name: 'Alice Johnson',
+                avatar_url: 'https://randomuser.me/api/portraits/women/44.jpg',
+                email: 'alice.j@example.com',
+                bio: 'Enthusiastic about new innovations and making a positive impact.'
+            },
+            'mock-user-beta': {
+                id: 'mock-user-beta',
+                full_name: 'Bob Williams',
+                avatar_url: 'https://randomuser.me/api/portraits/men/32.jpg',
+                email: 'bob.w@example.com',
+                bio: 'Financial analyst with a keen interest in market trends.'
+            },
+            'mock-user-commenter-1': {
+                id: 'mock-user-commenter-1',
+                full_name: 'Commenter X',
+                avatar_url: 'https://via.placeholder.com/32',
+                email: 'commenter.x@example.com',
+                bio: 'Community member exploring new features.'
+            }
+        };
+
+        let activeChatSessionId = null;
+        let currentSearchFilter = 'posts'; // Default search filter
+
+        // UI Update Functions
+        function updateUserUI() {
+            const usernameElements = ['desktopUsername', 'mobileUsername'];
+            const avatarElements = ['desktopAvatar', 'mobileAvatar'];
+            const displayUsername = currentUser?.user_metadata?.full_name || currentUser?.email || 'Guest';
+            const displayAvatar = currentUser?.user_metadata?.avatar_url || 'https://via.placeholder.com/50';
+            usernameElements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) element.textContent = displayUsername;
+            });
+            avatarElements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) element.src = displayAvatar;
+            });
+            fetchUserBalance(); // This will update the balance specifically for desktop
+        }
+
+        function fetchUserBalance() {
+            console.log('Mock: Fetching user balance...');
+            const balance = currentUser?.user_metadata?.balance || 0.00;
+            const userBalanceElement = document.getElementById('userBalance');
+            if (userBalanceElement) {
+                userBalanceElement.textContent = `Balance: $${balance.toFixed(2)}`;
+            }
+        }
+
+        function renderPosts(posts) {
+            const communityFeed = document.getElementById('communityFeed');
+            communityFeed.innerHTML = '';
+            if (!posts || posts.length === 0) {
+                communityFeed.innerHTML = '<p class="text-center text-gray-500">No posts available.</p>';
+                return;
+            }
+            posts.forEach(post => {
+                const postCard = document.createElement('div');
+                postCard.className = 'post-card';
+                const postAuthor = post.users || { full_name: 'Anonymous User', avatar_url: 'https://via.placeholder.com/50', id: 'anonymous' };
+                postCard.innerHTML = `
+                    <div class="post-card-header">
+                        <img src="${postAuthor.avatar_url}" alt="${postAuthor.full_name} Avatar" data-user-id="${postAuthor.id}" class="clickable-profile-avatar">
+                        <div class="post-card-author-info">
+                            <strong data-user-id="${postAuthor.id}" class="clickable-profile-name">${postAuthor.full_name}</strong>
+                            <span>${formatTimeAgo(new Date(post.created_at))}</span>
+                        </div>
+                    </div>
+                    <div class="post-content">
+                        <p>${post.content}</p>
+                        ${post.media_urls ? post.media_urls.map(media =>
+                            media.type === 'image' ? `<img src="${media.url}" alt="Post Media">` :
+                            `<video src="${media.url}" controls class="video"></video>`).join('') : ''
+                        }
+                    </div>
+                    <div class="post-actions">
+                        <button class="post-action-button like-button" data-post-id="${post.id}">
+                            <i class="fas fa-heart"></i> <span class="like-count">${post.likes_count || 0}</span> Likes
+                        </button>
+                        <button class="post-action-button love-button" data-post-id="${post.id}">
+                            <i class="fas fa-star"></i> <span class="love-count">${post.loves_count || 0}</span> Loves
+                        </button>
+                        <button class="post-action-button comment-button" data-post-id="${post.id}">
+                            <i class="fas fa-comment"></i> <span class="comment-count">${post.comments_count || 0}</span> Comments
+                        </button>
+                    </div>
+                    <div class="comments-section" id="comments-section-${post.id}">
+                        <div class="comment-input-area">
+                            <input type="text" id="comment-input-${post.id}" placeholder="Write a comment...">
+                            <button data-post-id="${post.id}" class="submit-comment-button">Post</button>
+                        </div>
+                        <div class="comments-list" id="comments-list-${post.id}"></div>
+                    </div>
+                `;
+                communityFeed.appendChild(postCard);
+            });
+            attachPostActionListeners();
+            attachProfileClickListeners(); // Attach listener to new post elements
+        }
+
+        function renderMarketplaceHighlights(items) {
+            const marketplaceHighlightsDiv = document.getElementById('marketplaceHighlights');
+            marketplaceHighlightsDiv.innerHTML = '';
+            if (!items || items.length === 0) {
+                marketplaceHighlightsDiv.innerHTML = '<p class="text-center text-gray-500">No marketplace items available.</p>';
+                return;
+            }
+            items.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'marketplace-item';
+                itemDiv.innerHTML = `
+                    <img src="${item.image_url || 'https://via.placeholder.com/80'}" alt="${item.name}">
+                    <div class="item-details">
+                        <strong>${item.name}</strong>
+                        <span>$${item.price.toFixed(2)}</span>
+                    </div>
+                `;
+                marketplaceHighlightsDiv.appendChild(itemDiv);
+            });
+        }
+
+        function renderMessages(messages, chatWindowId) {
+            const chatWindow = document.getElementById(chatWindowId);
+            chatWindow.innerHTML = '';
+            if (!messages || messages.length === 0) {
+                chatWindow.innerHTML = '<p class="text-center text-gray-500">No messages in this chat.</p>';
+                return;
+            }
+            messages.sort((a, b) => new Date(a.sent_at) - new Date(b.sent_at));
+            messages.forEach(msg => {
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('chat-message', msg.sender_id === currentUser.id ? 'self' : 'other');
+                messageDiv.innerHTML = `<div class="chat-bubble">${msg.content}</div>`;
+                chatWindow.appendChild(messageDiv);
+            });
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+
+        function renderComment(comment, commentsListElement) {
+            const commentItem = document.createElement('div');
+            commentItem.className = 'comment-item';
+            commentItem.innerHTML = `
+                <img src="${comment.profiles?.avatar_url || 'https://via.placeholder.com/32'}" alt="${comment.profiles?.full_name || 'Anonymous'} Avatar" data-user-id="${comment.profiles?.id || 'anonymous'}" class="clickable-profile-avatar">
+                <div class="comment-content-wrapper">
+                    <div class="comment-author" data-user-id="${comment.profiles?.id || 'anonymous'}">${comment.profiles?.full_name || 'Anonymous User'}</div>
+                    <div class="comment-text">${comment.content}</div>
+                    <div class="comment-meta">${formatTimeAgo(new Date(comment.created_at))}</div>
+                </div>
+            `;
+            commentsListElement.prepend(commentItem);
+            attachProfileClickListeners(); // Attach listener to new comment elements
+        }
+
+        // Data Fetching Functions (Mocked)
+        async function fetchUserProfile() {
+            console.log('Mock: Fetching user profile...');
+            updateUserUI();
+        }
+
+        async function fetchPosts() {
+            console.log('Mock: Fetching posts...');
+            const mockPosts = [
+                {
+                    id: 'mock-post-1',
+                    content: '🚀 Just launched a new project in nova7! So excited about the possibilities. #innovation #nova7',
+                    media_urls: [{ url: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97', type: 'image' }],
+                    created_at: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
+                    likes_count: 25,
+                    comments_count: 8,
+                    loves_count: 3,
+                    user_id: 'mock-user-alpha',
+                    users: mockOtherUsers['mock-user-alpha']
+                },
+                {
+                    id: 'mock-post-2',
+                    content: 'Enjoying the community discussions here. Always learning something new!',
+                    media_urls: null,
+                    created_at: new Date(Date.now() - 2 * 3600 * 1000).toISOString(),
+                    likes_count: 12,
+                    comments_count: 3,
+                    loves_count: 1,
+                    user_id: 'mock-user-beta',
+                    users: mockOtherUsers['mock-user-beta']
+                }
+            ];
+            renderPosts(mockPosts);
+        }
+
+        async function fetchComments(postId) {
+            console.log(`Mock: Fetching comments for post ${postId}...`);
+            const commentsListElement = document.getElementById(`comments-list-${postId}`);
+            commentsListElement.innerHTML = '';
+            const mockComments = [
+                {
+                    id: `mock-comment-${postId}-1`,
+                    content: `Great post! Very insightful. (Mock Comment for ${postId})`,
+                    created_at: new Date(Date.now() - 1 * 60 * 1000).toISOString(),
+                    user_id: 'mock-user-commenter-1',
+                    profiles: mockOtherUsers['mock-user-commenter-1']
+                }
+            ];
+            if (mockComments.length === 0) {
+                commentsListElement.innerHTML = '<p class="text-center text-gray-400 text-sm mt-2">No comments yet.</p>';
+            } else {
+                mockComments.forEach(comment => renderComment(comment, commentsListElement));
+            }
+        }
+
+        async function fetchMarketplaceHighlights() {
+            console.log('Mock: Fetching marketplace highlights...');
+            const mockItems = [
+                { id: 'item-1', name: 'Premium Analytics Dashboard', price: 99.99, image_url: 'https://images.unsplash.com/photo-1549646638-31627e7f67fb' },
+                { id: 'item-2', name: 'AI Chatbot Integration', price: 150.00, image_url: 'https://images.unsplash.com/photo-1620712948601-ba242a5a519b' }
+            ];
+            renderMarketplaceHighlights(mockItems);
+        }
+
+        async function createPost(e) {
+            e.preventDefault();
+            console.log('Mock: Attempting to create post...');
+            const postContent = document.getElementById('postContent').value;
+            const mediaInput = document.getElementById('mediaInput');
+            const files = Array.from(mediaInput.files);
+            if (!postContent && files.length === 0) {
+                showMessage('Post content or media is required!', 'error');
+                return;
+            }
+            const mediaUploadArea = document.getElementById('mediaUploadArea');
+            const uploadProgress = document.getElementById('uploadProgress');
+            const uploadProgressBar = document.getElementById('uploadProgressBar');
+            let mediaUrls = [];
+            if (files.length > 0) {
+                mediaUploadArea.classList.add('uploading');
+                uploadProgress.classList.remove('hidden');
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += 10;
+                    uploadProgressBar.style.width = `${progress}%`;
+                    if (progress >= 100) {
+                        clearInterval(interval);
+                        mediaUploadArea.classList.remove('uploading');
+                        uploadProgress.classList.add('hidden');
+                        uploadProgressBar.style.width = '0%';
+                    }
+                }, 200);
+                mediaUrls = files.map(file => ({
+                    url: URL.createObjectURL(file),
+                    type: file.type.startsWith('image') ? 'image' : 'video'
+                }));
+                showMessage('Media prepared for mock upload!', 'info');
+            }
+            console.log('Mock: Post creation attempted with:', { content: postContent, mediaUrls });
+            showMessage('Post created (mock)!', 'success');
+            document.getElementById('postContent').value = '';
+            removeMedia();
+            fetchPosts();
+        }
+
+        async function handleLikeClick(postId) {
+            console.log(`Mock: Liking post ${postId}...`);
+            const likeButton = document.querySelector(`.like-button[data-post-id="${postId}"]`);
+            const likeCountSpan = likeButton.querySelector('.like-count');
+            let currentLikes = parseInt(likeCountSpan.textContent);
+
+            if (likeButton.classList.contains('liked')) {
+                likeButton.classList.remove('liked');
+                likeCountSpan.textContent = currentLikes - 1;
+                showMessage(`Unliked post ${postId} (mock)!`, 'info');
+            } else {
+                likeButton.classList.add('liked');
+                likeCountSpan.textContent = currentLikes + 1;
+                showMessage(`Liked post ${postId} (mock)!`, 'info');
+            }
+        }
+
+        async function handleLoveClick(postId) {
+            console.log(`Mock: Loving post ${postId}...`);
+            const loveButton = document.querySelector(`.love-button[data-post-id="${postId}"]`);
+            const loveCountSpan = loveButton.querySelector('.love-count');
+            let currentLoves = parseInt(loveCountSpan.textContent);
+
+            if (loveButton.classList.contains('loved')) {
+                loveButton.classList.remove('loved');
+                loveCountSpan.textContent = currentLoves - 1;
+                showMessage(`Unloved post ${postId} (mock)!`, 'info');
+            } else {
+                loveButton.classList.add('loved');
+                loveCountSpan.textContent = currentLoves + 1;
+                showMessage(`Loved post ${postId} (mock)!`, 'info');
+            }
+        }
+
+        async function submitComment(postId) {
+            const commentInput = document.getElementById(`comment-input-${postId}`);
+            const commentContent = commentInput.value.trim();
+            if (!commentContent) {
+                showMessage('Comment cannot be empty!', 'error');
+                return;
+            }
+            console.log(`Mock: Submitting comment for post ${postId}: "${commentContent}"`);
+            const commentsListElement = document.getElementById(`comments-list-${postId}`);
+            const newMockComment = {
+                id: `mock-comment-${postId}-${Date.now()}`,
+                content: commentContent,
+                created_at: new Date().toISOString(),
+                user_id: currentUser.id,
+                profiles: {
+                    id: currentUser.id, // Add ID for clickable profile
+                    full_name: currentUser.user_metadata?.full_name || 'You',
+                    avatar_url: currentUser.user_metadata?.avatar_url || 'https://via.placeholder.com/32'
+                }
+            };
+            renderComment(newMockComment, commentsListElement);
+            showMessage('Comment posted (mock)!', 'success');
+            commentInput.value = '';
+
+            // Update comment count
+            const commentButton = document.querySelector(`.comment-button[data-post-id="${postId}"]`);
+            if (commentButton) {
+                const commentCountSpan = commentButton.querySelector('.comment-count');
+                commentCountSpan.textContent = parseInt(commentCountSpan.textContent) + 1;
+            }
+        }
+
+        // Messaging Functions (Mocked)
+        const mockChatUsers = [
+            { id: 'chat-user-1', name: 'Chat Buddy 1', avatar: 'https://randomuser.me/api/portraits/women/1.jpg', lastMessage: 'Hey there!' },
+            { id: 'chat-user-2', name: 'Chat Friend 2', avatar: 'https://randomuser.me/api/portraits/men/2.jpg', lastMessage: 'Got it, thanks!' }
+        ];
+        const mockChatMessages = {
+            'chat-user-1': [
+                { id: 'msg-1-1', sender_id: 'chat-user-1', content: 'Hi! How are you?', sent_at: new Date(Date.now() - 120000).toISOString() },
+                { id: 'msg-1-2', sender_id: currentUser.id, content: 'I am good, thanks! How about you?', sent_at: new Date(Date.now() - 60000).toISOString() }
+            ]
+        };
+        function openMessageModal() {
+            document.getElementById('messageModalOverlay').classList.add('show');
+            populateChatUserList(mockChatUsers);
+            document.getElementById('chatInput').focus();
+        }
+        function closeMessageModal() {
+            document.getElementById('messageModalOverlay').classList.remove('show');
+            document.getElementById('chatUserSearch').value = '';
+            document.getElementById('chatUserList').innerHTML = '';
+            document.getElementById('chatWindow').innerHTML = '';
+            document.getElementById('activeChatHeader').textContent = 'Select a chat';
+            activeChatSessionId = null;
+        }
+        function populateChatUserList(users) {
+            const chatUserList = document.getElementById('chatUserList');
+            chatUserList.innerHTML = '';
+            users.forEach(user => {
+                const listItem = document.createElement('div');
+                listItem.classList.add('message-list-item');
+                listItem.setAttribute('data-user-id', user.id);
+                listItem.innerHTML = `
+                    <img src="${user.avatar}" alt="${user.name}">
+                    <div class="message-list-item-info">
+                        <strong>${user.name}</strong>
+                        <span>${user.lastMessage}</span>
+                    </div>
+                `;
+                listItem.addEventListener('click', () => {
+                    document.querySelectorAll('.message-list-item').forEach(item => item.classList.remove('active'));
+                    listItem.classList.add('active');
+                    document.getElementById('activeChatHeader').textContent = user.name;
+                    activeChatSessionId = user.id;
+                    renderMessages(mockChatMessages[user.id] || [], 'chatWindow');
+                });
+                chatUserList.appendChild(listItem);
+            });
+        }
+        function searchUsersForChat(query) {
+            console.log(`Mock: Searching for users with query: "${query}"`);
+            const filteredUsers = mockChatUsers.filter(user =>
+                user.name.toLowerCase().includes(query.toLowerCase())
+            );
+            populateChatUserList(filteredUsers);
+        }
+        async function sendChatMessage() {
+            const messageContent = document.getElementById('chatInput').value.trim();
+            if (!messageContent || !activeChatSessionId) return;
+            console.log(`Mock: Sending message to session ${activeChatSessionId}: "${messageContent}"`);
+            const chatWindow = document.getElementById('chatWindow');
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('chat-message', 'self');
+            messageDiv.innerHTML = `<div class="chat-bubble">${messageContent}</div>`;
+            chatWindow.appendChild(messageDiv);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+            document.getElementById('chatInput').value = '';
+            if (!mockChatMessages[activeChatSessionId]) {
+                mockChatMessages[activeChatSessionId] = [];
+            }
+            mockChatMessages[activeChatSessionId].push({
+                id: `msg-${activeChatSessionId}-${Date.now()}`,
+                sender_id: currentUser.id,
+                content: messageContent,
+                sent_at: new Date().toISOString()
+            });
+            showMessage('Message sent (mock)!', 'success');
+        }
+
+        // Search Functionality
+        function handleSearch(query, filterType, isMobile = false) {
+            console.log(`Mock: Searching for "${query}" with filter "${filterType}" ${isMobile ? '(mobile)' : '(desktop)'}...`);
+            showMessage(`Search for "${query}" (filter: ${filterType}, mock)!`, 'info');
+
+            // Mock search: filter posts and marketplace items
+            const mockPosts = [
+                {
+                    id: 'mock-post-1',
+                    content: '🚀 Just launched a new project in nova7! So excited about the possibilities. #innovation #nova7',
+                    media_urls: [{ url: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97', type: 'image' }],
+                    created_at: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
+                    likes_count: 25,
+                    comments_count: 8,
+                    loves_count: 3,
+                    user_id: 'mock-user-alpha',
+                    users: mockOtherUsers['mock-user-alpha']
+                },
+                {
+                    id: 'mock-post-2',
+                    content: 'Enjoying the community discussions here. Always learning something new!',
+                    media_urls: null,
+                    created_at: new Date(Date.now() - 2 * 3600 * 1000).toISOString(),
+                    likes_count: 12,
+                    comments_count: 3,
+                    loves_count: 1,
+                    user_id: 'mock-user-beta',
+                    users: mockOtherUsers['mock-user-beta']
+                }
+            ];
+
+            const mockUsers = Object.values(mockOtherUsers).concat(currentUser); // Include current user in people search
+
+            if (filterType === 'posts') {
+                const filteredPosts = mockPosts.filter(post =>
+                    post.content.toLowerCase().includes(query.toLowerCase()) ||
+                    post.users.full_name.toLowerCase().includes(query.toLowerCase())
+                );
+                renderPosts(filteredPosts);
+                // Optionally clear or show a message for marketplace if filter is "posts"
+                document.getElementById('marketplaceHighlights').innerHTML = '<p class="text-center text-gray-500">Marketplace results filtered by "Posts" search.</p>';
+            } else if (filterType === 'people') {
+                const filteredPeople = mockUsers.filter(user =>
+                    user.full_name.toLowerCase().includes(query.toLowerCase()) ||
+                    user.email.toLowerCase().includes(query.toLowerCase())
+                );
+                // Render filtered people as mock posts or a separate list
+                renderMockPeopleResults(filteredPeople);
+                document.getElementById('marketplaceHighlights').innerHTML = '<p class="text-center text-gray-500">Marketplace results filtered by "People" search.</p>';
+            } else { // Default or general search
+                const filteredPosts = mockPosts.filter(post =>
+                    post.content.toLowerCase().includes(query.toLowerCase()) ||
+                    post.users.full_name.toLowerCase().includes(query.toLowerCase())
+                );
+                renderPosts(filteredPosts);
+
+                const filteredItems = [
+                    { id: 'item-1', name: 'Premium Analytics Dashboard', price: 99.99, image_url: 'https://images.unsplash.com/photo-1549646638-31627e7f67fb' },
+                    { id: 'item-2', name: 'AI Chatbot Integration', price: 150.00, image_url: 'https://images.unsplash.com/photo-1620712948601-ba242a5a519b' }
+                ].filter(item =>
+                    item.name.toLowerCase().includes(query.toLowerCase())
+                );
+                renderMarketplaceHighlights(filteredItems);
+            }
+        }
+
+        // Function to render mock people search results
+        function renderMockPeopleResults(people) {
+            const communityFeed = document.getElementById('communityFeed');
+            communityFeed.innerHTML = '';
+            if (!people || people.length === 0) {
+                communityFeed.innerHTML = '<p class="text-center text-gray-500">No people found matching your search.</p>';
+                return;
+            }
+            const peopleHtml = people.map(person => `
+                <div class="post-card p-4 flex items-center mb-3">
+                    <img src="${person.avatar_url || 'https://via.placeholder.com/50'}" alt="${person.full_name} Avatar" class="w-16 h-16 rounded-full mr-4 object-cover clickable-profile-avatar" data-user-id="${person.id}">
+                    <div class="flex-grow">
+                        <strong class="text-xl font-semibold clickable-profile-name" data-user-id="${person.id}">${person.full_name}</strong>
+                        <p class="text-gray-600 text-sm">${person.email}</p>
+                        <p class="text-gray-700 mt-1 text-sm">${person.bio || 'No bio available.'}</p>
+                    </div>
+                    <button class="btn-primary py-2 px-4 rounded-full text-sm">View Profile</button>
+                </div>
+            `).join('');
+            communityFeed.innerHTML = `
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">People Results</h2>
+                ${peopleHtml}
+            `;
+            attachProfileClickListeners(); // Re-attach listeners for newly rendered elements
+        }
+
+        // Profile Modal Functions
+        function openProfileModal(user) {
+            const profileModalOverlay = document.getElementById('profileModalOverlay');
+            document.getElementById('profileModalAvatar').src = user.avatar_url || 'https://via.placeholder.com/120';
+            document.getElementById('profileModalName').textContent = user.full_name || 'Anonymous User';
+            document.getElementById('profileModalEmail').textContent = user.email || 'N/A';
+            document.getElementById('profileModalBio').textContent = user.bio || 'No bio available.';
+
+            const profileModalBalance = document.getElementById('profileModalBalance');
+            if (user.id === currentUser.id && currentUser.user_metadata?.balance !== undefined) {
+                profileModalBalance.textContent = `Balance: $${currentUser.user_metadata.balance.toFixed(2)}`;
+                profileModalBalance.classList.remove('hidden');
+            } else {
+                profileModalBalance.classList.add('hidden');
+            }
+
+            // Mock "Connect" and "Message" buttons
+            const connectBtn = document.getElementById('profileModalConnectBtn');
+            const messageBtn = document.getElementById('profileModalMessageBtn');
+
+            if (user.id === currentUser.id) {
+                connectBtn.style.display = 'none';
+                messageBtn.style.display = 'none';
+            } else {
+                connectBtn.style.display = 'inline-block';
+                messageBtn.style.display = 'inline-block';
+                // Add mock functionality to these buttons
+                connectBtn.onclick = () => {
+                    showMessage(`Connected with ${user.full_name} (mock)!`, 'success');
+                    closeProfileModal();
+                };
+                messageBtn.onclick = () => {
+                    showMessage(`Opened chat with ${user.full_name} (mock)!`, 'success');
+                    closeProfileModal();
+                    // Optionally, integrate with message modal
+                    // openMessageModal();
+                    // find user in mockChatUsers and open that specific chat
+                };
+            }
+
+            profileModalOverlay.classList.add('show');
+        }
+
+        function closeProfileModal() {
+            document.getElementById('profileModalOverlay').classList.remove('show');
+        }
+
+        // Event Listeners
+        function setupEventListeners() {
+            // Mobile menu toggle
+            document.getElementById('mobileMenuButton')?.addEventListener('click', (e) => {
+                e.stopPropagation();
+                document.getElementById('sidebar').classList.toggle('open');
+            });
+            document.addEventListener('click', (e) => {
+                const sidebar = document.getElementById('sidebar');
+                if (sidebar.classList.contains('open') && !sidebar.contains(e.target) && !document.getElementById('mobileMenuButton').contains(e.target)) {
+                    sidebar.classList.remove('open');
+                }
+            });
+            // Media upload preview
+            const mediaInput = document.getElementById('mediaInput');
+            const mediaPreviewContainer = document.getElementById('mediaPreviewContainer');
+            mediaInput.addEventListener('change', () => {
+                mediaPreviewContainer.innerHTML = '';
+                const files = Array.from(mediaInput.files);
+                files.forEach((file, index) => {
+                    const fileURL = URL.createObjectURL(file);
+                    const previewItem = document.createElement('div');
+                    previewItem.className = 'media-preview-item';
+                    previewItem.innerHTML = `
+                        ${file.type.startsWith('image') ?
+                            `<img src="${fileURL}" class="media-preview" alt="Media Preview ${index + 1}">` :
+                            `<video src="${fileURL}" class="media-preview video" controls></video>`
+                        }
+                        <button type="button" class="remove-media-btn" data-file-index="${index}"><i class="fas fa-times"></i></button>
+                    `;
+                    mediaPreviewContainer.appendChild(previewItem);
+                });
+                document.querySelectorAll('.remove-media-btn').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const index = parseInt(button.dataset.fileIndex);
+                        const newFiles = Array.from(mediaInput.files).filter((_, i) => i !== index);
+                        const dt = new DataTransfer();
+                        newFiles.forEach(file => dt.items.add(file));
+                        mediaInput.files = dt.files;
+                        mediaInput.dispatchEvent(new Event('change'));
+                    });
+                });
+            });
+            // Create Post Form Submission
+            document.getElementById('createPostForm')?.addEventListener('submit', createPost);
+            // Message Modal Handlers
+            document.getElementById('messageFab')?.addEventListener('click', openMessageModal);
+            document.getElementById('closeMessageModalButton')?.addEventListener('click', closeMessageModal);
+            document.getElementById('messageModalOverlay')?.addEventListener('click', (e) => {
+                if (e.target === e.currentTarget) {
+                    closeMessageModal();
+                }
+            });
+            document.getElementById('chatUserSearch')?.addEventListener('input', (e) => searchUsersForChat(e.target.value));
+            document.getElementById('sendChatMessageButton')?.addEventListener('click', sendChatMessage);
+            document.getElementById('chatInput')?.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') sendChatMessage();
+            });
+
+            // Profile Modal Handlers
+            document.getElementById('closeProfileModalButton')?.addEventListener('click', closeProfileModal);
+            document.getElementById('profileModalOverlay')?.addEventListener('click', (e) => {
+                if (e.target === e.currentTarget) {
+                    closeProfileModal();
+                }
+            });
+            document.getElementById('desktopUserInfo')?.addEventListener('click', () => {
+                openProfileModal(currentUser.user_metadata ? { ...currentUser.user_metadata, id: currentUser.id, email: currentUser.email } : currentUser);
+            });
+            document.getElementById('mobileUserInfo')?.addEventListener('click', () => {
+                openProfileModal(currentUser.user_metadata ? { ...currentUser.user_metadata, id: currentUser.id, email: currentUser.email } : currentUser);
+            });
+
+            // Search Bar Handlers (Desktop)
+            const desktopSearchBar = document.getElementById('desktopSearchBar');
+            const desktopSearchFilterButton = document.getElementById('desktopSearchFilterButton');
+            const desktopSearchFilterOptions = document.getElementById('desktopSearchFilterOptions');
+            const desktopSearchContainer = document.getElementById('desktopSearchContainer');
+
+            desktopSearchBar?.addEventListener('focus', () => desktopSearchContainer.classList.add('focused'));
+            desktopSearchBar?.addEventListener('blur', () => desktopSearchContainer.classList.remove('focused'));
+
+            desktopSearchBar?.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    handleSearch(e.target.value, currentSearchFilter, false);
+                    e.target.value = '';
+                }
+            });
+            desktopSearchFilterButton?.addEventListener('click', () => {
+                desktopSearchFilterOptions.classList.toggle('show');
+            });
+            desktopSearchFilterOptions?.addEventListener('click', (e) => {
+                if (e.target.tagName === 'DIV') {
+                    const newFilterType = e.target.dataset.filterType;
+                    currentSearchFilter = newFilterType;
+                    desktopSearchFilterButton.innerHTML = `${newFilterType.charAt(0).toUpperCase() + newFilterType.slice(1)} <i class="fas fa-chevron-down text-xs"></i>`;
+
+                    // Update active class
+                    Array.from(desktopSearchFilterOptions.children).forEach(option => {
+                        option.classList.remove('active');
+                    });
+                    e.target.classList.add('active');
+
+                    desktopSearchFilterOptions.classList.remove('show');
+                    if (desktopSearchBar.value) { // Re-run search if there's a query
+                        handleSearch(desktopSearchBar.value, currentSearchFilter, false);
+                    } else { // If no query, reset to show all posts for 'posts' filter, or nothing for 'people'
+                        if (currentSearchFilter === 'posts') {
+                            fetchPosts();
+                            fetchMarketplaceHighlights(); // Restore marketplace for posts filter
+                        } else if (currentSearchFilter === 'people') {
+                            document.getElementById('communityFeed').innerHTML = '<p class="text-center text-gray-500">Enter a search query to find people.</p>';
+                            document.getElementById('marketplaceHighlights').innerHTML = '<p class="text-center text-gray-500">Marketplace items not shown during "People" search.</p>';
+                        }
+                    }
+                }
+            });
+
+            // Search Bar Handlers (Mobile)
+            const mobileSearchBar = document.getElementById('mobileSearchBar');
+            const mobileSearchFilterButton = document.getElementById('mobileSearchFilterButton');
+            const mobileSearchFilterOptions = document.getElementById('mobileSearchFilterOptions');
+            const mobileSearchContainer = document.getElementById('mobileSearchContainer');
+
+            mobileSearchBar?.addEventListener('focus', () => mobileSearchContainer.classList.add('focused'));
+            mobileSearchBar?.addEventListener('blur', () => mobileSearchContainer.classList.remove('focused'));
+
+            mobileSearchBar?.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    handleSearch(e.target.value, currentSearchFilter, true);
+                    e.target.value = '';
+                }
+            });
+            mobileSearchFilterButton?.addEventListener('click', () => {
+                mobileSearchFilterOptions.classList.toggle('show');
+            });
+            mobileSearchFilterOptions?.addEventListener('click', (e) => {
+                if (e.target.tagName === 'DIV') {
+                    const newFilterType = e.target.dataset.filterType;
+                    currentSearchFilter = newFilterType;
+                    mobileSearchFilterButton.innerHTML = `${newFilterType.charAt(0).toUpperCase() + newFilterType.slice(1)} <i class="fas fa-chevron-down text-xs"></i>`;
+
+                     // Update active class
+                     Array.from(mobileSearchFilterOptions.children).forEach(option => {
+                        option.classList.remove('active');
+                    });
+                    e.target.classList.add('active');
+
+                    mobileSearchFilterOptions.classList.remove('show');
+                     if (mobileSearchBar.value) { // Re-run search if there's a query
+                        handleSearch(mobileSearchBar.value, currentSearchFilter, true);
+                    } else {
+                        if (currentSearchFilter === 'posts') {
+                            fetchPosts();
+                            fetchMarketplaceHighlights();
+                        } else if (currentSearchFilter === 'people') {
+                            document.getElementById('communityFeed').innerHTML = '<p class="text-center text-gray-500">Enter a search query to find people.</p>';
+                            document.getElementById('marketplaceHighlights').innerHTML = '<p class="text-center text-gray-500">Marketplace items not shown during "People" search.</p>';
+                        }
+                    }
+                }
+            });
+            // Close filter options if clicked outside
+            document.addEventListener('click', (e) => {
+                if (!desktopSearchFilterButton?.contains(e.target) && !desktopSearchFilterOptions?.contains(e.target)) {
+                    desktopSearchFilterOptions?.classList.remove('show');
+                }
+                if (!mobileSearchFilterButton?.contains(e.target) && !mobileSearchFilterOptions?.contains(e.target)) {
+                    mobileSearchFilterOptions?.classList.remove('show');
+                }
+            });
+
+            // Logout button
+            document.getElementById('sidebarLogoutLink')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                handleLogout();
+            });
+        }
+
+        // Attach listeners for dynamic content
+        function attachPostActionListeners() {
+            document.querySelectorAll('.like-button').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const postId = e.currentTarget.dataset.postId;
+                    handleLikeClick(postId);
+                });
+            });
+            document.querySelectorAll('.love-button').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const postId = e.currentTarget.dataset.postId;
+                    handleLoveClick(postId);
+                });
+            });
+            document.querySelectorAll('.comment-button').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const postId = e.currentTarget.dataset.postId;
+                    const commentsSection = document.getElementById(`comments-section-${postId}`);
+                    if (commentsSection) {
+                        commentsSection.style.display = commentsSection.style.display === 'block' ? 'none' : 'block';
+                        if (commentsSection.style.display === 'block') {
+                            fetchComments(postId);
+                        }
+                    }
+                });
+            });
+            document.querySelectorAll('.submit-comment-button').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const postId = e.currentTarget.dataset.postId;
+                    submitComment(postId);
+                });
+            });
+        }
+
+        function attachProfileClickListeners() {
+            document.querySelectorAll('.clickable-profile-avatar, .clickable-profile-name').forEach(element => {
+                element.removeEventListener('click', handleProfileClick); // Remove existing to prevent duplicates
+                element.addEventListener('click', handleProfileClick);
+            });
+        }
+
+        function handleProfileClick(e) {
+            const userId = e.currentTarget.dataset.userId;
+            let userProfileData = null;
+
+            if (userId === currentUser.id) {
+                userProfileData = currentUser.user_metadata ? { ...currentUser.user_metadata, id: currentUser.id, email: currentUser.email } : currentUser;
+            } else if (mockOtherUsers[userId]) {
+                userProfileData = mockOtherUsers[userId];
+            }
+
+            if (userProfileData) {
+                openProfileModal(userProfileData);
+            } else {
+                showMessage('User profile not found (mock)!', 'error');
+            }
+        }
+
+        async function handleLogout() {
+            console.log('Mock: Logging out...');
+            showMessage('Logged out (mock)!', 'info');
+            window.location.reload();
+        }
+
+        function formatTimeAgo(date) {
+            const now = new Date();
+            const seconds = Math.floor((now - date) / 1000);
+            if (seconds < 60) return `${seconds}s ago`;
+            const minutes = Math.floor(seconds / 60);
+            if (minutes < 60) return `${minutes}m ago`;
+            const hours = Math.floor(minutes / 60);
+            if (hours < 24) return `${hours}h ago`;
+            const days = Math.floor(hours / 24);
+            if (days < 7) return `${days}d ago`;
+            return date.toLocaleDateString();
+        }
+
+        function showMessage(message, type = 'info', duration = 3000) {
+            const messageBox = document.getElementById('messageBox');
+            messageBox.textContent = message;
+            messageBox.className = `message-box ${type}`;
+            messageBox.classList.add('show');
+            setTimeout(() => messageBox.classList.remove('show'), duration);
+        }
+
+        function removeMedia() {
+            const mediaInput = document.getElementById('mediaInput');
+            const mediaPreviewContainer = document.getElementById('mediaPreviewContainer');
+            mediaInput.value = '';
+            mediaPreviewContainer.innerHTML = '';
+        }
+
+        // Initial load
+        document.addEventListener('DOMContentLoaded', async () => {
+            updateUserUI();
+            fetchPosts();
+            fetchMarketplaceHighlights();
+            setupEventListeners();
+        });
+    </script>
+</body>
+</html>
