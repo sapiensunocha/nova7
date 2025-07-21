@@ -987,16 +987,26 @@ let mediaRecorder = null;
 let audioChunks = [];
 
 // Subscribe to real-time message updates
+function subscribeToLikes() {
+  supabase
+    .channel('likes-channel')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'likes' }, async (payload) => {
+      if (payload.eventType === 'INSERT' || payload.eventType === 'DELETE') {
+        await updateSinglePost(payload.new.post_id || payload.old.post_id);
+      }
+    })
+    .subscribe();
+}
+
 function subscribeToMessages() {
-    supabase
-        .channel('messages-channel')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, async (payload) => {
-            if (payload.new.chat_id === activeChatSessionId) {
-                await loadChatSession(payload.new.chat_id, document.getElementById('activeChatHeader').textContent);
-            }
-            await populateChatUserList();
-        })
-        .subscribe();
+  supabase
+    .channel('messages-channel')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, async (payload) => {
+      if (payload.eventType === 'INSERT' && payload.new.chat_id === activeChatSessionId) {
+        await loadChatSession(payload.new.chat_id, document.getElementById('activeChatHeader').textContent);
+      }
+    })
+    .subscribe();
 }
 
 async function populateChatUserList() {
@@ -1443,6 +1453,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     const { data: { session }, error: sessionError } = await supabase.auth.getSession();
     if (sessionError || !session) {
         console.log("Community: No active session. Redirecting to login.");
+        subscribeToLikes();
         showMessage('No active session. Please log in.', 'error');
         window.location.href = 'login.html';
         return;
@@ -1703,9 +1714,7 @@ async function fetchPosts() {
             `)
             .order('created_at', { ascending: true });
 
-        if (error) {
-            throw error;
-        }
+        if (error) throw error;
 
         console.log('Posts data:', posts);
 
@@ -1767,7 +1776,7 @@ async function fetchPosts() {
                     <span><span id="commentsCount-${post.id}">${post.comments_count || 0}</span> Comments</span>
                 </div>
                 <div class="post-footer">
-                    <button class="like-btn ${isLikedByMe ? 'liked' : ''}" data-post-id="${post.id}" data-is-liked="${isLikedByMe}">
+                    <button class="like-btn ${isLikedByMe ? 'liked' : ''}" data-post-id="${post.id}">
                         <i class="fas fa-thumbs-up"></i>Like
                     </button>
                     <button class="love-btn" data-post-id="${post.id}" ${isMyPost ? 'disabled' : ''}>
@@ -1794,38 +1803,59 @@ async function fetchPosts() {
 
             const likeButton = postElement.querySelector(`.like-btn[data-post-id="${post.id}"]`);
             if (likeButton) {
-                likeButton.addEventListener('click', () => likePost(post.id, likeButton));
+                likeButton.addEventListener('click', (e) => {
+                    const postId = e.target.dataset.postId || e.target.closest('.like-btn').dataset.postId;
+                    likePost(postId, likeButton);
+                });
             }
 
             const loveButton = postElement.querySelector(`.love-btn[data-post-id="${post.id}"]`);
             if (loveButton) {
-                loveButton.addEventListener('click', () => lovePost(post.id, loveButton, post.users.id));
+                loveButton.addEventListener('click', (e) => {
+                    const postId = e.target.dataset.postId || e.target.closest('.love-btn').dataset.postId;
+                    lovePost(postId, loveButton, post.users.id);
+                });
             }
 
             const commentToggleButton = postElement.querySelector(`.comment-toggle-btn[data-post-id="${post.id}"]`);
             if (commentToggleButton) {
-                commentToggleButton.addEventListener('click', () => toggleCommentsSection(post.id));
+                commentToggleButton.addEventListener('click', (e) => {
+                    const postId = e.target.dataset.postId || e.target.closest('.comment-toggle-btn').dataset.postId;
+                    toggleCommentsSection(postId);
+                });
             }
 
             const postCommentButton = postElement.querySelector(`.post-comment-btn[data-post-id="${post.id}"]`);
             if (postCommentButton) {
-                postCommentButton.addEventListener('click', () => addComment(post.id, postElement.querySelector(`.comment-input[data-post-id="${post.id}"]`)));
+                postCommentButton.addEventListener('click', (e) => {
+                    const postId = e.target.dataset.postId || e.target.closest('.post-comment-btn').dataset.postId;
+                    addComment(postId, postElement.querySelector(`.comment-input[data-post-id="${post.id}"]`));
+                });
             }
 
             const postOptionsBtn = postElement.querySelector(`.post-options-btn[data-post-id="${post.id}"]`);
             if (postOptionsBtn) {
                 postOptionsBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    togglePostOptionsDropdown(post.id);
+                    const postId = e.target.dataset.postId || e.target.closest('.post-options-btn').dataset.postId;
+                    togglePostOptionsDropdown(postId);
                 });
             }
+
             const editPostBtn = postElement.querySelector(`.edit-post-btn[data-post-id="${post.id}"]`);
             if (editPostBtn) {
-                editPostBtn.addEventListener('click', () => editPost(post.id, post.content));
+                editPostBtn.addEventListener('click', (e) => {
+                    const postId = e.target.dataset.postId || e.target.closest('.edit-post-btn').dataset.postId;
+                    editPost(postId, post.content);
+                });
             }
+
             const deletePostBtn = postElement.querySelector(`.delete-post-btn[data-post-id="${post.id}"]`);
             if (deletePostBtn) {
-                deletePostBtn.addEventListener('click', () => deletePost(post.id, post.media_url));
+                deletePostBtn.addEventListener('click', (e) => {
+                    const postId = e.target.dataset.postId || e.target.closest('.delete-post-btn').dataset.postId;
+                    deletePost(postId, post.media_url);
+                });
             }
         });
     } catch (error) {
@@ -1836,53 +1866,79 @@ async function fetchPosts() {
 }
 
 async function likePost(postId, buttonElement) {
-    if (!currentUser || !currentUser.id) {
-        showMessage('You must be logged in to like a post.', 'error');
-        return;
+  if (!currentUser || !currentUser.id) {
+    showMessage('You must be logged in to like a post.', 'error');
+    return;
+  }
+
+  if (buttonElement.disabled) return;
+  buttonElement.disabled = true;
+
+  const likesCountElement = document.getElementById(`likesCount-${postId}`);
+  let currentLikes = parseInt(likesCountElement?.textContent || '0');
+
+  try {
+    const { data: existingLike, error: checkError } = await supabase
+      .from('likes')
+      .select('id')
+      .eq('post_id', postId)
+      .eq('user_id', currentUser.id)
+      .maybeSingle();
+
+    if (checkError && checkError.code !== 'PGRST116') {
+      throw checkError;
     }
 
-    const isCurrentlyLiked = buttonElement.classList.contains('liked');
-    const likesCountElement = document.getElementById(`likesCount-${postId}`);
-    let currentLikes = parseInt(likesCountElement.textContent);
+    if (existingLike) {
+      const { error: deleteError } = await supabase
+        .from('likes')
+        .delete()
+        .eq('post_id', postId)
+        .eq('user_id', currentUser.id);
 
-    try {
-        if (isCurrentlyLiked) {
-            const { error } = await supabase
-                .from('likes')
-                .delete()
-                .eq('post_id', postId)
-                .eq('user_id', currentUser.id);
+      if (deleteError) throw deleteError;
 
-            if (error) throw error;
+      const newLikesCount = Math.max(0, currentLikes - 1);
+      await supabase
+        .from('posts')
+        .update({ likes_count: newLikesCount })
+        .eq('id', postId);
 
-            buttonElement.classList.remove('liked');
-            likesCountElement.textContent = currentLikes - 1;
-            await supabase
-                .from('posts')
-                .update({ likes_count: currentLikes - 1 })
-                .eq('id', postId);
-            showMessage('Post unliked.', 'success');
-        } else {
-            const { error } = await supabase
-                .from('likes')
-                .insert([
-                    { post_id: postId, user_id: currentUser.id, created_at: new Date().toISOString() }
-                ]);
+      buttonElement.classList.remove('liked'); // Ensure class is removed
+      likesCountElement.textContent = newLikesCount; // Update UI immediately
+      showMessage('Post unliked.', 'success');
+    } else {
+      const { data, error: insertError } = await supabase
+        .from('likes')
+        .insert([{ post_id: postId, user_id: currentUser.id, created_at: new Date().toISOString() }])
+        .select()
+        .single();
 
-            if (error) throw error;
-
-            buttonElement.classList.add('liked');
-            likesCountElement.textContent = currentLikes + 1;
-            await supabase
-                .from('posts')
-                .update({ likes_count: currentLikes + 1 })
-                .eq('id', postId);
-            showMessage('Post liked!', 'success');
+      if (insertError) {
+        if (insertError.code === '23505') {
+          showMessage('You already liked this post.', 'warning');
+          return;
         }
-    } catch (error) {
-        console.error(`Error liking/unliking post ${postId}:`, error.message);
-        showMessage(`Failed to ${isCurrentlyLiked ? 'unlike' : 'like'} post: ${error.message}`, 'error');
+        throw insertError;
+      }
+
+      const newLikesCount = currentLikes + 1;
+      await supabase
+        .from('posts')
+        .update({ likes_count: newLikesCount })
+        .eq('id', postId);
+
+      buttonElement.classList.add('liked'); // Ensure class is added
+      likesCountElement.textContent = newLikesCount; // Update UI immediately
+      showMessage('Post liked!', 'success');
     }
+  } catch (error) {
+    console.error('Like/unlike error:', error.message || error);
+    showMessage(`Error processing your like: ${error.message}`, 'error');
+    likesCountElement.textContent = currentLikes; // Rollback on error
+  } finally {
+    buttonElement.disabled = false;
+  }
 }
 
 async function lovePost(postId, buttonElement, postOwnerId) {
@@ -1981,112 +2037,162 @@ async function lovePost(postId, buttonElement, postOwnerId) {
     }
 }
 
-async function updatePostCounts(postId) {
-    try {
-        const { data, error } = await supabase
-            .from('posts')
-            .select('likes_count, loves_count, comments_count')
-            .eq('id', postId)
-            .single();
+async function updateSinglePost(postId) {
+  try {
+    const { data: post, error } = await supabase
+      .from('posts')
+      .select(`
+        id,
+        content,
+        media_url,
+        media_type,
+        created_at,
+        likes_count,
+        loves_count,
+        comments_count,
+        users (
+          id,
+          full_name,
+          email,
+          avatar_url
+        ),
+        likes (user_id)
+      `)
+      .eq('id', postId)
+      .single();
 
-        if (error) throw error;
+    if (error) throw error;
 
-        if (data) {
-            document.getElementById(`likesCount-${postId}`).textContent = data.likes_count || 0;
-            document.getElementById(`lovesCount-${postId}`).textContent = data.loves_count || 0;
-            document.getElementById(`commentsCount-${postId}`).textContent = data.comments_count || 0;
-        }
-    } catch (error) {
-        console.error(`Error updating counts for post ${postId}:`, error.message);
+    const postElement = document.querySelector(`.post-card .like-btn[data-post-id="${postId}"]`)?.closest('.post-card');
+    if (!postElement) return;
+
+    const isMyPost = currentUser && post.users && currentUser.id === post.users.id;
+    const isLikedByMe = post.likes && post.likes.some(like => like.user_id === currentUser.id);
+
+    // Update the post's HTML
+    const authorName = post.users
+      ? post.users.full_name || post.users.email?.split('@')[0] || 'Anonymous'
+      : 'Anonymous';
+    const authorAvatarUrl = post.users ? post.users.avatar_url : null;
+    const avatarHtml = authorAvatarUrl
+      ? `<img src="${authorAvatarUrl}" alt="Profile" class="w-full h-full rounded-full object-cover">`
+      : `<span>${authorName.charAt(0).toUpperCase()}</span>`;
+    const postDate = new Date(post.created_at);
+    const formattedTime = timeDifference(new Date(), postDate);
+    const mediaHtml = post.media_url
+      ? `<div class="post-image"><img src="${post.media_url}" alt="Post image" loading="lazy"></div>`
+      : '';
+
+    postElement.innerHTML = `
+      <div class="post-header">
+        <div class="post-avatar">${avatarHtml}</div>
+        <div class="post-author-info">
+          <a href="#">${authorName}</a>
+          <p class="post-timestamp">${formattedTime}</p>
+        </div>
+        ${isMyPost ? `
+        <button class="post-options-btn" data-post-id="${post.id}">
+          <i class="fas fa-ellipsis-h"></i>
+        </button>
+        <div class="post-options-dropdown hidden" id="postOptionsDropdown-${post.id}">
+          <button class="edit-post-btn" data-post-id="${post.id}">Edit</button>
+          <button class="delete-post-btn" data-post-id="${post.id}">Delete</button>
+        </div>` : ''}
+      </div>
+      <div class="post-content">
+        <p>${post.content}</p>
+      </div>
+      ${mediaHtml}
+      <div class="post-stats">
+        <span><span id="likesCount-${post.id}">${post.likes_count || 0}</span> Likes</span>
+        <span><span id="lovesCount-${post.id}">${post.loves_count || 0}</span> Loves</span>
+        <span><span id="commentsCount-${post.id}">${post.comments_count || 0}</span> Comments</span>
+      </div>
+      <div class="post-footer">
+        <button class="like-btn ${isLikedByMe ? 'liked' : ''}" data-post-id="${post.id}">
+          <i class="fas fa-thumbs-up"></i>Like
+        </button>
+        <button class="love-btn" data-post-id="${post.id}" ${isMyPost ? 'disabled' : ''}>
+          <i class="fas fa-heart"></i>Love ($1)
+        </button>
+        <button class="comment-toggle-btn" data-post-id="${post.id}">
+          <i class="fas fa-comment"></i>Comment
+        </button>
+      </div>
+      <div class="comments-section hidden" id="commentsSection-${post.id}">
+        <div class="comments-list" id="commentsList-${post.id}">
+          <p class="text-gray-500 text-center py-2 text-sm">No comments yet.</p>
+        </div>
+        <div class="add-comment-area">
+          <div class="comment-avatar" id="addCommentAvatar-${post.id}">
+            ${currentUser && currentUser.avatar_url ? `<img src="${currentUser.avatar_url}" alt="Profile">` : (currentUser && currentUser.full_name ? currentUser.full_name.charAt(0).toUpperCase() : (currentUser && currentUser.email ? currentUser.email.charAt(0).toUpperCase() : 'U'))}
+          </div>
+          <textarea placeholder="Add a comment..." rows="1" class="comment-input" data-post-id="${post.id}"></textarea>
+          <button class="btn-primary-action post-comment-btn" data-post-id="${post.id}">Post</button>
+        </div>
+      </div>
+    `;
+
+    // Reattach event listeners
+    const likeButton = postElement.querySelector(`.like-btn[data-post-id="${post.id}"]`);
+    if (likeButton) {
+      likeButton.addEventListener('click', (e) => {
+        const postId = e.target.dataset.postId || e.target.closest('.like-btn').dataset.postId;
+        likePost(postId, likeButton);
+      });
     }
-}
 
-async function fetchComments(postId) {
-    const commentsListDiv = document.getElementById(`commentsList-${postId}`);
-    commentsListDiv.innerHTML = '<p class="text-gray-500 text-center py-2 text-sm">Loading comments...</p>';
-
-    try {
-        const { data: comments, error } = await supabase
-            .from('comments')
-            .select(`
-                id,
-                content,
-                created_at,
-                users (
-                    id,
-                    full_name,
-                    email,
-                    avatar_url
-                )
-            `)
-            .eq('post_id', postId)
-            .order('created_at', { ascending: true });
-
-        if (error) throw error;
-
-        commentsListDiv.innerHTML = '';
-
-        if (comments.length === 0) {
-            commentsListDiv.innerHTML = '<p class="text-gray-500 text-center py-2 text-sm">No comments yet.</p>';
-            return;
-        }
-
-        comments.forEach(comment => {
-            const commentElement = document.createElement('div');
-            commentElement.className = 'comment';
-            const commenterName = comment.users
-                ? comment.users.full_name || comment.users.email?.split('@')[0] || 'Anonymous'
-                : 'Anonymous';
-            const commenterAvatarUrl = comment.users ? comment.users.avatar_url : null;
-            const isMyComment = currentUser && comment.users && currentUser.id === comment.users.id;
-
-            const avatarHtml = commenterAvatarUrl
-                ? `<img src="${commenterAvatarUrl}" alt="Profile">`
-                : `<span>${commenterName.charAt(0).toUpperCase()}</span>`;
-
-            const commentDate = new Date(comment.created_at);
-            const formattedCommentTime = timeDifference(new Date(), commentDate);
-
-            commentElement.innerHTML = `
-                <div class="comment-avatar">${avatarHtml}</div>
-                <div class="comment-content-wrapper">
-                    <div>
-                        <span class="commenter-name">${commenterName}</span>
-                        <span class="comment-timestamp">${formattedCommentTime}</span>
-                    </div>
-                    <div class="comment-text">${comment.content}</div>
-                    ${isMyComment ? `
-                    <button class="comment-options-btn" data-comment-id="${comment.id}">
-                        <i class="fas fa-ellipsis-h"></i>
-                    </button>
-                    <div class="comment-options-dropdown hidden" id="commentOptionsDropdown-${comment.id}">
-                        <button class="edit-comment-btn" data-comment-id="${comment.id}" data-current-content="${comment.content}">Edit</button>
-                        <button class="delete-comment-btn" data-comment-id="${comment.id}">Delete</button>
-                    </div>` : ''}
-                </div>
-            `;
-            commentsListDiv.appendChild(commentElement);
-
-            const commentOptionsBtn = commentElement.querySelector(`.comment-options-btn[data-comment-id="${comment.id}"]`);
-            if (commentOptionsBtn) {
-                commentOptionsBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    toggleCommentOptionsDropdown(comment.id);
-                });
-            }
-            const editCommentBtn = commentElement.querySelector(`.edit-comment-btn[data-comment-id="${comment.id}"]`);
-            if (editCommentBtn) {
-                editCommentBtn.addEventListener('click', () => editComment(comment.id, comment.content, commentElement));
-            }
-            const deleteCommentBtn = commentElement.querySelector(`.delete-comment-btn[data-comment-id="${comment.id}"]`);
-            if (deleteCommentBtn) {
-                deleteCommentBtn.addEventListener('click', () => deleteComment(comment.id, postId));
-            }
-        });
-    } catch (error) {
-        console.error(`Error fetching comments for post ${postId}:`, error.message);
-        commentsListDiv.innerHTML = `<p class="text-red-500 text-center py-2 text-sm">Failed to load comments: ${error.message}.</p>`;
+    const loveButton = postElement.querySelector(`.love-btn[data-post-id="${post.id}"]`);
+    if (loveButton) {
+      loveButton.addEventListener('click', (e) => {
+        const postId = e.target.dataset.postId || e.target.closest('.love-btn').dataset.postId;
+        lovePost(postId, loveButton, post.users.id);
+      });
     }
+
+    const commentToggleButton = postElement.querySelector(`.comment-toggle-btn[data-post-id="${post.id}"]`);
+    if (commentToggleButton) {
+      commentToggleButton.addEventListener('click', (e) => {
+        const postId = e.target.dataset.postId || e.target.closest('.comment-toggle-btn').dataset.postId;
+        toggleCommentsSection(postId);
+      });
+    }
+
+    const postCommentButton = postElement.querySelector(`.post-comment-btn[data-post-id="${post.id}"]`);
+    if (postCommentButton) {
+      postCommentButton.addEventListener('click', (e) => {
+        const postId = e.target.dataset.postId || e.target.closest('.post-comment-btn').dataset.postId;
+        addComment(postId, postElement.querySelector(`.comment-input[data-post-id="${post.id}"]`));
+      });
+    }
+
+    const postOptionsBtn = postElement.querySelector(`.post-options-btn[data-post-id="${post.id}"]`);
+    if (postOptionsBtn) {
+      postOptionsBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const postId = e.target.dataset.postId || e.target.closest('.post-options-btn').dataset.postId;
+        togglePostOptionsDropdown(postId);
+      });
+    }
+
+    const editPostBtn = postElement.querySelector(`.edit-post-btn[data-post-id="${post.id}"]`);
+    if (editPostBtn) {
+      editPostBtn.addEventListener('click', (e) => {
+        const postId = e.target.dataset.postId || e.target.closest('.edit-post-btn').dataset.postId;
+        editPost(postId, post.content);
+      });
+    }
+
+    const deletePostBtn = postElement.querySelector(`.delete-post-btn[data-post-id="${post.id}"]`);
+    if (deletePostBtn) {
+      deletePostBtn.addEventListener('click', (e) => {
+        const postId = e.target.dataset.postId || e.target.closest('.delete-post-btn').dataset.postId;
+        deletePost(postId, post.media_url);
+      });
+    }
+  } catch (error) {
+    console.error(`Error updating post ${postId}:`, error.message);
+  }
 }
 
 async function addComment(postId, commentInput) {
@@ -2370,6 +2476,81 @@ function showMessage(message, type = 'success', duration = 3000) {
     messageTimeout = setTimeout(() => {
         messageBox.classList.remove('show');
     }, duration);
+}
+
+async function fetchComments(postId) {
+  const commentsList = document.getElementById(`commentsList-${postId}`);
+  try {
+    const { data: comments, error } = await supabase
+      .from('comments')
+      .select(`
+        id,
+        content,
+        created_at,
+        user_id,
+        users (
+          full_name,
+          avatar_url,
+          email
+        )
+      `)
+      .eq('post_id', postId)
+      .order('created_at', { ascending: true });
+
+    if (error) throw error;
+
+    commentsList.innerHTML = comments.length === 0 ? '<p class="text-gray-500 text-center py-2 text-sm">No comments yet.</p>' : '';
+
+    comments.forEach(comment => {
+      const isMyComment = currentUser && comment.user_id === currentUser.id;
+      const commenterName = comment.users?.full_name || comment.users?.email?.split('@')[0] || 'Anonymous';
+      const commenterAvatar = comment.users?.avatar_url ? `<img src="${comment.users.avatar_url}" alt="Profile">` : commenterName.charAt(0).toUpperCase();
+      const commentDate = new Date(comment.created_at);
+      const formattedTime = timeDifference(new Date(), commentDate);
+
+      const commentElement = document.createElement('div');
+      commentElement.className = 'comment';
+      commentElement.innerHTML = `
+        <div class="comment-avatar">${commenterAvatar}</div>
+        <div class="comment-content-wrapper">
+          <span class="commenter-name">${commenterName}</span>
+          <span class="comment-timestamp">${formattedTime}</span>
+          <p class="comment-text">${comment.content}</p>
+          ${isMyComment ? `
+          <button class="comment-options-btn" data-comment-id="${comment.id}">
+            <i class="fas fa-ellipsis-h"></i>
+          </button>
+          <div class="comment-options-dropdown hidden" id="commentOptionsDropdown-${comment.id}">
+            <button class="edit-comment-btn" data-comment-id="${comment.id}">Edit</button>
+            <button class="delete-comment-btn" data-comment-id="${comment.id}">Delete</button>
+          </div>` : ''}
+        `;
+      commentsList.appendChild(commentElement);
+
+      if (isMyComment) {
+        const commentOptionsBtn = commentElement.querySelector(`.comment-options-btn[data-comment-id="${comment.id}"]`);
+        if (commentOptionsBtn) {
+          commentOptionsBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleCommentOptionsDropdown(comment.id);
+          });
+        }
+
+        const editCommentBtn = commentElement.querySelector(`.edit-comment-btn[data-comment-id="${comment.id}"]`);
+        if (editCommentBtn) {
+          editCommentBtn.addEventListener('click', () => editComment(comment.id, comment.content, commentElement));
+        }
+
+        const deleteCommentBtn = commentElement.querySelector(`.delete-comment-btn[data-comment-id="${comment.id}"]`);
+        if (deleteCommentBtn) {
+          deleteCommentBtn.addEventListener('click', () => deleteComment(comment.id, postId));
+        }
+      }
+    });
+  } catch (error) {
+    console.error(`Error fetching comments for post ${postId}:`, error.message);
+    commentsList.innerHTML = `<p class="text-red-500 text-center py-2 text-sm">Failed to load comments: ${error.message}</p>`;
+  }
 }
 
 async function fetchMarketplaceHighlights() {
