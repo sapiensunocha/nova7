@@ -1,0 +1,35 @@
+{
+  "rewrites": [
+    { "source": "/", "destination": "/index.html" },
+    { "source": "/add-transaction", "destination": "/add-transaction.html" },
+    { "source": "/admin-kyc", "destination": "/admin-kyc.html" },
+    { "source": "/article-detail", "destination": "/article-detail.html" },
+    { "source": "/chatbot", "destination": "/chatbot.html" },
+    { "source": "/community", "destination": "/community.html" },
+    { "source": "/dashboard", "destination": "/dashboard.html" },
+    { "source": "/edit-transaction", "destination": "/edit-transaction.html" },
+    { "source": "/email-verification", "destination": "/email-verification.html" },
+    { "source": "/list-item", "destination": "/list-item.html" },
+    { "source": "/list-lendable-product", "destination": "/list-lendable-product.html" },
+    { "source": "/login", "destination": "/login.html" },
+    { "source": "/marketplace-item-detail", "destination": "/marketplace-item-detail.html" },
+    { "source": "/marketplace", "destination": "/marketplace.html" },
+    { "source": "/pay", "destination": "/pay.html" },
+    { "source": "/privacy-policy", "destination": "/privacy-policy.html" },
+    { "source": "/profile", "destination": "/profile.html" },
+    { "source": "/register", "destination": "/register.html" },
+    { "source": "/reports", "destination": "/reports.html" },
+    { "source": "/request-money-loan", "destination": "/request-money-loan.html" },
+    { "source": "/reset-password", "destination": "/reset-password.html" },
+    { "source": "/resources", "destination": "/resources.html" },
+    { "source": "/settings", "destination": "/settings.html" },
+    { "source": "/team-management", "destination": "/team-management.html" },
+    { "source": "/terms-of-service", "destination": "/terms-of-service.html" },
+    { "source": "/verify-email", "destination": "/verify-email.html" },
+    { "source": "/view-transactions", "destination": "/view-transactions.html" },
+    { "source": "/wallet", "destination": "/wallet.html" },
+    { "source": "/print-receipt", "destination": "/print-receipt.html" }
+
+    -- Note: `false-cmmunity.html` was excluded as it appears to be a temporary or unused file.
+  ]
+}
