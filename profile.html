@@ -1,673 +1,678 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User ID Card - nova7</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto+Mono:wght@500&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #F0F2F5;
-            color: #1a202c;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-        .sidebar-nova7 {
-            background-color: #004182;
-            color: #E0F2FE;
-            width: 260px;
-            box-shadow: 2px 0 8px rgba(0,0,0,0.15);
-            height: 100vh;
-            position: fixed;
-            top: 0;
-            left: 0;
-            padding-top: 1.5rem;
-            transition: transform 0.3s ease-in-out;
-            z-index: 40;
-            display: flex;
-            flex-direction: column;
-        }
-        .sidebar-header {
-            padding: 0.75rem 1.5rem 1rem 1.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-bottom: 1px solid #0053a0;
-            margin-bottom: 0.75rem;
-        }
-        .sidebar-logo-img {
-            max-height: 120px;
-            width: auto;
-            filter: brightness(0) invert(1);
-        }
-        .sidebar-nova7 .nav-link-sidebar {
-            display: flex;
-            align-items: center;
-            padding: 0.75rem 1.5rem;
-            border-radius: 6px;
-            margin: 0.25rem 1rem;
-            font-weight: 500;
-            color: #E0F2FE;
-            transition: background-color 0.2s, color 0.2s;
-        }
-        .sidebar-nova7 .nav-link-sidebar:hover {
-            background-color: #0A66C2;
-            color: #FFFFFF;
-        }
-        .sidebar-nova7 .nav-link-sidebar.active {
-            background-color: #FFFFFF;
-            color: #0A66C2;
-            font-weight: 600;
-        }
-        .sidebar-nova7 .nav-link-sidebar i {
-            width: 20px;
-            margin-right: 0.75rem;
-            text-align: center;
-        }
-        .main-content-area {
-            margin-left: 260px;
-            padding: 1.5rem;
-            width: calc(100% - 260px);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            flex-grow: 1;
-        }
-        .mobile-header {
-            display: none;
-            background-color: #FFFFFF;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            padding: 0 1rem;
-            height: 60px;
-            align-items: center;
-            justify-content: space-between;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 50;
-        }
-        @media (max-width: 768px) {
-            .sidebar-nova7 {
-                transform: translateX(-100%);
-                height: 100vh;
-            }
-            .sidebar-nova7.open {
-                transform: translateX(0);
-            }
-            .main-content-area {
-                margin-left: 0;
-                width: 100%;
-                padding-top: calc(60px + 1.5rem);
-            }
-            .mobile-header {
-                display: flex;
-            }
-        }
-        .print-button-container {
-            width: 100%;
-            display: flex;
-            justify-content: flex-end;
-            margin-bottom: 1.5rem;
-        }
-        .print-button {
-            background-color: #16A34A;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        .print-button:hover {
-            background-color: #15803D;
-        }
-        #id-card-container {
-            width: 800px;
-            height: 475px;
-            background-color: white;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            padding: 24px;
-            display: flex;
-            flex-direction: column;
-            margin-bottom: 2rem;
-            overflow: hidden;
-        }
-        @media (max-width: 850px) {
-            #id-card-container {
-                width: 95%;
-                max-width: 800px;
-                height: auto;
-                min-height: 475px;
-                padding: 1rem;
-            }
-            #id-card-body {
-                flex-direction: column;
-                align-items: center;
-                gap: 1rem;
-            }
-            #id-card-left, #id-card-right {
-                width: 100%;
-                border: none;
-                padding: 0;
-            }
-            #id-card-photo {
-                margin-bottom: 1rem;
-            }
-            #id-card-info {
-                grid-template-columns: 1fr;
-            }
-            #id-card-bottom-right-section {
-                margin-top: 1rem;
-            }
-        }
-        #id-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid #004182;
-            padding-bottom: 12px;
-            margin-bottom: 16px;
-        }
-        #id-card-header h2 {
-            font-size: 22px;
-            font-weight: 700;
-            color: #004182;
-        }
-        #id-card-header img {
-            height: 40px;
-        }
-        #id-card-body {
-            display: flex;
-            flex-grow: 1;
-            padding-top: 0;
-            gap: 24px;
-        }
-        #id-card-left {
-            flex-basis: 30%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding-right: 12px;
-            border-right: 1px solid #e2e8f0;
-            justify-content: space-between;
-        }
-        #id-card-photo {
-            width: 150px;
-            height: 220px;
-            background-color: #e2e8f0;
-            border: 4px solid #004182;
-            border-radius: 8px;
-            overflow: hidden;
-            margin-bottom: 1.5rem;
-        }
-        #id-card-photo img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        #id-card-signature {
-            margin-top: auto;
-            width: 100%;
-            text-align: center;
-            padding-top: 1rem;
-            border-top: 1px dashed #A0AEC0;
-        }
-        #id-card-signature .label {
-            font-size: 12px;
-            color: #64748B;
-            display: block;
-            margin-top: 4px;
-        }
-        #id-card-right {
-            flex-basis: 70%;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            padding-left: 12px;
-        }
-        #id-card-info {
-            flex-grow: 1;
-            display: grid;
-            grid-template-columns: 1fr 1fr 140px;
-            gap: 10px;
-            font-family: 'Roboto Mono', monospace;
-        }
-        #id-card-qr-main {
-            grid-column: 3 / 4;
-            grid-row: 1 / span 5;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 140px;
-            height: 140px;
-            background-color: #FFFFFF;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            padding: 5px;
-        }
-        #id-card-qr-main img {
-            max-width: 100%;
-            max-height: 100%;
-            display: block;
-        }
-        .info-field {
-            display: flex;
-            flex-direction: column;
-            padding: 1px 0;
-        }
-        .info-field .label {
-            font-size: 9px;
-            color: #64748B;
-            margin-bottom: 1px;
-            font-weight: 500;
-        }
-        .info-field .value {
-            font-size: 13px;
-            font-weight: 500;
-            color: #002868;
-            word-break: break-word;
-        }
-        .info-field.full-width {
-            grid-column: 1 / 3;
-        }
-        #id-card-bottom-right-section {
-            display: flex;
-            align-items: flex-end;
-            gap: 15px;
-            margin-top: auto;
-            padding-top: 10px;
-            width: 100%;
-        }
-        #id-card-payment-details {
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            gap: 5px;
-            flex-grow: 1;
-            min-width: 100px;
-        }
-        #id-card-unique-code {
-            flex-grow: 1;
-            font-family: 'Roboto Mono', monospace;
-            font-weight: 700;
-            font-size: 14px;
-            color: #004182;
-            padding: 6px 10px;
-            background-color: #E0F2FE;
-            border-radius: 8px;
-            border: 1px solid #004182;
-            word-break: break-all;
-            text-align: center;
-            min-width: 100px;
-        }
-        #id-card-unique-code .label {
-            font-size: 8px;
-            color: #4b5563;
-            display: block;
-            margin-bottom: 2px;
-        }
-        #id-card-footer {
-            margin-top: auto;
-            padding-top: 12px;
-            text-align: center;
-            font-size: 10px;
-            color: #9ca3af;
-            border-top: 1px solid #e2e8f0;
-            padding-top: 16px;
-        }
-        @page {
-            size: A5 landscape;
-            margin: 0cm;
-        }
-        @media print {
-            body {
-                background-color: white;
-            }
-            body > *:not(#id-card-container) {
-                display: none !important;
-                visibility: hidden !important;
-            }
-            #id-card-container {
-                visibility: visible !important;
-                display: flex !important;
-                position: absolute;
-                left: 0;
-                top: 0;
-                margin: 0;
-                width: 210mm;
-                height: 148mm;
-                box-shadow: none;
-                border-radius: 0;
-                padding: 10mm;
-                box-sizing: border-box;
-                border: 1px solid #ccc;
-            }
-            #id-card-header, #id-card-body, #id-card-footer,
-            #id-card-left, #id-card-right, #id-card-info, #id-card-bottom-right-section,
-            #id-card-qr-main, #id-card-signature, #id-card-unique-code, #id-card-payment-details,
-            .info-field, .info-field .label, .info-field .value {
-                visibility: visible !important;
-                display: flex !important;
-            }
-            #id-card-header {
-                width: 100%;
-                font-size: 18px;
-                padding-bottom: 6mm;
-                margin-bottom: 8mm;
-            }
-            #id-card-header h2 {
-                font-size: 18px;
-            }
-            #id-card-header img {
-                height: 30px;
-            }
-            #id-card-body {
-                width: 100%;
-                flex-grow: 1;
-                justify-content: space-between;
-                align-items: flex-start;
-                padding-top: 0;
-                gap: 8mm;
-            }
-            #id-card-left {
-                padding-right: 8mm;
-                border-right: 1px solid #e2e8f0;
-                justify-content: space-between;
-                height: 100%;
-            }
-            #id-card-right {
-                padding-left: 8mm;
-                flex-direction: column;
-                justify-content: space-between;
-                height: 100%;
-                gap: 5mm;
-            }
-            #id-card-info {
-                gap: 5mm;
-                grid-template-columns: 1fr 1fr 38mm;
-            }
-            .info-field {
-                padding: 0;
-            }
-            #id-card-photo {
-                width: 40mm;
-                height: 55mm;
-                border-width: 1.5px;
-                margin-bottom: 6mm;
-            }
-            #id-card-signature {
-                border-top: 1px dashed #A0AEC0;
-                margin-top: auto;
-                padding-top: 4mm;
-            }
-            #id-card-signature .label, .info-field .label {
-                font-size: 7.5px;
-            }
-            .info-field .value {
-                font-size: 10.5px;
-            }
-            #id-card-qr-main {
-                width: 38mm;
-                height: 38mm;
-                min-width: 38mm;
-                min-height: 38mm;
-                grid-column: 3 / 4;
-                grid-row: 1 / span 5;
-            }
-            #id-card-bottom-right-section {
-                flex-direction: row;
-                margin-top: auto;
-                gap: 8mm;
-                padding-top: 4mm;
-                align-items: flex-end;
-            }
-            #id-card-unique-code {
-                font-size: 11px;
-                padding: 3mm 5mm;
-            }
-            #id-card-unique-code .label {
-                font-size: 7px;
-            }
-            #id-card-payment-details {
-                font-size: 9px;
-                gap: 1mm;
-            }
-            #id-card-footer {
-                width: 100%;
-                text-align: center;
-                font-size: 6.5px;
-                padding-top: 6mm;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>User ID Card - nova7</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto+Mono:wght@500&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+body {
+font-family: 'Inter', sans-serif;
+background-color: #F0F2F5;
+color: #1a202c;
+display: flex;
+flex-direction: column;
+min-height: 100vh;
+}
+.sidebar-nova7 {
+background-color: #004182;
+color: #E0F2FE;
+width: 260px;
+box-shadow: 2px 0 8px rgba(0,0,0,0.15);
+height: 100vh;
+position: fixed;
+top: 0;
+left: 0;
+padding-top: 1.5rem;
+transition: transform 0.3s ease-in-out;
+z-index: 40;
+display: flex;
+flex-direction: column;
+}
+.sidebar-header {
+padding: 0.75rem 1.5rem 1rem 1.5rem;
+display: flex;
+align-items: center;
+justify-content: center;
+border-bottom: 1px solid #0053a0;
+margin-bottom: 0.75rem;
+}
+.sidebar-logo-img {
+max-height: 120px;
+width: auto;
+filter: brightness(0) invert(1);
+}
+.sidebar-nova7 .nav-link-sidebar {
+display: flex;
+align-items: center;
+padding: 0.75rem 1.5rem;
+border-radius: 6px;
+margin: 0.25rem 1rem;
+font-weight: 500;
+color: #E0F2FE;
+transition: background-color 0.2s, color 0.2s;
+}
+.sidebar-nova7 .nav-link-sidebar:hover {
+background-color: #0A66C2;
+color: #FFFFFF;
+}
+.sidebar-nova7 .nav-link-sidebar.active {
+background-color: #FFFFFF;
+color: #0A66C2;
+font-weight: 600;
+}
+.sidebar-nova7 .nav-link-sidebar i {
+width: 20px;
+margin-right: 0.75rem;
+text-align: center;
+}
+.main-content-area {
+margin-left: 260px;
+padding: 1.5rem;
+width: calc(100% - 260px);
+min-height: 100vh;
+display: flex;
+flex-direction: column;
+align-items: center;
+flex-grow: 1;
+}
+.mobile-header {
+display: none;
+background-color: #FFFFFF;
+box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+padding: 0 1rem;
+height: 60px;
+align-items: center;
+justify-content: space-between;
+position: fixed;
+top: 0;
+left: 0;
+right: 0;
+z-index: 50;
+}
+@media (max-width: 768px) {
+.sidebar-nova7 {
+transform: translateX(-100%);
+height: 100vh;
+}
+.sidebar-nova7.open {
+transform: translateX(0);
+}
+.main-content-area {
+margin-left: 0;
+width: 100%;
+padding-top: calc(60px + 1.5rem);
+}
+.mobile-header {
+display: flex;
+}
+}
+.print-button-container {
+width: 100%;
+display: flex;
+justify-content: flex-end;
+margin-bottom: 1.5rem;
+}
+.print-button {
+background-color: #16A34A;
+color: white;
+border: none;
+padding: 10px 20px;
+border-radius: 8px;
+font-weight: 600;
+cursor: pointer;
+transition: background-color 0.2s;
+}
+.print-button:hover {
+background-color: #15803D;
+}
+#id-card-container {
+width: 800px;
+height: 475px;
+background-color: white;
+border-radius: 16px;
+box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+padding: 24px;
+display: flex;
+flex-direction: column;
+margin-bottom: 2rem;
+overflow: hidden;
+}
+@media (max-width: 850px) {
+#id-card-container {
+width: 95%;
+max-width: 800px;
+height: auto;
+min-height: 475px;
+padding: 1rem;
+}
+#id-card-body {
+flex-direction: column;
+align-items: center;
+gap: 1rem;
+}
+#id-card-left, #id-card-right {
+width: 100%;
+border: none;
+padding: 0;
+}
+#id-card-photo {
+margin-bottom: 1rem;
+}
+#id-card-info {
+grid-template-columns: 1fr;
+}
+#id-card-bottom-right-section {
+margin-top: 1rem;
+}
+}
+#id-card-header {
+display: flex;
+justify-content: space-between;
+align-items: center;
+border-bottom: 2px solid #004182;
+padding-bottom: 12px;
+margin-bottom: 16px;
+}
+#id-card-header h2 {
+font-size: 22px;
+font-weight: 700;
+color: #004182;
+}
+#id-card-header img {
+height: 40px;
+}
+#id-card-body {
+display: flex;
+flex-grow: 1;
+padding-top: 0;
+gap: 24px;
+}
+#id-card-left {
+flex-basis: 30%;
+display: flex;
+flex-direction: column;
+align-items: center;
+padding-right: 12px;
+border-right: 1px solid #e2e8f0;
+justify-content: space-between;
+}
+#id-card-photo {
+width: 150px;
+height: 220px;
+background-color: #e2e8f0;
+border: 4px solid #004182;
+border-radius: 8px;
+overflow: hidden;
+margin-bottom: 1.5rem;
+}
+#id-card-photo img {
+width: 100%;
+height: 100%;
+object-fit: cover;
+}
+#id-card-signature {
+margin-top: auto;
+width: 100%;
+text-align: center;
+padding-top: 1rem;
+border-top: 1px dashed #A0AEC0;
+}
+#id-card-signature .label {
+font-size: 12px;
+color: #64748B;
+display: block;
+margin-top: 4px;
+}
+#id-card-right {
+flex-basis: 70%;
+display: flex;
+flex-direction: column;
+gap: 15px;
+padding-left: 12px;
+}
+#id-card-info {
+flex-grow: 1;
+display: grid;
+grid-template-columns: 1fr 1fr 140px;
+gap: 10px;
+font-family: 'Roboto Mono', monospace;
+}
+#id-card-qr-main {
+grid-column: 3 / 4;
+grid-row: 1 / span 5;
+display: flex;
+align-items: center;
+justify-content: center;
+width: 140px;
+height: 140px;
+background-color: #FFFFFF;
+border-radius: 8px;
+box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+padding: 5px;
+}
+#id-card-qr-main img {
+max-width: 100%;
+max-height: 100%;
+display: block;
+}
+.info-field {
+display: flex;
+flex-direction: column;
+padding: 1px 0;
+}
+.info-field .label {
+font-size: 9px;
+color: #64748B;
+margin-bottom: 1px;
+font-weight: 500;
+}
+.info-field .value {
+font-size: 13px;
+font-weight: 500;
+color: #002868;
+word-break: break-word;
+}
+.info-field.full-width {
+grid-column: 1 / 3;
+}
+#id-card-bottom-right-section {
+display: flex;
+align-items: flex-end;
+gap: 15px;
+margin-top: auto;
+padding-top: 10px;
+width: 100%;
+}
+#id-card-payment-details {
+display: flex;
+flex-direction: column;
+justify-content: flex-end;
+gap: 5px;
+flex-grow: 1;
+min-width: 100px;
+}
+#id-card-unique-code {
+flex-grow: 1;
+font-family: 'Roboto Mono', monospace;
+font-weight: 700;
+font-size: 14px;
+color: #004182;
+padding: 6px 10px;
+background-color: #E0F2FE;
+border-radius: 8px;
+border: 1px solid #004182;
+word-break: break-all;
+text-align: center;
+min-width: 100px;
+}
+#id-card-unique-code .label {
+font-size: 8px;
+color: #4b5563;
+display: block;
+margin-bottom: 2px;
+}
+#id-card-footer {
+margin-top: auto;
+padding-top: 12px;
+text-align: center;
+font-size: 10px;
+color: #9ca3af;
+border-top: 1px solid #e2e8f0;
+padding-top: 16px;
+}
+@page {
+size: A5 landscape;
+margin: 0cm;
+}
+@media print {
+body {
+background-color: white;
+}
+body > *:not(#id-card-container) {
+display: none !important;
+visibility: hidden !important;
+}
+#id-card-container {
+visibility: visible !important;
+display: flex !important;
+position: absolute;
+left: 0;
+top: 0;
+margin: 0;
+width: 210mm;
+height: 148mm;
+box-shadow: none;
+border-radius: 0;
+padding: 10mm;
+box-sizing: border-box;
+border: 1px solid #ccc;
+}
+#id-card-header, #id-card-body, #id-card-footer,
+#id-card-left, #id-card-right, #id-card-info, #id-card-bottom-right-section,
+#id-card-qr-main, #id-card-signature, #id-card-unique-code, #id-card-payment-details,
+.info-field, .info-field .label, .info-field .value {
+visibility: visible !important;
+display: flex !important;
+}
+#id-card-header {
+width: 100%;
+font-size: 18px;
+padding-bottom: 6mm;
+margin-bottom: 8mm;
+}
+#id-card-header h2 {
+font-size: 18px;
+}
+#id-card-header img {
+height: 30px;
+}
+#id-card-body {
+width: 100%;
+flex-grow: 1;
+justify-content: space-between;
+align-items: flex-start;
+padding-top: 0;
+gap: 8mm;
+}
+#id-card-left {
+padding-right: 8mm;
+border-right: 1px solid #e2e8f0;
+justify-content: space-between;
+height: 100%;
+}
+#id-card-right {
+padding-left: 8mm;
+flex-direction: column;
+justify-content: space-between;
+height: 100%;
+gap: 5mm;
+}
+#id-card-info {
+gap: 5mm;
+grid-template-columns: 1fr 1fr 38mm;
+}
+.info-field {
+padding: 0;
+}
+#id-card-photo {
+width: 40mm;
+height: 55mm;
+border-width: 1.5px;
+margin-bottom: 6mm;
+}
+#id-card-signature {
+border-top: 1px dashed #A0AEC0;
+margin-top: auto;
+padding-top: 4mm;
+}
+#id-card-signature .label, .info-field .label {
+font-size: 7.5px;
+}
+.info-field .value {
+font-size: 10.5px;
+}
+#id-card-qr-main {
+width: 38mm;
+height: 38mm;
+min-width: 38mm;
+min-height: 38mm;
+grid-column: 3 / 4;
+grid-row: 1 / span 5;
+}
+#id-card-bottom-right-section {
+flex-direction: row;
+margin-top: auto;
+gap: 8mm;
+padding-top: 4mm;
+align-items: flex-end;
+}
+#id-card-unique-code {
+font-size: 11px;
+padding: 3mm 5mm;
+}
+#id-card-unique-code .label {
+font-size: 7px;
+}
+#id-card-payment-details {
+font-size: 9px;
+gap: 1mm;
+}
+#id-card-footer {
+width: 100%;
+text-align: center;
+font-size: 6.5px;
+padding-top: 6mm;
+}
+}
+</style>
 </head>
 <body class="flex flex-col min-h-screen">
-    <header class="mobile-header md:hidden">
-        <button id="hamburgerBtnMobile" class="p-2 text-gray-700 hover:text-blue-600">
-            <i class="fas fa-bars text-2xl"></i>
-        </button>
-        <a href="dashboard.html">
-            <img src="nova-logo.png" alt="nova7 Logo" class="nova7-logo-header"
-                 onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
-            <span style="display:none;" class="text-xl font-semibold text-gray-700">nova7</span>
-        </a>
-        <a href="#" id="mobileLogoutLink" class="p-2 text-gray-700 hover:text-blue-600">
-            <i class="fas fa-sign-out-alt text-xl"></i>
-        </a>
-    </header>
-    <aside id="sidebar" class="sidebar-nova7">
-        <div class="sidebar-header">
-            <a href="dashboard.html" class="flex items-center">
-                <img src="nova-logo.png" alt="nova7 Logo" class="sidebar-logo-img"
-                     style="filter: brightness(0) invert(1);"
-                     onerror="this.style.display='none';">
-            </a>
-        </div>
-        <nav class="flex-grow">
-            <a href="dashboard.html" class="nav-link-sidebar">
-                <i class="fas fa-tachometer-alt"></i>Dashboard
-            </a>
-            <a href="view-transactions.html" class="nav-link-sidebar">
-                <i class="fas fa-exchange-alt"></i>Transactions
-            </a>
-            <a href="reports.html" class="nav-link-sidebar">
-                <i class="fas fa-chart-pie"></i>Reports
-            </a>
-            <a href="community.html" class="nav-link-sidebar">
-                <i class="fas fa-users"></i>Community
-            </a>
-            <a href="chatbot.html" class="nav-link-sidebar">
-                <i class="fas fa-comments-dollar"></i>Chat Advisor
-            </a>
-            <a href="resources.html" class="nav-link-sidebar">
-                <i class="fas fa-book-open"></i>Resources
-            </a>
-            <a href="settings.html" class="nav-link-sidebar">
-                <i class="fas fa-cog"></i>Settings
-            </a>
-            <a href="wallet.html" class="nav-link-sidebar">
-                <i class="fas fa-wallet"></i>Wallet
-            </a>
-        </nav>
-        <div class="pb-4">
-            <a href="profile.html" class="nav-link-sidebar active">
-                <i class="fas fa-user-circle"></i>Profile
-            </a>
-            <a href="#" id="sidebarLogoutLink" class="nav-link-sidebar">
-                <i class="fas fa-sign-out-alt"></i>Logout
-            </a>
-        </div>
-    </aside>
-    <main class="main-content-area">
-        <div class="print-button-container">
-            <button id="printButton" class="print-button"><i class="fas fa-print mr-2"></i>Print ID Card</button>
-        </div>
-        <div id="profileContent" class="hidden">
-            <div id="id-card-container">
-                <div id="id-card-header">
-                    <h2>NOVA7 IDENTITY CARD</h2>
-                    <img src="nova-logo.png" alt="nova7 Logo">
-                </div>
-                <div id="id-card-body">
-                    <div id="id-card-left">
-                        <div id="id-card-photo">
-                            <img id="profile-photo-val" src="https://picsum.photos/150/220?random=1" alt="User Photo">
-                        </div>
-                        <div id="id-card-signature">
-                            <span class="label">HOLDER SIGNATURE</span>
-                        </div>
-                    </div>
-                    <div id="id-card-right">
-                        <div id="id-card-info">
-                            <div class="info-field"><span class="label">SURNAME</span><span class="value" id="surname-val"></span></div>
-                            <div class="info-field"><span class="label">GIVEN NAMES</span><span class="value" id="givennames-val"></span></div>
-                            <div class="info-field"><span class="label">ACCOUNT NUMBER</span><span class="value" id="account-val"></span></div>
-                            <div class="info-field"><span class="label">DATE OF BIRTH</span><span class="value" id="dob-val"></span></div>
-                            <div class="info-field"><span class="label">AGE</span><span class="value" id="age-val"></span></div>
-                            <div class="info-field"><span class="label">MEMBER SINCE</span><span class="value" id="member-since-val"></span></div>
-                            <div class="info-field full-width"><span class="label">ADDRESS</span><span class="value" id="address-val"></span></div>
-                            <div class="info-field"><span class="label">EMAIL</span><span class="value" id="email-val"></span></div>
-                            <div class="info-field"><span class="label">PHONE</span><span class="value" id="phone-val"></span></div>
-                            <div class="info-field"><span class="label">ACCOUNT STATUS</span><span class="value" id="account-status-val"></span></div>
-                            <div class="info-field"><span class="label">MEMBERSHIP LEVEL</span><span class="value" id="membership-val"></span></div>
-                            <div class="info-field"><span class="label">KYC STATUS</span><span class="value" id="kyc-status-val"></span></div>
-                            <div class="info-field"><span class="label">WALLET BALANCE</span><span class="value" id="balance-val"></span></div>
-                            <div id="id-card-qr-main">
-                                <img id="qr-code-val" src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=Placeholder" alt="QR Code">
-                            </div>
-                        </div>
-                        <div id="id-card-bottom-right-section">
-                            <div id="id-card-payment-details">
-                                <div class="info-field"><span class="label">CURRENCY</span><span class="value" id="currency-val">USD</span></div>
-                                <div class="info-field"><span class="label">DAILY LIMIT</span><span class="value" id="limit-val">$5,000</span></div>
-                            </div>
-                            <div id="id-card-unique-code">
-                                <span class="label">UNIQUE USER CODE</span>
-                                <span class="value" id="unique-code-val"></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div id="id-card-footer">This card is the property of nova7 Financial Services. If found, please return to nova7.</div>
-            </div>
-        </div>
-    </main>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', async function() {
-            const SUPABASE_URL = 'https://nvxqorudztbpwyanakdj.supabase.co';
-            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52eHFvcnVkenRicHd5YW5ha2RqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIzOTk5NTQsImV4cCI6MjA2Nzk3NTk1NH0.XvITDAnpEkjQTh4SCVOfwGKsaANS6tp58Up37SXwYRw';
-            const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            console.log("Supabase client initialized for Profile page.");
-            const profileContent = document.getElementById('profileContent');
-            let currentUserId = null;
-            async function handleLogout() {
-                console.log("Profile: Logging out and redirecting to login.html");
-                await supabase.auth.signOut();
-                window.location.href = 'login.html';
-            }
-            const sidebarLogoutLink = document.getElementById('sidebarLogoutLink');
-            if (sidebarLogoutLink) sidebarLogoutLink.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); });
-            const mobileLogoutLink = document.getElementById('mobileLogoutLink');
-            if (mobileLogoutLink) mobileLogoutLink.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); });
-            const hamburgerBtnMobile = document.getElementById('hamburgerBtnMobile');
-            const sidebar = document.getElementById('sidebar');
-            if (hamburgerBtnMobile && sidebar) {
-                hamburgerBtnMobile.addEventListener('click', (e) => { e.stopPropagation(); sidebar.classList.toggle('open'); });
-            }
-            document.addEventListener('click', (e) => {
-                if (sidebar && sidebar.classList.contains('open') && !sidebar.contains(e.target) && (!hamburgerBtnMobile || !hamburgerBtnMobile.contains(e.target))) {
-                    sidebar.classList.remove('open');
-                }
-            });
-            document.getElementById('printButton').addEventListener('click', () => {
-                window.print();
-            });
-            const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-            if (sessionError || !session) {
-                console.log("Profile: No active Supabase session found. Redirecting to login.");
-                window.location.href = 'login.html';
-                return;
-            }
-            currentUserId = session.user.id;
-            console.log("Current Supabase User ID:", currentUserId);
-            profileContent.classList.remove('hidden');
-            try {
-                const { data: profile, error: profileError } = await supabase
-                    .from('users')
-                    .select('*')
-                    .eq('id', currentUserId)
-                    .single();
-                if (profileError) {
-                    console.error('Error fetching user profile:', profileError.message);
-                    populateIdCard({}, session.user, '0.00');
-                    return;
-                }
-                const balance = (profile.balance !== undefined && profile.balance !== null) ? parseFloat(profile.balance).toFixed(2) : '0.00';
-                populateIdCard(profile, session.user, `$${balance}`);
-            } catch (error) {
-                console.error("Error during profile data fetch or processing:", error);
-                populateIdCard({}, session.user, '$0.00');
-            }
-            function populateIdCard(profileData, userAuthData, balance) {
-                const user = userAuthData || {};
-                const profile = profileData || {};
-                const fullName = profile.full_name || user.email?.split('@')[0] || 'Jane Doe';
-                const nameParts = fullName.split(" ");
-                const givenNames = nameParts.length > 1 ? nameParts.slice(0, -1).join(" ") : nameParts[0] || "Jane";
-                const surname = nameParts.length > 1 ? nameParts[nameParts.length - 1] : "Doe";
-                let age = 'N/A';
-                if (profile.date_of_birth) {
-                    try {
-                        const birthDate = new Date(profile.date_of_birth);
-                        const today = new Date();
-                        let calculatedAge = today.getFullYear() - birthDate.getFullYear();
-                        const monthDifference = today.getMonth() - birthDate.getMonth();
-                        if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
-                            calculatedAge--;
-                        }
-                        age = calculatedAge;
-                    } catch (e) {
-                        console.error("Could not calculate age from date:", profile.date_of_birth);
-                    }
-                }
-                const formatDate = (dateStr) => dateStr ? new Date(dateStr).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase() : 'N/A';
-                const profilePhotoVal = document.getElementById('profile-photo-val');
-                if (profile.avatar_url) {
-                    profilePhotoVal.src = profile.avatar_url;
-                } else {
-                    profilePhotoVal.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&size=220&background=004182&color=fff`;
-                }
-                document.getElementById('surname-val').textContent = surname;
-                document.getElementById('givennames-val').textContent = givenNames;
-                document.getElementById('account-val').textContent = profile.account_number || user.id?.substring(0, 8).toUpperCase() || '00000000';
-                document.getElementById('dob-val').textContent = formatDate(profile.date_of_birth);
-                document.getElementById('age-val').textContent = age;
-                document.getElementById('member-since-val').textContent = formatDate(profile.member_since || user.created_at);
-                document.getElementById('address-val').textContent = profile.address || 'Not Provided';
-                document.getElementById('email-val').textContent = user.email || 'N/A';
-                document.getElementById('phone-val').textContent = profile.phone_number || 'N/A';
-                document.getElementById('account-status-val').textContent = profile.account_status?.toUpperCase() || "ACTIVE";
-                document.getElementById('membership-val').textContent = profile.membership_level || 'Standard';
-                document.getElementById('kyc-status-val').textContent = profile.kyc_status?.toUpperCase() || 'PENDING';
-                document.getElementById('balance-val').textContent = balance;
-                document.getElementById('unique-code-val').textContent = profile.unique_code || (user.id ? 'NOVA7-' + user.id.substring(0,6).toUpperCase() : 'N/A');
-                const walletAddress = profile.wallet_address || user.id;
-                const qrDataForPayment = `https://nova7.vercel.app/pay/${walletAddress}`;
-                document.getElementById('qr-code-val').src = `https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(qrDataForPayment)}`;
-                document.getElementById('currency-val').textContent = profile.currency_type || 'USD';
-                document.getElementById('limit-val').textContent = profile.payment_limit || '$5,000';
-            }
-            console.log("Profile page scripts attached and execution started.");
-        });
-    </script>
+<header class="mobile-header md:hidden">
+<button id="hamburgerBtnMobile" class="p-2 text-gray-700 hover:text-blue-600">
+<i class="fas fa-bars text-2xl"></i>
+</button>
+<a href="dashboard.html">
+<img src="nova-logo.png" alt="nova7 Logo" class="nova7-logo-header"
+onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+<span style="display:none;" class="text-xl font-semibold text-gray-700">nova7</span>
+</a>
+<a href="#" id="mobileLogoutLink" class="p-2 text-gray-700 hover:text-blue-600">
+<i class="fas fa-sign-out-alt text-xl"></i>
+</a>
+</header>
+<aside id="sidebar" class="sidebar-nova7">
+<div class="sidebar-header">
+<a href="dashboard.html" class="flex items-center">
+<img src="nova-logo.png" alt="nova7 Logo" class="sidebar-logo-img"
+style="filter: brightness(0) invert(1);"
+onerror="this.style.display='none';">
+</a>
+</div>
+<nav class="flex-grow">
+<a href="dashboard.html" class="nav-link-sidebar">
+<i class="fas fa-tachometer-alt"></i>Dashboard
+</a>
+<a href="view-transactions.html" class="nav-link-sidebar">
+<i class="fas fa-exchange-alt"></i>Transactions
+</a>
+<a href="reports.html" class="nav-link-sidebar">
+<i class="fas fa-chart-pie"></i>Reports
+</a>
+<a href="community.html" class="nav-link-sidebar">
+<i class="fas fa-users"></i>Community
+</a>
+<a href="chatbot.html" class="nav-link-sidebar">
+<i class="fas fa-comments-dollar"></i>Chat Advisor
+</a>
+<a href="resources.html" class="nav-link-sidebar">
+<i class="fas fa-book-open"></i>Resources
+</a>
+<a href="settings.html" class="nav-link-sidebar">
+<i class="fas fa-cog"></i>Settings
+</a>
+<a href="wallet.html" class="nav-link-sidebar">
+<i class="fas fa-wallet"></i>Wallet
+</a>
+</nav>
+<div class="pb-4">
+<a href="profile.html" class="nav-link-sidebar active">
+<i class="fas fa-user-circle"></i>Profile
+</a>
+<a href="#" id="sidebarLogoutLink" class="nav-link-sidebar">
+<i class="fas fa-sign-out-alt"></i>Logout
+</a>
+</div>
+</aside>
+<main class="main-content-area">
+<div class="print-button-container">
+<button id="printButton" class="print-button"><i class="fas fa-print mr-2"></i>Print ID Card</button>
+</div>
+<div id="profileContent" class="hidden">
+<div id="id-card-container">
+<div id="id-card-header">
+<h2>NOVA7 IDENTITY CARD</h2>
+<img src="nova-logo.png" alt="nova7 Logo">
+</div>
+<div id="id-card-body">
+<div id="id-card-left">
+<div id="id-card-photo">
+<img id="profile-photo-val" src="https://picsum.photos/150/220?random=1" alt="User Photo">
+</div>
+<div id="id-card-signature">
+<span class="label">HOLDER SIGNATURE</span>
+</div>
+</div>
+<div id="id-card-right">
+<div id="id-card-info">
+<div class="info-field"><span class="label">SURNAME</span><span class="value" id="surname-val"></span></div>
+<div class="info-field"><span class="label">GIVEN NAMES</span><span class="value" id="givennames-val"></span></div>
+<div class="info-field"><span class="label">ACCOUNT NUMBER</span><span class="value" id="account-val"></span></div>
+<div class="info-field"><span class="label">DATE OF BIRTH</span><span class="value" id="dob-val"></span></div>
+<div class="info-field"><span class="label">AGE</span><span class="value" id="age-val"></span></div>
+<div class="info-field"><span class="label">MEMBER SINCE</span><span class="value" id="member-since-val"></span></div>
+<div class="info-field full-width"><span class="label">ADDRESS</span><span class="value" id="address-val"></span></div>
+<div class="info-field"><span class="label">EMAIL</span><span class="value" id="email-val"></span></div>
+<div class="info-field"><span class="label">PHONE</span><span class="value" id="phone-val"></span></div>
+<div class="info-field"><span class="label">ACCOUNT STATUS</span><span class="value" id="account-status-val"></span></div>
+<div class="info-field"><span class="label">MEMBERSHIP LEVEL</span><span class="value" id="membership-val"></span></div>
+<div class="info-field"><span class="label">KYC STATUS</span><span class="value" id="kyc-status-val"></span></div>
+<div class="info-field"><span class="label">WALLET BALANCE</span><span class="value" id="balance-val"></span></div>
+<div id="id-card-qr-main">
+<img id="qr-code-val" src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=Placeholder" alt="QR Code">
+</div>
+</div>
+<div id="id-card-bottom-right-section">
+<div id="id-card-payment-details">
+<div class="info-field"><span class="label">CURRENCY</span><span class="value" id="currency-val">USD</span></div>
+<div class="info-field"><span class="label">DAILY LIMIT</span><span class="value" id="limit-val">$5,000</span></div>
+</div>
+<div id="id-card-unique-code">
+<span class="label">UNIQUE USER CODE</span>
+<span class="value" id="unique-code-val"></span>
+</div>
+</div>
+</div>
+</div>
+<div id="id-card-footer">This card is the property of nova7 Financial Services. If found, please return to nova7.</div>
+</div>
+</div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async function() {
+const SUPABASE_URL = 'https://nvxqorudztbpwyanakdj.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52eHFvcnVkenRicHd5YW5ha2RqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIzOTk5NTQsImV4cCI6MjA2Nzk3NTk1NH0.XvITDAnpEkjQTh4SCVOfwGKsaANS6tp58Up37SXwYRw';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+console.log("Supabase client initialized for Profile page.");
+const profileContent = document.getElementById('profileContent');
+let currentUserId = null;
+async function handleLogout() {
+console.log("Profile: Logging out and redirecting to login.html");
+await supabase.auth.signOut();
+window.location.href = 'login.html';
+}
+const sidebarLogoutLink = document.getElementById('sidebarLogoutLink');
+if (sidebarLogoutLink) sidebarLogoutLink.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); });
+const mobileLogoutLink = document.getElementById('mobileLogoutLink');
+if (mobileLogoutLink) mobileLogoutLink.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); });
+const hamburgerBtnMobile = document.getElementById('hamburgerBtnMobile');
+const sidebar = document.getElementById('sidebar');
+if (hamburgerBtnMobile && sidebar) {
+hamburgerBtnMobile.addEventListener('click', (e) => { e.stopPropagation(); sidebar.classList.toggle('open'); });
+}
+document.addEventListener('click', (e) => {
+if (sidebar && sidebar.classList.contains('open') && !sidebar.contains(e.target) && (!hamburgerBtnMobile || !hamburgerBtnMobile.contains(e.target))) {
+sidebar.classList.remove('open');
+}
+});
+document.getElementById('printButton').addEventListener('click', () => {
+window.print();
+});
+const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+if (sessionError || !session) {
+console.log("Profile: No active Supabase session found. Redirecting to login.");
+window.location.href = 'login.html';
+return;
+}
+currentUserId = session.user.id;
+console.log("Current Supabase User ID:", currentUserId);
+profileContent.classList.remove('hidden');
+try {
+const { data: profile, error: profileError } = await supabase
+.from('users')
+.select('*, stripe_payment_link')
+.eq('id', currentUserId)
+.single();
+if (profileError) {
+console.error('Error fetching user profile:', profileError.message);
+populateIdCard({}, session.user, '0.00');
+return;
+}
+const balance = (profile.balance !== undefined && profile.balance !== null) ? parseFloat(profile.balance).toFixed(2) : '0.00';
+populateIdCard(profile, session.user, `$${balance}`);
+} catch (error) {
+console.error("Error during profile data fetch or processing:", error);
+populateIdCard({}, session.user, '$0.00');
+}
+function populateIdCard(profileData, userAuthData, balance) {
+const user = userAuthData || {};
+const profile = profileData || {};
+const fullName = profile.full_name || user.email?.split('@')[0] || 'Jane Doe';
+const nameParts = fullName.split(" ");
+const givenNames = nameParts.length > 1 ? nameParts.slice(0, -1).join(" ") : nameParts[0] || "Jane";
+const surname = nameParts.length > 1 ? nameParts[nameParts.length - 1] : "Doe";
+let age = 'N/A';
+if (profile.date_of_birth) {
+try {
+const birthDate = new Date(profile.date_of_birth);
+const today = new Date();
+let calculatedAge = today.getFullYear() - birthDate.getFullYear();
+const monthDifference = today.getMonth() - birthDate.getMonth();
+if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+calculatedAge--;
+}
+age = calculatedAge;
+} catch (e) {
+console.error("Could not calculate age from date:", profile.date_of_birth);
+}
+}
+const formatDate = (dateStr) => dateStr ? new Date(dateStr).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase() : 'N/A';
+const profilePhotoVal = document.getElementById('profile-photo-val');
+if (profile.avatar_url) {
+profilePhotoVal.src = profile.avatar_url;
+} else {
+profilePhotoVal.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&size=220&background=004182&color=fff`;
+}
+document.getElementById('surname-val').textContent = surname;
+document.getElementById('givennames-val').textContent = givenNames;
+document.getElementById('account-val').textContent = profile.account_number || user.id?.substring(0, 8).toUpperCase() || '00000000';
+document.getElementById('dob-val').textContent = formatDate(profile.date_of_birth);
+document.getElementById('age-val').textContent = age;
+document.getElementById('member-since-val').textContent = formatDate(profile.member_since || user.created_at);
+document.getElementById('address-val').textContent = profile.address || 'Not Provided';
+document.getElementById('email-val').textContent = user.email || 'N/A';
+document.getElementById('phone-val').textContent = profile.phone_number || 'N/A';
+document.getElementById('account-status-val').textContent = profile.account_status?.toUpperCase() || "ACTIVE";
+document.getElementById('membership-val').textContent = profile.membership_level || 'Standard';
+document.getElementById('kyc-status-val').textContent = profile.kyc_status?.toUpperCase() || 'PENDING';
+document.getElementById('balance-val').textContent = balance;
+document.getElementById('unique-code-val').textContent = profile.unique_code || (user.id ? 'NOVA7-' + user.id.substring(0,6).toUpperCase() : 'N/A');
+
+// --- START OF MODIFICATION ---
+// Use lifeline-wdc.com and the unique_code for the QR code data
+const qrCodeIdentifier = profile.unique_code || (user.id ? 'NOVA7-' + user.id.substring(0,6).toUpperCase() : 'N/A');
+const qrDataForPayment = `https://lifeline-wdc.com/pay?user_code=${encodeURIComponent(qrCodeIdentifier)}`;
+// --- END OF MODIFICATION ---
+
+document.getElementById('qr-code-val').src = `https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(qrDataForPayment)}`;
+document.getElementById('currency-val').textContent = profile.currency_type || 'USD';
+document.getElementById('limit-val').textContent = profile.payment_limit || '$5,000';
+}
+console.log("Profile page scripts attached and execution started.");
+});
+</script>
 </body>
 </html>

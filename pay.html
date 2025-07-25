@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pay with nova7</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+  body {
+    font-family: 'Inter', sans-serif;
+    background-color: #F0F2F5;
+    color: #1a202c;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+  .card {
+    background-color: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    padding: 2rem;
+    width: 100%;
+    max-width: 450px;
+    text-align: center;
+  }
+  .loading, .error-message, .success-message {
+    padding: 1rem;
+    border-radius: 8px;
+    margin-top: 1rem;
+    font-weight: 500;
+  }
+  .loading {
+    background-color: #E0F2FE;
+    color: #004182;
+  }
+  .error-message {
+    background-color: #FEE2E2;
+    color: #EF4444;
+  }
+  .success-message {
+    background-color: #D1FAE5;
+    color: #10B981;
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <h2 class="text-3xl font-bold text-[#004182] mb-6">Send Money</h2>
+
+  <div id="loading" class="loading hidden">
+    <i class="fas fa-spinner fa-spin mr-2"></i> Loading recipient details...
+  </div>
+  <div id="errorMessage" class="error-message hidden"></div>
+  <div id="successMessage" class="success-message hidden"></div>
+
+  <div id="recipientDetails" class="hidden">
+    <img id="recipientPhoto" class="w-24 h-24 rounded-full mx-auto mb-4 object-cover border-4 border-[#004182]" src="" alt="Recipient Photo">
+    <p class="text-xl font-semibold text-gray-800 mb-2">Sending to <span id="recipientName" class="text-[#004182]"></span></p>
+    <p class="text-sm text-gray-600 mb-6">Unique Code: <span id="recipientUniqueCode" class="font-mono"></span></p>
+
+    <div class="mb-4 text-left">
+      <label for="amount" class="block text-gray-700 text-sm font-bold mb-2">Amount (USD):</label>
+      <input type="number" id="amount" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="e.g., 50.00" min="0.01" step="0.01">
+    </div>
+
+    <button id="sendButton" class="bg-[#004182] hover:bg-[#0A66C2] text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full transition-colors duration-200">
+      <i class="fas fa-paper-plane mr-2"></i> Send Payment
+    </button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', async function() {
+    const SUPABASE_URL = 'https://nvxqorudztbpwyanakdj.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52eHFvcnVkenRicHd5YW5ha2RqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIzOTk5NTQsImV4cCI6MjA2Nzk3NTk1NH0.XvITDAnpEkjQTh4SCVOfwGKsaANS6tp58Up37SXwYRw';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const loadingElement = document.getElementById('loading');
+    const errorMessageElement = document.getElementById('errorMessage');
+    const successMessageElement = document.getElementById('successMessage');
+    const recipientDetailsElement = document.getElementById('recipientDetails');
+    const recipientPhotoElement = document.getElementById('recipientPhoto');
+    const recipientNameElement = document.getElementById('recipientName');
+    const recipientUniqueCodeElement = document.getElementById('recipientUniqueCode');
+    const amountInput = document.getElementById('amount');
+    const sendButton = document.getElementById('sendButton');
+
+    let recipientId = null; // Will store the Supabase user ID of the recipient
+
+    function showLoading(message = "Loading...") {
+      loadingElement.textContent = message;
+      loadingElement.classList.remove('hidden');
+      errorMessageElement.classList.add('hidden');
+      successMessageElement.classList.add('hidden');
+      recipientDetailsElement.classList.add('hidden');
+    }
+
+    function showError(message) {
+      errorMessageElement.textContent = message;
+      errorMessageElement.classList.remove('hidden');
+      loadingElement.classList.add('hidden');
+      successMessageElement.classList.add('hidden');
+      recipientDetailsElement.classList.add('hidden');
+    }
+
+    function showSuccess(message) {
+      successMessageElement.textContent = message;
+      successMessageElement.classList.remove('hidden');
+      loadingElement.classList.add('hidden');
+      errorMessageElement.classList.add('hidden');
+      recipientDetailsElement.classList.add('hidden'); // Hide details after success
+    }
+
+    function showRecipientDetails() {
+      recipientDetailsElement.classList.remove('hidden');
+      loadingElement.classList.add('hidden');
+      errorMessageElement.classList.add('hidden');
+      successMessageElement.classList.add('hidden');
+    }
+
+    async function initializePage() {
+      showLoading("Checking session and fetching recipient info...");
+
+      // 1. Check user session
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !session) {
+        showError("Please log in to send money. Redirecting to login...");
+        setTimeout(() => { window.location.href = 'login.html'; }, 3000);
+        return;
+      }
+
+      // 2. Get recipient's unique_code from URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const recipientUniqueCode = urlParams.get('user_code');
+
+      if (!recipientUniqueCode) {
+        showError("Recipient user code missing from URL.");
+        return;
+      }
+
+      // 3. Fetch recipient's public profile using unique_code
+      try {
+        const { data: recipientProfile, error: profileError } = await supabase
+          .from('users')
+          .select('id, full_name, avatar_url, unique_code')
+          .eq('unique_code', recipientUniqueCode)
+          .single();
+
+        if (profileError || !recipientProfile) {
+          console.error("Error fetching recipient profile:", profileError?.message || "Profile not found.");
+          showError("Recipient not found or profile is not public.");
+          return;
+        }
+
+        if (recipientProfile.id === session.user.id) {
+          showError("You cannot send money to yourself.");
+          return;
+        }
+
+        recipientId = recipientProfile.id; // Store recipient's Supabase UUID
+        recipientNameElement.textContent = recipientProfile.full_name || 'Anonymous User';
+        recipientUniqueCodeElement.textContent = recipientProfile.unique_code;
+        recipientPhotoElement.src = recipientProfile.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(recipientProfile.full_name || 'User')}&size=96&background=004182&color=fff`;
+
+        showRecipientDetails();
+
+      } catch (error) {
+        console.error("Failed to load recipient details:", error.message);
+        showError("Failed to load recipient details. Please try again.");
+      }
+    }
+
+    sendButton.addEventListener('click', async () => {
+      const amount = parseFloat(amountInput.value);
+
+      if (isNaN(amount) || amount <= 0) {
+        showError("Please enter a valid amount greater than zero.");
+        return;
+      }
+
+      if (!recipientId) {
+        showError("Recipient information is missing. Please refresh the page.");
+        return;
+      }
+
+      showLoading("Processing payment...");
+      sendButton.disabled = true; // Disable button to prevent multiple clicks
+
+      try {
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        if (sessionError || !session) {
+          showError("Your session expired. Please log in again.");
+          sendButton.disabled = false;
+          return;
+        }
+
+        // --- Call your Supabase Edge Function here ---
+        // This is a placeholder. You'll need to create a `handle-transaction` Edge Function.
+        const { data, error } = await supabase.functions.invoke('handle-transaction', {
+          body: JSON.stringify({
+            sender_id: session.user.id,
+            recipient_id: recipientId,
+            amount: amount,
+            transaction_type: 'transfer', // Or 'payment', 'buy', etc., based on your system
+            description: `Payment to ${recipientNameElement.textContent}`
+          }),
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (error) {
+          console.error('Edge Function invocation error:', error);
+          showError(`Transaction failed: ${error.message || 'Unknown error'}`);
+          sendButton.disabled = false;
+          return;
+        }
+
+        if (data && data.status === 'success') {
+          showSuccess(`Successfully sent $${amount.toFixed(2)} to ${recipientNameElement.textContent}!`);
+          amountInput.value = ''; // Clear amount input
+        } else {
+          showError(`Transaction failed: ${data?.message || 'Please try again.'}`);
+        }
+
+      } catch (error) {
+        console.error("Payment error:", error.message);
+        showError("An unexpected error occurred during payment. Please try again.");
+      } finally {
+        sendButton.disabled = false;
+      }
+    });
+
+    initializePage();
+  });
+</script>
+</body>
+</html>
