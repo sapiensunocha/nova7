@@ -29,7 +29,5 @@
     { "source": "/view-transactions", "destination": "/view-transactions.html" },
     { "source": "/wallet", "destination": "/wallet.html" },
     { "source": "/print-receipt", "destination": "/print-receipt.html" }
-
-    -- Note: `false-cmmunity.html` was excluded as it appears to be a temporary or unused file.
   ]
 }
