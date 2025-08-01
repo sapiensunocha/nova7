@@ -1164,7 +1164,7 @@
                 messageDiv.textContent = '';
 
                 try {
-                    const { data, error } = await supabase.functions.invoke('create-payment-intent', {
+                    const { data, error } = await supabase.functions.invoke('create-payment-intent-handler', {
                         body: { amount: Math.round(amount * 100), user_id: userId }
                     });
 
