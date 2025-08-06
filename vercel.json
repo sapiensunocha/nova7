@@ -5,54 +5,83 @@
       "headers": [
         {
           "key": "Vary",
-          "value": "Vercel-Region"
+          "value": "x-vercel-ip-country"
         }
       ]
     }
   ],
   "redirects": [
     {
-      "source": "/",
+      "source": "/(.*)",
       "has": [
         {
           "type": "header",
-          "key": "Vercel-Region",
-          "value": "cd"
+          "key": "x-vercel-ip-country",
+          "value": "CD"
         }
       ],
-      "destination": "/fr",
+      "destination": "/fr/$1",
       "permanent": true
     }
   ],
   "rewrites": [
     { "source": "/", "destination": "/index.html" },
+    { "source": "/fr", "destination": "/fr/index.html" },
     { "source": "/add-transaction", "destination": "/add-transaction.html" },
+    { "source": "/fr/add-transaction", "destination": "/fr/add-transaction.html" },
     { "source": "/admin-kyc", "destination": "/admin-kyc.html" },
+    { "source": "/fr/admin-kyc", "destination": "/fr/admin-kyc.html" },
     { "source": "/article-detail", "destination": "/article-detail.html" },
+    { "source": "/fr/article-detail", "destination": "/fr/article-detail.html" },
     { "source": "/chatbot", "destination": "/chatbot.html" },
+    { "source": "/fr/chatbot", "destination": "/fr/chatbot.html" },
     { "source": "/community", "destination": "/community.html" },
+    { "source": "/fr/community", "destination": "/fr/community.html" },
     { "source": "/dashboard", "destination": "/dashboard.html" },
+    { "source": "/fr/dashboard", "destination": "/fr/dashboard.html" },
     { "source": "/edit-transaction", "destination": "/edit-transaction.html" },
+    { "source": "/fr/edit-transaction", "destination": "/fr/edit-transaction.html" },
     { "source": "/email-verification", "destination": "/email-verification.html" },
+    { "source": "/fr/email-verification", "destination": "/fr/email-verification.html" },
     { "source": "/list-item", "destination": "/list-item.html" },
+    { "source": "/fr/list-item", "destination": "/fr/list-item.html" },
     { "source": "/list-lendable-product", "destination": "/list-lendable-product.html" },
+    { "source": "/fr/list-lendable-product", "destination": "/fr/list-lendable-product.html" },
     { "source": "/login", "destination": "/login.html" },
+    { "source": "/fr/login", "destination": "/fr/login.html" },
     { "source": "/marketplace-item-detail", "destination": "/marketplace-item-detail.html" },
+    { "source": "/fr/marketplace-item-detail", "destination": "/fr/marketplace-item-detail.html" },
     { "source": "/marketplace", "destination": "/marketplace.html" },
+    { "source": "/fr/marketplace", "destination": "/fr/marketplace.html" },
     { "source": "/pay", "destination": "/pay.html" },
+    { "source": "/fr/pay", "destination": "/fr/pay.html" },
     { "source": "/privacy-policy", "destination": "/privacy-policy.html" },
+    { "source": "/fr/privacy-policy", "destination": "/fr/privacy-policy.html" },
     { "source": "/profile", "destination": "/profile.html" },
+    { "source": "/fr/profile", "destination": "/fr/profile.html" },
     { "source": "/register", "destination": "/register.html" },
+    { "source": "/fr/register", "destination": "/fr/register.html" },
     { "source": "/reports", "destination": "/reports.html" },
+    { "source": "/fr/reports", "destination": "/fr/reports.html" },
     { "source": "/request-money-loan", "destination": "/request-money-loan.html" },
+    { "source": "/fr/request-money-loan", "destination": "/fr/request-money-loan.html" },
     { "source": "/reset-password", "destination": "/reset-password.html" },
+    { "source": "/fr/reset-password", "destination": "/fr/reset-password.html" },
     { "source": "/resources", "destination": "/resources.html" },
+    { "source": "/fr/resources", "destination": "/fr/resources.html" },
     { "source": "/settings", "destination": "/settings.html" },
+    { "source": "/fr/settings", "destination": "/fr/settings.html" },
     { "source": "/team-management", "destination": "/team-management.html" },
+    { "source": "/fr/team-management", "destination": "/fr/team-management.html" },
     { "source": "/terms-of-service", "destination": "/terms-of-service.html" },
+    { "source": "/fr/terms-of-service", "destination": "/fr/terms-of-service.html" },
     { "source": "/verify-email", "destination": "/verify-email.html" },
+    { "source": "/fr/verify-email", "destination": "/fr/verify-email.html" },
     { "source": "/view-transactions", "destination": "/view-transactions.html" },
+    { "source": "/fr/view-transactions", "destination": "/fr/view-transactions.html" },
     { "source": "/wallet", "destination": "/wallet.html" },
-    { "source": "/print-receipt", "destination": "/print-receipt.html" }
+    { "source": "/fr/wallet", "destination": "/fr/wallet.html" },
+    { "source": "/print-receipt", "destination": "/print-receipt.html" },
+    { "source": "/fr/print-receipt", "destination": "/fr/print-receipt.html" }
   ]
 }
