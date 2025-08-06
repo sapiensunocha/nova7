@@ -11,19 +11,19 @@
     }
   ],
   "redirects": [
-    {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "header",
-          "key": "x-vercel-ip-country",
-          "value": "CD"
-        }
-      ],
-      "destination": "/fr/$1",
-      "permanent": true
-    }
-  ],
+  {
+    "source": "/((?!fr/).*)",
+    "has": [
+      {
+        "type": "header",
+        "key": "x-vercel-ip-country",
+        "value": "CD"
+      }
+    ],
+    "destination": "/fr/$1",
+    "permanent": true
+  }
+],
   "rewrites": [
     { "source": "/", "destination": "/index.html" },
     { "source": "/fr", "destination": "/fr/index.html" },
