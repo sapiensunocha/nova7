@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Post</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-900 flex justify-center items-center min-h-screen">
+  <div id="postContainer" class="max-w-xl w-full p-4 bg-white rounded shadow-md">
+    <p class="text-center text-gray-500">Loading...</p>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = 'https://nvxqorudztbpwyanakdj.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52eHFvcnVkenRicHd5YW5ha2RqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIzOTk5NTQsImV4cCI6MjA2Nzk3NTk1NH0.XvITDAnpEkjQTh4SCVOfwGKsaANS6tp58Up37SXwYRw';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const params = new URLSearchParams(window.location.search);
+    const postId = params.get('id');
+
+    async function loadPost() {
+      const container = document.getElementById('postContainer');
+      if (!postId) {
+        container.innerHTML = '<p class="text-center text-red-500">Invalid post link.</p>';
+        return;
+      }
+
+      const { data: post, error } = await supabase
+        .from('posts')
+        .select('id, content, media_url, media_type, created_at, users ( full_name, avatar_url )')
+        .eq('id', postId)
+        .single();
+
+      if (error || !post) {
+        container.innerHTML = '<p class="text-center text-red-500">Post not found.</p>';
+        return;
+      }
+
+      const author = post.users?.full_name || 'Unknown';
+      const avatar = post.users?.avatar_url || 'https://placehold.co/40x40';
+      const media = post.media_url
+        ? post.media_type === 'image'
+          ? `<img src="${post.media_url}" alt="Post image" class="rounded w-full mt-4"/>`
+          : `<video src="${post.media_url}" controls autoplay muted playsinline class="rounded w-full mt-4"></video>`
+        : '';
+
+      container.innerHTML = `
+        <div class="flex items-center gap-3 mb-4">
+          <img src="${avatar}" class="w-10 h-10 rounded-full object-cover"/>
+          <strong>${author}</strong>
+        </div>
+        <p class="whitespace-pre-wrap">${post.content}</p>
+        ${media}
+        <p class="text-sm text-gray-400 mt-2">${new Date(post.created_at).toLocaleString()}</p>
+      `;
+    }
+
+    loadPost();
+  </script>
+</body>
+</html>

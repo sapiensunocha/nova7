@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -211,9 +210,7 @@
             align-items: center;
         }
         .post-video::before {
-
             content: '\f04b'; /* Font Awesome play icon */
-
             font-family: 'Font Awesome 6 Free';
             font-weight: 900;
             position: absolute;
@@ -1051,8 +1048,7 @@
             </div>
             </div>
         </div>
-        <!-- Message Floating Action Button and Modal -->
-        <button id="""messageFab" class="""message-fab">
+        <button id="messageFab" class="message-fab">
             <i class="fas fa-comment"></i>
         </button>
         <div id="messageModalOverlay" class="message-modal-overlay">
@@ -1296,7 +1292,7 @@ async function populateChatUserList() {
         id: chat.id,
         name: otherUser?.full_name || chat.title || 'Chat',
         avatar: otherUser?.avatar_url || 'https://placehold.co/50x50',
-        lastMessage: 'No messages yet',
+        lastMessage: lastMessage ? lastMessage.content : 'No messages yet',
         created_at: chat.created_at,
         unreadCount: unreadByChat[chat.id] || 0
       };
@@ -1473,7 +1469,7 @@ async function loadChatSession(chatId, userName) {
       const messageElement = document.createElement('div');
       const isSelf = message.sender_id === currentUser.id;
       const formattedTime = timeDifference(new Date(), new Date(message.created_at));
-      messageElement.className = `chat-message ${isSelf ? 'self' : 'other'} mb-2 p-3 rounded-lg shadow-sm max-w-[70%]`;
+      messageElement.className = `chat-message ${isSelf ? 'self' : 'other'} mb-2 p-3 rounded-lg shadow-sm max-w-[70%] ${isSelf ? 'bg-blue-100' : 'bg-gray-100'}`;
       let contentHtml = '';
       if (message.media_type === 'audio' && message.media_content) {
         contentHtml = `
@@ -1770,7 +1766,7 @@ async function searchContent(query) {
               <p class="post-timestamp">${formattedTime}</p>
             </div>
             ${!isMyPost ? `
-              <button class="follow-btn" data-post-id="${post.id}" style="display:none;">
+              <button class="follow-btn" data-user-id="${post.users.id}" data-following="false">
               <span><i class="fas fa-user-plus"></i> Follow</span></button>
             ` : ''}
             ${isMyPost ? `
@@ -1844,7 +1840,7 @@ async function searchContent(query) {
         if (postCommentButton) {
           postCommentButton.addEventListener('click', (e) => {
             const postId = e.target.dataset.post_id || e.target.closest('.post-comment-btn').dataset.postId;
-            addComment(postId, postElement.querySelector(`.comment-input[data-post-id="${post.id}"]`));
+            addComment(postId, postElement.querySelector(`.comment-input[data-post-id="${postId}"]`));
           });
         }
         const postOptionsBtn = postElement.querySelector(`.post-options-btn[data-post-id="${post.id}"]`);
@@ -2213,6 +2209,9 @@ async function fetchPosts() {
           <button class="comment-toggle-btn" data-post-id="${post.id}">
             <i class="fas fa-comment"></i>Comment
           </button>
+          <button onclick="copyPostLink('${post.id}')">
+              <i class="fas fa-link"></i> Share
+          </button>
         </div>
         <div class="comments-section hidden" id="commentsSection-${post.id}">
           <div class="comments-list" id="comments-${post.id}">
@@ -2302,6 +2301,25 @@ async function deletePost(postId, mediaUrl) {
       .eq('id', postId)
       .eq('user_id', currentUser.id);
     if (error) throw error;
+
+    // If there's an associated media URL, attempt to delete it from storage
+    if (mediaUrl) {
+      const fileName = mediaUrl.split('/').pop(); // Extract file name from URL
+      const pathSegments = mediaUrl.split('/');
+      const userIdFromUrl = pathSegments[pathSegments.length - 2]; // Assuming user ID is the second to last segment
+      
+      if (userIdFromUrl === currentUser.id) { // Only delete if the media belongs to the current user
+        const { error: storageError } = await supabase.storage
+          .from('post-images')
+          .remove([`${currentUser.id}/${fileName}`]); // Correct path for deletion
+
+        if (storageError) {
+          console.error("Error deleting media from Supabase Storage:", storageError.message);
+          // Don't throw error here, as post deletion is more critical
+        }
+      }
+    }
+
     showMessage('Post deleted successfully!', 'success');
     document.getElementById('postFeed').querySelector(`.post-card .post-options-btn[data-post-id="${postId}"]`).closest('.post-card').remove();
   } catch (error) {
@@ -2310,8 +2328,60 @@ async function deletePost(postId, mediaUrl) {
   }
 }
 
+async function editPost(postId, currentContent) {
+  const postElement = document.querySelector(`.post-card .post-options-btn[data-post-id="${postId}"]`).closest('.post-card');
+  const postContentDiv = postElement.querySelector('.post-content p');
+  const originalContent = postContentDiv.textContent;
+
+  // Hide the dropdown immediately
+  document.getElementById(`postOptions-${postId}`).classList.add('hidden');
+
+  // Replace post content with a textarea for editing
+  postContentDiv.innerHTML = `
+    <textarea class="w-full border border-blue-500 rounded-md p-2 text-sm min-h-[80px]">${currentContent}</textarea>
+    <div class="flex justify-end gap-2 mt-2">
+      <button class="cancel-edit-post-btn btn-secondary-outline">Cancel</button>
+      <button class="save-edit-post-btn btn-primary-action">Save</button>
+    </div>
+  `;
+
+  const textarea = postContentDiv.querySelector('textarea');
+  const saveBtn = postContentDiv.querySelector('.save-edit-post-btn');
+  const cancelBtn = postContentDiv.querySelector('.cancel-edit-post-btn');
+
+  textarea.focus();
+
+  saveBtn.addEventListener('click', async () => {
+    const newContent = textarea.value.trim();
+    if (!newContent) {
+      showMessage('Post content cannot be empty.', 'error');
+      return;
+    }
+    try {
+      const { error } = await supabase
+        .from('posts')
+        .update({ content: newContent })
+        .eq('id', postId)
+        .eq('user_id', currentUser.id); // Ensure only the owner can edit
+      if (error) throw error;
+
+      showMessage('Post updated successfully!', 'success');
+      postContentDiv.innerHTML = newContent; // Update the displayed content
+    } catch (error) {
+      console.error(`Error updating post ${postId}:`, error.message);
+      showMessage(`Failed to update post: ${error.message}`, 'error');
+      postContentDiv.innerHTML = originalContent; // Revert on error
+    }
+  });
+
+  cancelBtn.addEventListener('click', () => {
+    postContentDiv.innerHTML = originalContent; // Revert to original content
+  });
+}
+
+
 async function editComment(commentId, content, commentElement) {
-  const commentTextDiv = document.querySelector('.comment-content');
+  const commentTextDiv = commentElement.querySelector('.comment-text');
   const originalCommentHtml = commentTextDiv.innerHTML;
   document.getElementById(`commentOptions-${commentId}`).classList.add('hidden');
   commentTextDiv.innerHTML = `
@@ -2376,7 +2446,7 @@ function previewMedia(event) {
   console.log("Selected file type:", file?.type);
   const imagePreview = document.getElementById('imagePreview');
   const videoPreview = document.getElementById('videoPreview');
-  const mediaPreviewContainer = document.getElementById('mediaPreview-img');
+  const mediaPreviewContainer = document.getElementById('mediaPreviewContainer'); // Corrected ID
   if (file && file.type) {
     const fileType = file.type.toLowerCase();
     if (fileType.startsWith('image/')) {
@@ -2384,7 +2454,7 @@ function previewMedia(event) {
       imagePreview.classList.remove('hidden');
       videoPreview.classList.add('hidden');
       videoPreview.src = '';
-    } else if (fileType.startsWith('video/') || fileType === 'video/mp4' || fileType === 'video/webm') {
+    } else if (fileType.startsWith('video/')) { // Simplified check for video
       videoPreview.src = URL.createObjectURL(file);
       videoPreview.load();
       videoPreview.classList.remove('hidden');
@@ -2403,14 +2473,14 @@ function previewMedia(event) {
 function removeMedia() {
   const imagePreview = document.getElementById('imagePreview');
   const videoPreview = document.getElementById('videoPreview');
-  const mediaPreviewContainer = document.getElementById('mediaPreview-img');
-  const postMediaUpload = document.getElementById('post-options');
+  const mediaPreviewContainer = document.getElementById('mediaPreviewContainer'); // Corrected ID
+  const postMediaUpload = document.getElementById('postMediaUpload'); // Corrected ID
   imagePreview.src = '#';
   videoPreview.src = '';
   imagePreview.classList.add('hidden');
   videoPreview.classList.add('hidden');
   mediaPreviewContainer.classList.add('hidden');
-  postMediaUpload.value = '';
+  postMediaUpload.value = ''; // Clear the selected file
 }
 
 function toggleCommentsSection(postId) {
@@ -2495,7 +2565,7 @@ async function fetchComments(postId) {
     comments.forEach(comment => {
       const isMyComment = currentUser && comment.user_id === currentUser.id;
       const commenterName = comment.users?.full_name || comment.users?.email?.split('@')[0] || 'Anonymous';
-      const commenterAvatar = comment.users?.avatar_url ? `<img src="${comment.users.avatar_url}" alt="Profile">` : commenterName.charAt(0).toUpperCase();
+      const commenterAvatar = comment.users?.avatar_url ? `<img src="${comment.users.avatar_url}" alt="Profile" class="w-full h-full rounded-full object-cover">` : commenterName.charAt(0).toUpperCase();
       const commentDate = new Date(comment.created_at);
       const formattedTime = timeDifference(new Date(), commentDate);
       const commentElement = document.createElement('div');
@@ -2585,9 +2655,10 @@ document.getElementById('searchBar').addEventListener('input', function(e) {
     clearSearchBtn.classList.remove('hidden');
   } else {
     searchResults.classList.add('opacity-0', 'invisible');
-    searchResults.classList.remove('opacity-100', '');
+    searchResults.classList.remove('opacity-100', 'visible'); // Corrected
     clearSearchBtn.classList.add('hidden');
     searchResults.innerHTML = '';
+    fetchPosts(); // Reload all posts when search bar is empty
   }
 });
 
@@ -2596,7 +2667,7 @@ document.getElementById('clearSearchBtn').addEventListener('click', function() {
   const searchResults = document.getElementById('searchResults');
   searchBar.value = '';
   searchResults.classList.add('opacity-0', 'invisible');
-  searchResults.classList.remove('opacity-100', '');
+  searchResults.classList.remove('opacity-100', 'visible'); // Corrected
   this.classList.add('hidden');
   fetchPosts();
 });
@@ -2605,20 +2676,25 @@ document.querySelectorAll('.search-result-item').forEach(item => {
   item.addEventListener('click', function() {
     const userId = this.querySelector('.follow-btn')?.dataset.userId;
     if (userId) {
-      searchResults.innerHTML = `
-        <div class="p-4 bg-white rounded-lg shadow">
-          <div class="flex items-center space-x-4">
-            <div class="search-result-avatar">${this.querySelector('.search-result-avatar').innerHTML}</div>
-            <div>
-              <p class="font-semibold">${this.querySelector('.search-result-info p').textContent}</p>
-              <span class="text-gray-500">User Profile</span>
-            </div>
-          </div>
-          <div id="userPosts" class="mt-4">
-            <p class="text-gray-500">Loading posts...</p>
-          </div>
-        </div>
-      `;
+      // This section seems to be for displaying user profiles/posts based on search.
+      // The current implementation is rudimentary and replaces searchResults with static content.
+      // If this is meant to navigate to a user profile page, that logic would be handled elsewhere.
+      // For now, it's commented out as it overrides the dynamic search results.
+
+      // searchResults.innerHTML = `
+      //   <div class="p-4 bg-white rounded-lg shadow">
+      //     <div class="flex items-center space-x-4">
+      //       <div class="search-result-avatar">${this.querySelector('.search-result-avatar').innerHTML}</div>
+      //       <div>
+      //         <p class="font-semibold">${this.querySelector('.search-result-info p').textContent}</p>
+      //         <span class="text-gray-500">User Profile</span>
+      //       </div>
+      //     </div>
+      //     <div id="userPosts" class="mt-4">
+      //       <p class="text-gray-500">Loading posts...</p>
+      //     </div>
+      //   </div>
+      // `;
     }
   });
 });
@@ -2627,10 +2703,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       const video = entry.target;
-      if (entry.isIntersecting) {
-        video.play().catch(() => {});
-      } else {
-        video.pause();
+      if (video.tagName === 'VIDEO') { // Ensure it's a video element
+        if (entry.isIntersecting) {
+          video.play().catch(() => {});
+        } else {
+          video.pause();
+        }
       }
     });
   }, { threshold: 0.6 });
@@ -2641,27 +2719,50 @@ document.addEventListener('DOMContentLoaded', () => {
 
 document.querySelectorAll('.post-video').forEach(videoContainer => {
   const video = videoContainer.querySelector('video');
-  const overlay = videoContainer.querySelector('::before');
-  video.addEventListener('play', () => overlay.style.display = 'none');
-  video.addEventListener('pause', () => overlay.style.display = 'flex');
+  // There is no direct way to select a ::before pseudo-element with JavaScript.
+  // The ::before content for the play icon is set in CSS.
+  // To control it, you would typically toggle a class on the parent element
+  // that then changes the ::before style in CSS.
+
+  // Let's assume you have a class 'video-paused-overlay' that controls the visibility of the overlay.
+  // And that the CSS for `.post-video::before` is active when `.post-video.video-paused-overlay::before` is active.
+
+  video.addEventListener('play', () => {
+    videoContainer.classList.remove('video-paused-overlay');
+  });
+  video.addEventListener('pause', () => {
+    videoContainer.classList.add('video-paused-overlay');
+  });
+
+  // Initial state check for overlay visibility
+  if (video.paused) {
+    videoContainer.classList.add('video-paused-overlay');
+  } else {
+    videoContainer.classList.remove('video-paused-overlay');
+  }
+
+  // Mouseenter/mouseleave to show/hide overlay when paused
   videoContainer.addEventListener('mouseenter', () => {
-    observer.observe(video);
+    if (video.paused) {
+      videoContainer.classList.add('video-paused-overlay');
+    }
+  });
+  videoContainer.addEventListener('mouseleave', () => {
+    if (video.paused) {
+      videoContainer.classList.remove('video-paused-overlay');
+    }
+  });
+
+  // Click on the container to play/pause the video
+  videoContainer.addEventListener('click', () => {
+    if (video.paused) {
+      video.play();
+    } else {
+      video.pause();
+    }
   });
 });
 
-document.querySelectorAll('.post-video').forEach(videoContainer => {
-  const video = videoContainer.querySelector('video');
-  const overlay = videoContainer.querySelector('::before');
-  video.addEventListener('play', () => overlay.style.display = 'none');
-  video.addEventListener('pause', () => overlay.style.display = 'flex');
-  videoContainer.addEventListener('mouseenter', () => {
-    if (video.paused) overlay.style.display = 'flex';
-  });
-  videoContainer.addEventListener('mouseleave', () => {
-    if (video.paused) overlay.style.display = 'none';
-  });
-  overlay.style.content = video.paused ? '\f04b' : '\f04c';
-});
 function copyPostLink(postId) {
   const url = `${window.location.origin}/post.html?id=${postId}`;
   navigator.clipboard.writeText(url)

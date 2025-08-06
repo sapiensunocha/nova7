@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rapports - nova7</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Dancing+Script:wght=700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F0F2F5;
+            color: #1a202c;
+            display: flex;
+            min-height: 100vh;
+            font-size: 102%;
+        }
+        .header-nova7 {
+            background-color: #FFFFFF;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 0.75rem 1.5rem;
+            height: 60px;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        .nova7-logo-header {
+            max-height: 36px;
+            width: auto;
+        }
+        .sidebar-nova7 {
+            background-color: #004182;
+            color: #E0F2FE;
+            width: 260px;
+            box-shadow: 2px 0 8px rgba(0,0,0,0.15);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding-top: 1.5rem;
+            transition: transform 0.3s ease-in-out;
+            z-index: 40;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar-header {
+            padding: 0 1.5rem 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid #0053a0;
+            margin-bottom: 0.75rem;
+        }
+        .sidebar-logo-img {
+            max-height: 120px;
+            width: auto;
+            filter: brightness(0) invert(1);
+        }
+        .sidebar-nova7 .nav-link-sidebar {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            margin: 0.25rem 1rem;
+            font-weight: 500;
+            color: #E0F2FE;
+            text-decoration: none;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .sidebar-nova7 .nav-link-sidebar:hover {
+            background-color: #0A66C2;
+        }
+        .sidebar-nova7 .nav-link-sidebar.active {
+            background-color: #FFFFFF;
+            color: #0A66C2;
+            font-weight: 600;
+        }
+        .sidebar-nova7 .nav-link-sidebar i {
+            width: 20px;
+            margin-right: 0.75rem;
+            text-align: center;
+        }
+        .main-content-area {
+            margin-left: 260px;
+            padding: 2rem;
+            width: calc(100% - 260px);
+            min-height: 100vh;
+        }
+        .mobile-header {
+            display: none;
+            background-color: #FFFFFF;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 0 1rem;
+            height: 60px;
+            align-items: center;
+            justify-content: space-between;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+        }
+        .card-styled {
+            background-color: #FFFFFF;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+            padding: 2rem;
+        }
+        .card-styled h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 1.5rem;
+        }
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .summary-card {
+            background-color: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+        .summary-card p {
+            font-size: 0.875rem;
+            color: #64748b;
+            margin-bottom: 0.25rem;
+        }
+        .summary-card span {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #0A66C2;
+        }
+        .table-container {
+            overflow-x: auto;
+        }
+        .reports-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+            text-align: left;
+        }
+        .reports-table th, .reports-table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #E2E8F0;
+        }
+        .reports-table th {
+            background-color: #F8FAFC;
+            font-weight: 600;
+            color: #4A5568;
+            text-transform: uppercase;
+        }
+        .reports-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        .reports-table tbody tr:hover {
+            background-color: #F0F4F8;
+        }
+        .filter-controls {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+            align-items: flex-end;
+        }
+        .filter-controls label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #4A5568;
+            margin-bottom: 0.25rem;
+            display: block;
+        }
+        .form-input-styled, .form-select-styled {
+            width: 100%;
+            border: 1px solid #D1D5DB;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            font-size: 0.969rem;
+            color: #1D2939;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .form-input-styled:focus, .form-select-styled:focus {
+            outline: none;
+            border-color: #0A66C2;
+            box-shadow: 0 0 0 2px rgba(10, 102, 194, 0.2);
+        }
+        .btn-primary-action {
+            background-color: #0A66C2;
+            color: white;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-primary-action:hover {
+            background-color: #0855a0;
+        }
+        .btn-primary-action:disabled {
+            background-color: #A0AEC0;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        .loading-message {
+            text-align: center;
+            color: #4A5568;
+            padding: 2rem;
+        }
+        .message-box {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            text-align: center;
+            min-width: 250px;
+        }
+        .message-box.error { background-color: #F44336; }
+        .message-box.show { display: block; opacity: 1; }
+        .chart-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+        .chart-box {
+            background-color: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            flex: 1;
+            min-width: 300px;
+            max-width: 48%;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .chart-box h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        .chart-canvas {
+            width: 100% !important;
+            height: 300px !important;
+        }
+        @media (max-width: 768px) {
+            .sidebar-nova7 { transform: translateX(-100%); height: auto; position: fixed; width: 100%; top: 60px; left: 0; padding-top: 0; }
+            .sidebar-nova7.open { transform: translateX(0); }
+            .main-content-area { margin-left: 0; width: 100%; padding-top: calc(60px + 1.5rem); padding: 1rem; }
+            .desktop-header { display: none !important; }
+            .mobile-header { display: flex; }
+            .card-styled { padding: 1.5rem; }
+            .summary-grid { grid-template-columns: 1fr; }
+            .filter-controls { flex-direction: column; align-items: stretch; }
+            .filter-controls input[type="date"],
+            .filter-controls select,
+            .btn-primary-action { width: 100%; }
+            .chart-box { max-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div id="messageBox" class="message-box"></div>
+
+    <header class="mobile-header md:hidden">
+        <button id="hamburgerBtnMobile" class="p-2 text-gray-700 hover:text-blue-600">
+            <i class="fas fa-bars text-2xl"></i>
+        </button>
+        <a href="dashboard.html">
+            <img src="nova-logo.png" alt="nova7 Logo" class="nova7-logo-header" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+            <span style="display:none;" class="text-xl font-semibold text-gray-700">nova7</span>
+        </a>
+        <a href="#" id="mobileLogoutLink" class="p-2 text-gray-700 hover:text-blue-600">
+            <i class="fas fa-sign-out-alt text-xl"></i>
+        </a>
+    </header>
+
+    <aside id="sidebar" class="sidebar-nova7">
+        <div class="sidebar-header">
+            <a href="dashboard.html"><img src="nova-logo.png" alt="nova7 Logo" class="sidebar-logo-img" onerror="this.style.display='none';"></a>
+        </div>
+        <nav class="flex-grow">
+            <a href="dashboard.html" class="nav-link-sidebar"><i class="fas fa-tachometer-alt"></i>Tableau de bord</a>
+            <a href="view-transactions.html" class="nav-link-sidebar"><i class="fas fa-exchange-alt"></i>Transactions</a>
+            <a href="reports.html" class="nav-link-sidebar active"><i class="fas fa-chart-pie"></i>Rapports</a>
+            <a href="community.html" class="nav-link-sidebar"><i class="fas fa-users"></i>Communauté</a>
+            <a href="chatbot.html" class="nav-link-sidebar"><i class="fas fa-comments-dollar"></i>Assistant de chat</a>
+            <a href="marketplace.html" class="nav-link-sidebar"><i class="fas fa-store"></i>Marché</a>
+            <a href="settings.html" class="nav-link-sidebar"><i class="fas fa-cog"></i>Paramètres</a>
+            <a href="wallet.html" class="nav-link-sidebar"><i class="fas fa-wallet"></i>Portefeuille</a>
+        </nav>
+        <div class="pb-4">
+            <a href="profile.html" class="nav-link-sidebar"><i class="fas fa-user-circle"></i>Profil</a>
+            <a href="#" id="sidebarLogoutLink" class="nav-link-sidebar"><i class="fas fa-sign-out-alt"></i>Déconnexion</a>
+        </div>
+    </aside>
+
+    <main class="main-content-area">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6 hidden md:block">Rapports</h1>
+
+        <div id="reportContent">
+            <div class="card-styled">
+                <h2>Aperçu des rapports</h2>
+                <div class="filter-controls">
+                    <div>
+                        <label for="startDate">Date de début :</label>
+                        <input type="date" id="startDate" class="form-input-styled">
+                    </div>
+                    <div>
+                        <label for="endDate">Date de fin :</label>
+                        <input type="date" id="endDate" class="form-input-styled">
+                    </div>
+                    <div>
+                        <label for="transactionType">Type :</label>
+                        <select id="transactionType" class="form-input-styled">
+                            <option value="all">Tous</option>
+                            <option value="deposit">Dépôt</option>
+                            <option value="withdrawal">Retrait</option>
+                            <option value="sale">Vente</option>
+                            <option value="purchase">Achat</option>
+                        </select>
+                    </div>
+                    <button id="applyFilterBtn" class="btn-primary-action">Appliquer le filtre</button>
+                    <button id="downloadPdfBtn" class="btn-primary-action ml-auto"><i class="fas fa-download mr-2"></i>Télécharger en PDF</button>
+                </div>
+
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <p>Solde actuel</p>
+                        <span id="currentBalance">0,00 €</span>
+                    </div>
+                    <div class="summary-card">
+                        <p>Total des dépôts</p>
+                        <span id="summaryTotalDeposits">0,00 €</span>
+                    </div>
+                    <div class="summary-card">
+                        <p>Total des retraits</p>
+                        <span id="summaryTotalWithdrawals">0,00 €</span>
+                    </div>
+                    <div class="summary-card">
+                        <p>Total des ventes</p>
+                        <span id="summaryTotalSales">0,00 €</span>
+                    </div>
+                    <div class="summary-card">
+                        <p>Total des achats</p>
+                        <span id="summaryTotalPurchases">0,00 €</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-styled">
+                <h2>Visualisations d'activité</h2>
+                <div class="chart-container">
+                    <div class="chart-box">
+                        <h3>Solde net dans le temps</h3>
+                        <canvas id="netBalanceChart" class="chart-canvas"></canvas>
+                    </div>
+                    <div class="chart-box">
+                        <h3>Distribution par type de transaction</h3>
+                        <canvas id="transactionTypeChart" class="chart-canvas"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-styled">
+                <h2>Transactions détaillées</h2>
+                <div class="table-container">
+                    <table class="reports-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                                <th>Montant</th>
+                                <th>Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactionsTableBody">
+                            <tr><td colspan="5" class="text-center py-4 text-gray-500" id="noTransactionsMessage">Aucune transaction trouvée pour les critères sélectionnés.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="loadingMessage" class="loading-message hidden">Chargement des transactions...</div>
+                <div id="dataErrorMessage" class="hidden text-red-600 text-center py-4">Échec du chargement des données de transaction.</div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            const SUPABASE_URL = 'https://nvxqorudztbpwyanakdj.supabase.co';
+            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52eHFvcnVkenRicHd5YW5ha2RqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIzOTk5NTQsImV4cCI6MjA2Nzk3NTk1NH0.XvITDAnpEkjQTh4SCVOfwGKsaANS6tp58Up37SXwYRw';
+            const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+            let currentUserId = null;
+            let netBalanceChart;
+            let transactionTypeChart;
+
+            const messageBox = document.getElementById('messageBox');
+            const transactionsTableBody = document.getElementById('transactionsTableBody');
+            const noTransactionsMessage = document.getElementById('noTransactionsMessage');
+            const loadingMessage = document.getElementById('loadingMessage');
+            const dataErrorMessage = document.getElementById('dataErrorMessage');
+
+            const startDateInput = document.getElementById('startDate');
+            const endDateInput = document.getElementById('endDate');
+            const transactionTypeSelect = document.getElementById('transactionType');
+            const applyFilterBtn = document.getElementById('applyFilterBtn');
+            const downloadPdfBtn = document.getElementById('downloadPdfBtn');
+            const currentBalanceSpan = document.getElementById('currentBalance');
+            const language = 'fr-FR';
+
+            // Set default dates for the last 30 days
+            const today = new Date();
+            const thirtyDaysAgo = new Date(today);
+            thirtyDaysAgo.setDate(today.getDate() - 30);
+            startDateInput.value = thirtyDaysAgo.toISOString().split('T')[0];
+            endDateInput.value = today.toISOString().split('T')[0];
+
+            function showMessage(message, type = 'success', duration = 3000) {
+                messageBox.textContent = message;
+                messageBox.className = 'message-box show';
+                if (type === 'error') messageBox.classList.add('error');
+                else messageBox.classList.remove('error');
+                setTimeout(() => messageBox.classList.remove('show'), duration);
+            }
+
+            async function handleLogout() {
+                await supabase.auth.signOut();
+                window.location.href = 'login.html';
+            }
+
+            // --- Sidebar and Logout Logic ---
+            const sidebarLogoutLink = document.getElementById('sidebarLogoutLink');
+            if (sidebarLogoutLink) sidebarLogoutLink.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); });
+            const mobileLogoutLink = document.getElementById('mobileLogoutLink');
+            if (mobileLogoutLink) mobileLogoutLink.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); });
+
+            const hamburgerBtnMobile = document.getElementById('hamburgerBtnMobile');
+            const sidebar = document.getElementById('sidebar');
+            if (hamburgerBtnMobile && sidebar) {
+                hamburgerBtnMobile.addEventListener('click', (e) => { e.stopPropagation(); sidebar.classList.toggle('open'); });
+            }
+            document.addEventListener('click', (e) => {
+                if (sidebar && sidebar.classList.contains('open') && !sidebar.contains(e.target) && (!hamburgerBtnMobile || !hamburgerBtnMobile.contains(e.target))) {
+                    sidebar.classList.remove('open');
+                }
+            });
+            // --- End Sidebar and Logout Logic ---
+
+            // Authentication Check
+            const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+            if (sessionError || !session) {
+                console.error('Aucune session active trouvée, redirection vers la page de connexion :', sessionError?.message);
+                handleLogout();
+                return;
+            }
+            currentUserId = session.user.id;
+            
+            function formatCurrency(amount) {
+                return new Intl.NumberFormat(language, { style: 'currency', currency: 'EUR' }).format(amount);
+            }
+
+            async function fetchBalance() {
+                try {
+                    const { data: transactions, error } = await supabase
+                        .from('transactions')
+                        .select('amount, type')
+                        .eq('user_id', currentUserId)
+                        .order('created_at', { ascending: true });
+
+                    if (error) {
+                        console.error('Erreur lors de la récupération des transactions pour le calcul du solde :', error.message);
+                        currentBalanceSpan.textContent = 'N/A';
+                        showMessage(`Erreur de récupération du solde : ${error.message}`, 'error');
+                        return;
+                    }
+
+                    let calculatedBalance = 0;
+                    transactions.forEach(tx => {
+                        const amount = parseFloat(tx.amount || 0);
+                        if (tx.type === 'deposit' || tx.type === 'sale') {
+                            calculatedBalance += amount;
+                        } else if (tx.type === 'withdrawal' || tx.type === 'purchase') {
+                            calculatedBalance -= amount;
+                        }
+                    });
+
+                    currentBalanceSpan.textContent = formatCurrency(calculatedBalance);
+
+                } catch (error) {
+                    console.error('Erreur inattendue lors du calcul du solde :', error);
+                    currentBalanceSpan.textContent = 'N/A';
+                    showMessage('Une erreur inattendue est survenue lors du calcul du solde.', 'error');
+                }
+            }
+
+            async function fetchTransactions() {
+                loadingMessage.classList.remove('hidden');
+                dataErrorMessage.classList.add('hidden');
+                transactionsTableBody.innerHTML = '';
+                noTransactionsMessage.classList.add('hidden');
+
+                const startDate = startDateInput.value;
+                const endDate = endDateInput.value;
+                const transactionType = transactionTypeSelect.value;
+
+                let query = supabase
+                    .from('transactions')
+                    .select('created_at, type, description, amount, status')
+                    .eq('user_id', currentUserId)
+                    .order('created_at', { ascending: true });
+
+                if (startDate) {
+                    query = query.gte('created_at', startDate + 'T00:00:00Z');
+                }
+                if (endDate) {
+                    query = query.lte('created_at', endDate + 'T23:59:59Z');
+                }
+                if (transactionType !== 'all') {
+                    query = query.eq('type', transactionType);
+                }
+
+                try {
+                    const { data: transactions, error } = await query;
+
+                    if (error) {
+                        console.error('Erreur lors de la récupération des transactions :', error.message);
+                        dataErrorMessage.textContent = `Erreur : ${error.message}`;
+                        dataErrorMessage.classList.remove('hidden');
+                        return;
+                    }
+
+                    if (transactions.length === 0) {
+                        noTransactionsMessage.classList.remove('hidden');
+                        document.getElementById('summaryTotalDeposits').textContent = formatCurrency(0);
+                        document.getElementById('summaryTotalWithdrawals').textContent = formatCurrency(0);
+                        document.getElementById('summaryTotalSales').textContent = formatCurrency(0);
+                        document.getElementById('summaryTotalPurchases').textContent = formatCurrency(0);
+                        updateCharts({ dates: [], netBalances: [] }, { typeCounts: { deposit: 0, withdrawal: 0, sale: 0, purchase: 0, other: 0 } });
+                        return;
+                    }
+
+                    let totalDeposits = 0;
+                    let totalWithdrawals = 0;
+                    let totalSales = 0;
+                    let totalPurchases = 0;
+
+                    const netBalanceData = { dates: [], netBalances: [] };
+                    let runningBalanceForChart = 0;
+                    const typeCounts = { deposit: 0, withdrawal: 0, sale: 0, purchase: 0, other: 0 };
+
+                    transactions.forEach(tx => {
+                        const row = transactionsTableBody.insertRow();
+                        const date = new Date(tx.created_at).toLocaleDateString(language);
+                        const amount = parseFloat(tx.amount || 0);
+
+                        row.innerHTML = `
+                            <td>${date}</td>
+                            <td class="capitalize">${tx.type || 'N/A'}</td>
+                            <td>${tx.description || 'N/A'}</td>
+                            <td>${formatCurrency(amount)}</td>
+                            <td class="capitalize">${tx.status || 'N/A'}</td>
+                        `;
+
+                        if (tx.type === 'deposit') {
+                            totalDeposits += amount;
+                            typeCounts.deposit += amount;
+                            runningBalanceForChart += amount;
+                        } else if (tx.type === 'withdrawal') {
+                            totalWithdrawals += amount;
+                            typeCounts.withdrawal += amount;
+                            runningBalanceForChart -= amount;
+                        } else if (tx.type === 'sale') {
+                            totalSales += amount;
+                            typeCounts.sale += amount;
+                            runningBalanceForChart += amount;
+                        } else if (tx.type === 'purchase') {
+                            totalPurchases += amount;
+                            typeCounts.purchase += amount;
+                            runningBalanceForChart -= amount;
+                        } else {
+                            typeCounts.other += amount;
+                        }
+
+                        netBalanceData.dates.push(date);
+                        netBalanceData.netBalances.push(runningBalanceForChart);
+                    });
+
+                    document.getElementById('summaryTotalDeposits').textContent = formatCurrency(totalDeposits);
+                    document.getElementById('summaryTotalWithdrawals').textContent = formatCurrency(totalWithdrawals);
+                    document.getElementById('summaryTotalSales').textContent = formatCurrency(totalSales);
+                    document.getElementById('summaryTotalPurchases').textContent = formatCurrency(totalPurchases);
+
+                    updateCharts(netBalanceData, { typeCounts: typeCounts });
+
+                } catch (err) {
+                    console.error('Erreur inattendue lors de la récupération des transactions :', err);
+                    dataErrorMessage.textContent = `Une erreur inattendue est survenue : ${err.message}`;
+                    dataErrorMessage.classList.remove('hidden');
+                } finally {
+                    loadingMessage.classList.add('hidden');
+                }
+            }
+
+            function updateCharts(netBalanceData, typeChartData) {
+                // Net Balance Over Time Chart
+                const netBalanceCtx = document.getElementById('netBalanceChart').getContext('2d');
+                if (netBalanceChart) {
+                    netBalanceChart.destroy();
+                }
+                netBalanceChart = new Chart(netBalanceCtx, {
+                    type: 'line',
+                    data: {
+                        labels: netBalanceData.dates,
+                        datasets: [
+                            {
+                                label: 'Solde net (période filtrée)',
+                                data: netBalanceData.netBalances,
+                                borderColor: '#0A66C2',
+                                backgroundColor: 'rgba(10, 102, 194, 0.2)',
+                                tension: 0.2,
+                                fill: true,
+                                pointRadius: 3
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                title: {
+                                    display: true,
+                                    text: 'Solde (€)'
+                                },
+                                ticks: {
+                                    callback: function(value) {
+                                        return formatCurrency(value);
+                                    }
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Date'
+                                },
+                                ticks: {
+                                    autoSkip: true,
+                                    maxTicksLimit: 10
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top',
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed.y !== null) {
+                                            label += formatCurrency(context.parsed.y);
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // Transaction Type Distribution Chart
+                const typeCtx = document.getElementById('transactionTypeChart').getContext('2d');
+                if (transactionTypeChart) {
+                    transactionTypeChart.destroy();
+                }
+
+                const rawTypeCounts = typeChartData.typeCounts;
+                const chartLabels = ['Dépôts', 'Retraits', 'Ventes', 'Achats', 'Autres'];
+                const chartDataValues = [
+                    rawTypeCounts.deposit,
+                    rawTypeCounts.withdrawal,
+                    rawTypeCounts.sale,
+                    rawTypeCounts.purchase,
+                    rawTypeCounts.other
+                ];
+                const backgroundColors = [
+                    'rgb(75, 192, 192)',
+                    'rgb(255, 99, 132)',
+                    'rgb(54, 162, 235)',
+                    'rgb(255, 205, 86)',
+                    'rgb(201, 203, 207)'
+                ];
+                
+                // Filter out labels and data for types with zero amounts to make the chart cleaner
+                const filteredLabels = [];
+                const filteredData = [];
+                const filteredColors = [];
+
+                chartDataValues.forEach((value, index) => {
+                    if (value > 0) {
+                        filteredData.push(value);
+                        filteredLabels.push(chartLabels[index]);
+                        filteredColors.push(backgroundColors[index]);
+                    }
+                });
+
+                transactionTypeChart = new Chart(typeCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: filteredLabels,
+                        datasets: [{
+                            data: filteredData,
+                            backgroundColor: filteredColors,
+                            hoverOffset: 8,
+                            borderColor: '#ffffff',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                                labels: {
+                                    boxWidth: 15,
+                                    padding: 10
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed !== null) {
+                                            label += formatCurrency(context.parsed);
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Initial fetches
+            fetchBalance();
+            fetchTransactions();
+
+            // Event Listeners for filters and PDF download
+            applyFilterBtn.addEventListener('click', fetchTransactions);
+
+            downloadPdfBtn.addEventListener('click', () => {
+                const element = document.getElementById('reportContent');
+                const opt = {
+                    margin: 1,
+                    filename: 'rapport_financier.pdf',
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, logging: true, dpi: 192, letterRendering: true },
+                    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+                };
+                html2pdf().from(element).set(opt).save();
+                showMessage('Génération du PDF...');
+            });
+        });
+    </script>
+</body>
+</html>

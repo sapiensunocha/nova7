@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transactions - nova7</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(to bottom, #E0F2FE, #F0F2F5);
+            color: #1F2937;
+            display: flex;
+            min-height: 100vh;
+            font-size: 102%;
+        }
+        .sidebar-nova7 {
+            background-color: #004182;
+            color: #E0F2FE;
+            width: 260px;
+            box-shadow: 2px 0 8px rgba(0,0,0,0.15);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding-top: 1rem;
+            transition: transform 0.3s ease-in-out;
+            z-index: 40;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar-header {
+            padding: 0.75rem 1.5rem 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid #0053a0;
+            margin-bottom: 0.75rem;
+        }
+        .sidebar-logo-img {
+            max-height: 120px;
+            width: auto;
+            filter: brightness(0) invert(1);
+        }
+        .sidebar-nova7 .nav-link-sidebar {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            margin: 0.25rem 1rem;
+            font-weight: 500;
+            color: #E0F2FE;
+            transition: background-color 0.2s, color 0.2s;
+            text-decoration: none;
+        }
+        .sidebar-nova7 .nav-link-sidebar:hover {
+            background-color: #0A66C2;
+            color: #FFFFFF;
+        }
+        .sidebar-nova7 .nav-link-sidebar.active {
+            background-color: #FFFFFF;
+            color: #0A66C2;
+            font-weight: 600;
+        }
+        .sidebar-nova7 .nav-link-sidebar i {
+            width: 20px;
+            margin-right: 0.75rem;
+            text-align: center;
+        }
+        .main-content-area {
+            margin-left: 260px;
+            padding: 1.5rem;
+            width: calc(100% - 260px);
+            min-height: 100vh;
+            flex-grow: 1;
+        }
+        .header-nova7 {
+            background-color: #FFFFFF;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+            padding: 0.75rem 1.5rem;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            border-radius: 8px;
+        }
+        .nova7-logo-header {
+            max-height: 36px;
+            width: auto;
+            transition: transform 0.3s ease;
+        }
+        .nova7-logo-header:hover {
+            transform: scale(1.05);
+        }
+        .mobile-header {
+            display: none;
+            background-color: #FFFFFF;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+            padding: 0.75rem 1.5rem;
+            height: 60px;
+            align-items: center;
+            justify-content: space-between;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+        }
+        .transaction-card {
+            background: linear-gradient(to bottom, #FFFFFF, #F8FAFC);
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #DBEAFE;
+        }
+        .transaction-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 8px;
+        }
+        .transaction-table th, .transaction-table td {
+            padding: 12px 15px;
+            text-align: left;
+        }
+        .transaction-table thead th {
+            background: #EFF6FF;
+            color: #1F2937;
+            font-weight: 700;
+            font-size: 0.8925rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            text-shadow: 0 1px 1px rgba(0,0,0,0.05);
+        }
+        .transaction-table tbody tr {
+            background-color: #FFFFFF;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        .transaction-table tbody tr:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+            background: #EFF6FF;
+        }
+        .transaction-table td {
+            font-size: 0.918rem;
+            color: #1F2937;
+            border-top: 1px solid #DBEAFE;
+            border-bottom: 1px solid #DBEAFE;
+        }
+        .transaction-table tbody tr:first-child td {
+            border-top: none;
+        }
+        .transaction-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        .transaction-table th:first-child, .transaction-table td:first-child {
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+        }
+        .transaction-table th:last-child, .transaction-table td:last-child {
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+        .amount-income {
+            color: #10B981;
+            font-weight: 700;
+            text-shadow: 0 1px 1px rgba(0,0,0,0.05);
+        }
+        .amount-expense {
+            color: #EF4444;
+            font-weight: 700;
+            text-shadow: 0 1px 1px rgba(0,0,0,0.05);
+        }
+        .pagination-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: #FFFFFF;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border: 1px solid #DBEAFE;
+        }
+        .pagination-controls button {
+            background: #2563EB;
+            color: white;
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            font-weight: 600;
+            font-size: 0.918rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .pagination-controls button:hover:not(:disabled) {
+            background: #1E40AF;
+            transform: scale(1.05);
+        }
+        .pagination-controls button:disabled {
+            background: #94A3B8;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        .pagination-controls .page-info {
+            font-size: 0.918rem;
+            color: #1F2937;
+            font-weight: 600;
+        }
+        .filter-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+            background: linear-gradient(to bottom, #FFFFFF, #F8FAFC);
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border: 1px solid #DBEAFE;
+        }
+        .filter-controls label {
+            font-size: 0.867rem;
+            font-weight: 600;
+            color: #1F2937;
+            margin-bottom: 0.4rem;
+            display: block;
+            text-shadow: 0 1px 1px rgba(0,0,0,0.05);
+        }
+        .filter-controls select, .filter-controls input[type="date"], .filter-controls input[type="number"] {
+            width: 100%;
+            padding: 0.6rem 0.8rem;
+            border: 1px solid #BFDBFE;
+            border-radius: 8px;
+            font-size: 0.918rem;
+            color: #1F2937;
+            background-color: #FFFFFF;
+            transition: all 0.3s ease;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+        .filter-controls select:focus, .filter-controls input[type="date"]:focus, .filter-controls input[type="number"]:focus {
+            outline: none;
+            border-color: #2563EB;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.3);
+        }
+        .select-wrapper {
+            position: relative;
+        }
+        .select-wrapper::after {
+            content: '\f078';
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+            color: #6B7280;
+        }
+        .no-transactions {
+            text-align: center;
+            padding: 2rem;
+            font-size: 1.122rem;
+            color: #6B7280;
+            background: #FFFFFF;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-top: 1.5rem;
+            border: 1px solid #DBEAFE;
+        }
+        .message-box {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #10B981;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            text-align: center;
+            min-width: 250px;
+            font-size: 0.918rem;
+        }
+        .message-box.error {
+            background: #EF4444;
+        }
+        .message-box.show {
+            display: block;
+            opacity: 1;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        .modal-content {
+            background: #FFFFFF;
+            border-radius: 12px;
+            padding: 1.5rem;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+        .modal.show .modal-content {
+            transform: scale(1);
+        }
+        .modal-content h2 {
+            font-size: 1.275rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #1F2937;
+            text-shadow: 0 1px 1px rgba(0,0,0,0.05);
+        }
+        .modal-content .form-group {
+            margin-bottom: 1rem;
+        }
+        .modal-content .form-group label {
+            font-size: 0.867rem;
+            font-weight: 600;
+            color: #1F2937;
+            margin-bottom: 0.4rem;
+            display: block;
+        }
+        .modal-content .form-group input, .modal-content .form-group select {
+            width: 100%;
+            padding: 0.6rem 0.8rem;
+            border: 1px solid #BFDBFE;
+            border-radius: 8px;
+            font-size: 0.918rem;
+            transition: all 0.3s ease;
+        }
+        .modal-content .form-group input:focus, .modal-content .form-group select:focus {
+            outline: none;
+            border-color: #2563EB;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.3);
+        }
+        .modal-content .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+        .modal-content .form-actions button {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.918rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .modal-content .form-actions .btn-primary {
+            background: #2563EB;
+            color: white;
+        }
+        .modal-content .form-actions .btn-primary:hover {
+            background: #1E40AF;
+            transform: scale(1.05);
+        }
+        .modal-content .form-actions .btn-secondary {
+            background: #E5E7EB;
+            color: #1F2937;
+        }
+        .modal-content .form-actions .btn-secondary:hover {
+            background: #D1D5DB;
+            transform: scale(1.05);
+        }
+        .metrics-card {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            padding: 1.5rem;
+            background: linear-gradient(to bottom, #FFFFFF, #F8FAFC);
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+            border: 1px solid #DBEAFE;
+        }
+        .metric-item {
+            text-align: center;
+            background: #EFF6FF;
+            padding: 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        .metric-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .metric-item h3 {
+            font-size: 0.867rem;
+            font-weight: 700;
+            color: #1F2937;
+            text-transform: uppercase;
+        }
+        .metric-item p {
+            font-size: 1.53rem;
+            font-weight: 800;
+            color: #2563EB;
+            text-shadow: 0 1px 1px rgba(0,0,0,0.05);
+        }
+        @media (max-width: 768px) {
+            .sidebar-nova7 {
+                transform: translateX(-100%);
+            }
+            .sidebar-nova7.open {
+                transform: translateX(0);
+            }
+            .main-content-area {
+                margin-left: 0;
+                width: 100%;
+                padding-top: calc(60px + 1rem);
+            }
+            .desktop-header {
+                display: none;
+            }
+            .mobile-header {
+                display: flex;
+            }
+            .filter-controls, .metrics-card {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+            .transaction-table thead {
+                display: none;
+            }
+            .transaction-table, .transaction-table tbody, .transaction-table tr, .transaction-table td {
+                display: block;
+                width: 100%;
+            }
+            .transaction-table td {
+                text-align: right;
+                padding-left: 50%;
+                position: relative;
+                border: none;
+            }
+            .transaction-table td::before {
+                content: attr(data-label);
+                position: absolute;
+                left: 15px;
+                width: calc(50% - 30px);
+                text-align: left;
+                font-weight: 700;
+                color: #1F2937;
+                font-size: 0.867rem;
+                text-transform: uppercase;
+            }
+            .transaction-table td:first-child {
+                border-top-left-radius: 8px;
+                border-top-right-radius: 8px;
+            }
+            .transaction-table td:last-child {
+                border-bottom-left-radius: 8px;
+                border-bottom-right-radius: 8px;
+            }
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+    <div id="messageBox" class="message-box"></div>
+    <header class="mobile-header md:hidden">
+        <button id="hamburgerBtnMobile" class="p-2 text-gray-700 hover:text-blue-600 transition-all">
+            <i class="fas fa-bars text-[1.53rem]"></i>
+        </button>
+        <a href="dashboard.html">
+            <img src="nova-logo.png" alt="nova7 Logo" class="nova7-logo-header"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+            <span style="display:none;" class="text-[1.275rem] font-semibold text-gray-700">nova7</span>
+        </a>
+        <a href="#" id="mobileLogoutLink" class="p-2 text-gray-700 hover:text-blue-600 transition-all">
+            <i class="fas fa-sign-out-alt text-[1.122rem]"></i>
+        </a>
+    </header>
+    <aside id="sidebar" class="sidebar-nova7">
+        <div class="sidebar-header">
+            <a href="dashboard.html" class="flex items-center">
+                <img src="nova-logo.png" alt="nova7 Logo" class="sidebar-logo-img"
+                     style="filter: brightness(0) invert(1);"
+                     onerror="this.style.display='none';">
+            </a>
+        </div>
+        <nav class="flex-grow">
+            <a href="dashboard.html" class="nav-link-sidebar">
+                <i class="fas fa-tachometer-alt"></i>Tableau de bord
+            </a>
+            <a href="view-transactions.html" class="nav-link-sidebar active">
+                <i class="fas fa-exchange-alt"></i>Transactions
+            </a>
+            <a href="reports.html" class="nav-link-sidebar">
+                <i class="fas fa-chart-pie"></i>Rapports
+            </a>
+            <a href="community.html" class="nav-link-sidebar">
+                <i class="fas fa-users"></i>Communauté
+            </a>
+            <a href="chatbot.html" class="nav-link-sidebar">
+                <i class="fas fa-comments-dollar"></i>Assistant Virtuel
+            </a>
+            <a href="resources.html" class="nav-link-sidebar">
+                <i class="fas fa-book-open"></i>Ressources
+            </a>
+            <a href="settings.html" class="nav-link-sidebar">
+                <i class="fas fa-cog"></i>Paramètres
+            </a>
+            <a href="wallet.html" class="nav-link-sidebar">
+                <i class="fas fa-wallet"></i>Portefeuille
+            </a>
+        </nav>
+        <div class="pb-4">
+            <a href="profile.html" class="nav-link-sidebar">
+                <i class="fas fa-user-circle"></i>Profil
+            </a>
+            <a href="#" id="sidebarLogoutLink" class="nav-link-sidebar">
+                <i class="fas fa-sign-out-alt"></i>Déconnexion
+            </a>
+        </div>
+    </aside>
+    <main class="main-content-area">
+        <header class="desktop-header header-nova7 hidden md:flex items-center justify-between mb-6">
+            <h1 class="text-[1.275rem] font-bold text-gray-800">Aperçu des transactions</h1>
+            <div class="flex items-center space-x-3">
+                <span id="desktopUserWelcome" class="text-[0.867rem] text-gray-700 font-semibold">Bienvenue, Utilisateur !</span>
+            </div>
+        </header>
+        <div class="metrics-card">
+            <div class="metric-item">
+                <h3>Total des articles en stock</h3>
+                <p id="totalStockItems" class="text-[1.53rem]">0</p>
+            </div>
+            <div class="metric-item">
+                <h3>Total des transactions</h3>
+                <p id="totalTransactions" class="text-[1.53rem]">0</p>
+            </div>
+        </div>
+        <div class="filter-controls">
+            <div class="select-wrapper">
+                <label for="transactionTypeFilter">Type</label>
+                <select id="transactionTypeFilter">
+                    <option value="all">Tous</option>
+                    <option value="income">Revenu</option>
+                    <option value="expense">Dépense</option>
+                    <option value="deposit">Dépôt</option>
+                    <option value="withdrawal">Retrait</option>
+                    <option value="transfer">Virement</option>
+                    <option value="product_sell">Vente de produit</option>
+                    <option value="product_buy">Achat de produit</option>
+                    <option value="insurance_payment">Paiement d'assurance</option>
+                    <option value="bill_payment">Paiement de facture</option>
+                    <option value="loan_received">Prêt reçu</option>
+                    <option value="loan_payment">Remboursement de prêt</option>
+                </select>
+            </div>
+            <div class="select-wrapper">
+                <label for="sortOrderSelect">Trier par</label>
+                <select id="sortOrderSelect">
+                    <option value="newest">Les plus récents en premier</option>
+                    <option value="oldest">Les plus anciens en premier</option>
+                    <option value="highest_amount">Montant le plus élevé</option>
+                    <option value="lowest_amount">Montant le plus bas</option>
+                </select>
+            </div>
+            <div>
+                <label for="startDateInput">Date de début</label>
+                <input type="date" id="startDateInput">
+            </div>
+            <div>
+                <label for="endDateInput">Date de fin</label>
+                <input type="date" id="endDateInput">
+            </div>
+            <div>
+                <label for="minAmountInput">Montant min</label>
+                <input type="number" id="minAmountInput" placeholder="ex., 50.00" step="0.01">
+            </div>
+            <div>
+                <label for="maxAmountInput">Montant max</label>
+                <input type="number" id="maxAmountInput" placeholder="ex., 500.00" step="0.01">
+            </div>
+            <div class="flex items-end">
+                <button id="addStockBtn" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all transform hover:scale-105">
+                    <i class="fas fa-plus mr-2"></i>Ajouter un stock
+                </button>
+            </div>
+        </div>
+        <div class="transaction-card">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-[1.1475rem] font-semibold text-gray-800">Liste des transactions</h2>
+                <button id="downloadCsvBtn" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all transform hover:scale-105">
+                    <i class="fas fa-download mr-2"></i>Télécharger les transactions
+                </button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="transaction-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Description</th>
+                            <th>Type</th>
+                            <th>Montant</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactionsTableBody">
+                        <tr><td colspan="5" class="text-center py-4 text-gray-500">Chargement des transactions...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div id="noTransactionsMessage" class="no-transactions hidden">
+                Aucune transaction trouvée pour les critères sélectionnés.
+            </div>
+        </div>
+        <div id="paginationControls" class="pagination-controls"></div>
+        <div id="addStockModal" class="modal">
+            <div class="modal-content">
+                <h2>Ajouter un nouveau stock</h2>
+                <div class="form-group">
+                    <label for="stockSymbol">Symbole du stock</label>
+                    <input type="text" id="stockSymbol" placeholder="ex., AAPL">
+                </div>
+                <div class="form-group">
+                    <label for="companyName">Nom de l'entreprise (Optionnel)</label>
+                    <input type="text" id="companyName" placeholder="ex., Apple Inc.">
+                </div>
+                <div class="form-group">
+                    <label for="stockQuantity">Quantité</label>
+                    <input type="number" id="stockQuantity" placeholder="ex., 100" step="1">
+                </div>
+                <div class="form-group">
+                    <label for="stockPrice">Prix moyen</label>
+                    <input type="number" id="stockPrice" placeholder="ex., 29.99" step="0.01">
+                </div>
+                <div class="form-actions">
+                    <button class="btn-secondary" id="cancelAddStockBtn">Annuler</button>
+                    <button class="btn-primary" id="saveStockBtn">Sauvegarder le stock</button>
+                </div>
+            </div>
+        </div>
+        <div id="modifyStockModal" class="modal">
+            <div class="modal-content">
+                <h2>Modifier un stock</h2>
+                <div class="form-group">
+                    <label for="modifyStockId" class="hidden">ID du stock</label>
+                    <input type="hidden" id="modifyStockId">
+                </div>
+                <div class="form-group">
+                    <label for="modifyStockSymbol">Symbole du stock</label>
+                    <input type="text" id="modifyStockSymbol" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="modifyQuantity">Ajuster la quantité</label>
+                    <input type="number" id="modifyQuantity" placeholder="ex., 10 ou -10" step="1">
+                </div>
+                <div class="form-actions">
+                    <button class="btn-secondary" id="cancelModifyStockBtn">Annuler</button>
+                    <button class="btn-primary" id="saveStockAdjustBtn">Sauvegarder les changements</button>
+                </div>
+            </div>
+        </div>
+        <div id="sellStockModal" class="modal">
+            <div class="modal-content">
+                <h2>Vendre un stock</h2>
+                <div class="form-group">
+                    <label for="sellStockId" class="hidden">ID du stock</label>
+                    <input type="hidden" id="sellStockId">
+                </div>
+                <div class="form-group">
+                    <label for="sellStockSymbol">Symbole du stock</label>
+                    <input type="text" id="sellStockSymbol" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="sellQuantity">Quantité à vendre</label>
+                    <input type="number" id="sellQuantity" placeholder="ex., 5" step="1" min="1">
+                </div>
+                <div class="form-group">
+                    <label for="sellPrice">Prix de vente</label>
+                    <input type="number" id="sellPrice" placeholder="ex., 29.99" step="0.01" min="0">
+                </div>
+                <div class="form-actions">
+                    <button class="btn-secondary" id="cancelSellStockBtn">Annuler</button>
+                    <button class="btn-primary" id="confirmSellBtn">Confirmer la vente</button>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            const SUPABASE_URL = 'https://nvxqorudztbpwyanakdj.supabase.co';
+            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52eHFvcnVkenRicHd5YW5ha2RqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIzOTk5NTQsImV4cCI6MjA2Nzk3NTk1NH0.XvITDAnpEkjQTh4SCVOfwGKsaANS6tp58Up37SXwYRw';
+            const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            console.log("Client Supabase initialisé pour les Transactions.");
+
+            let userId = null;
+            const transactionsPerPage = 10;
+            let currentPageNum = 1;
+            let currentFilterType = 'all';
+            let currentSortOrder = 'newest';
+            let currentStartDate = '';
+            let currentEndDate = '';
+            let currentMinAmount = '';
+            let currentMaxAmount = '';
+
+            const transactionsTableBody = document.getElementById('transactionsTableBody');
+            const paginationControls = document.getElementById('paginationControls');
+            const noTransactionsMessage = document.getElementById('noTransactionsMessage');
+            const totalStockItems = document.getElementById('totalStockItems');
+            const totalTransactions = document.getElementById('totalTransactions');
+            const transactionTypeFilter = document.getElementById('transactionTypeFilter');
+            const sortOrderSelect = document.getElementById('sortOrderSelect');
+            const startDateInput = document.getElementById('startDateInput');
+            const endDateInput = document.getElementById('endDateInput');
+            const minAmountInput = document.getElementById('minAmountInput');
+            const maxAmountInput = document.getElementById('maxAmountInput');
+
+            const addStockBtn = document.getElementById('addStockBtn');
+            const saveStockBtn = document.getElementById('saveStockBtn');
+            const saveStockAdjustBtn = document.getElementById('saveStockAdjustBtn');
+            const confirmSellBtn = document.getElementById('confirmSellBtn');
+            const downloadCsvBtn = document.getElementById('downloadCsvBtn');
+            const cancelAddStockBtn = document.getElementById('cancelAddStockBtn');
+            const cancelModifyStockBtn = document.getElementById('cancelModifyStockBtn');
+            const cancelSellStockBtn = document.getElementById('cancelSellStockBtn');
+
+            transactionTypeFilter.addEventListener('change', applyFilters);
+            sortOrderSelect.addEventListener('change', applyFilters);
+            startDateInput.addEventListener('change', applyFilters);
+            endDateInput.addEventListener('change', applyFilters);
+            minAmountInput.addEventListener('change', applyFilters);
+            maxAmountInput.addEventListener('change', applyFilters);
+
+            addStockBtn.addEventListener('click', () => openModal('addStockModal'));
+            saveStockBtn.addEventListener('click', saveStock);
+            saveStockAdjustBtn.addEventListener('click', modifyStock);
+            confirmSellBtn.addEventListener('click', sellStock);
+            downloadCsvBtn.addEventListener('click', downloadTransactionsCsv);
+            cancelAddStockBtn.addEventListener('click', () => closeModal('addStockModal'));
+            cancelModifyStockBtn.addEventListener('click', () => closeModal('modifyStockModal'));
+            cancelSellStockBtn.addEventListener('click', () => closeModal('sellStockModal'));
+
+            async function applyFilters() {
+                currentPageNum = 1;
+                currentFilterType = transactionTypeFilter.value;
+                currentSortOrder = sortOrderSelect.value;
+                currentStartDate = startDateInput.value;
+                currentEndDate = endDateInput.value;
+                currentMinAmount = minAmountInput.value;
+                currentMaxAmount = maxAmountInput.value;
+                await fetchBusinessTransactions();
+                await fetchMetrics();
+            }
+
+            async function handleLogout() {
+                console.log("Transactions: Déconnexion et redirection vers login.html");
+                await supabase.auth.signOut();
+                window.location.href = 'login.html';
+            }
+
+            const sidebarLogoutLink = document.getElementById('sidebarLogoutLink');
+            if (sidebarLogoutLink) sidebarLogoutLink.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); });
+            const mobileLogoutLink = document.getElementById('mobileLogoutLink');
+            if (mobileLogoutLink) mobileLogoutLink.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); });
+
+            const hamburgerBtnMobile = document.getElementById('hamburgerBtnMobile');
+            const sidebar = document.getElementById('sidebar');
+            if (hamburgerBtnMobile && sidebar) {
+                hamburgerBtnMobile.addEventListener('click', (e) => { e.stopPropagation(); sidebar.classList.toggle('open'); });
+            }
+            document.addEventListener('click', (e) => {
+                if (sidebar && sidebar.classList.contains('open') && !sidebar.contains(e.target) && (!hamburgerBtnMobile || !hamburgerBtnMobile.contains(e.target))) {
+                    sidebar.classList.remove('open');
+                }
+            });
+
+            const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+            if (sessionError || !session) {
+                console.log("Transactions: Aucune session Supabase active. Redirection vers login.");
+                handleLogout();
+                return;
+            }
+
+            userId = session.user.id;
+
+            try {
+                const { data: profile, error: profileError } = await supabase
+                    .from('users')
+                    .select('full_name')
+                    .eq('id', userId)
+                    .maybeSingle();
+
+                if (profileError) {
+                    console.error('Erreur lors de la récupération du profil utilisateur:', profileError.message);
+                } else if (profile?.full_name) {
+                    const desktopUserWelcomeElement = document.getElementById('desktopUserWelcome');
+                    if (desktopUserWelcomeElement) desktopUserWelcomeElement.textContent = `Bienvenue, ${profile.full_name}!`;
+                }
+            } catch (error) {
+                console.error("Erreur lors de la récupération du nom de l'utilisateur:", error);
+            }
+
+            await fetchBusinessTransactions();
+            await fetchMetrics();
+
+            function openModal(modalId) {
+                const modal = document.getElementById(modalId);
+                modal.style.display = 'flex';
+                modal.classList.add('show');
+            }
+
+            function closeModal(modalId) {
+                const modal = document.getElementById(modalId);
+                modal.style.display = 'none';
+                modal.classList.remove('show');
+                if (modalId === 'addStockModal') {
+                    document.getElementById('stockSymbol').value = '';
+                    document.getElementById('companyName').value = '';
+                    document.getElementById('stockQuantity').value = '';
+                    document.getElementById('stockPrice').value = '';
+                } else if (modalId === 'modifyStockModal') {
+                    document.getElementById('modifyStockId').value = '';
+                    document.getElementById('modifyStockSymbol').value = '';
+                    document.getElementById('modifyQuantity').value = '';
+                } else if (modalId === 'sellStockModal') {
+                    document.getElementById('sellStockId').value = '';
+                    document.getElementById('sellStockSymbol').value = '';
+                    document.getElementById('sellQuantity').value = '';
+                    document.getElementById('sellPrice').value = '';
+                }
+            }
+
+            async function fetchBusinessTransactions(page = currentPageNum) {
+                currentPageNum = page;
+                transactionsTableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-gray-500">Chargement des transactions...</td></tr>';
+                noTransactionsMessage.classList.add('hidden');
+
+                let transactionQuery = supabase
+                    .from('transactions')
+                    .select('*', { count: 'exact' })
+                    .eq('user_id', userId);
+
+                if (currentFilterType !== 'all') {
+                    if (currentFilterType === 'income') {
+                        transactionQuery = transactionQuery.in('transaction_type', ['deposit', 'transfer', 'product_sell', 'loan_received']).gte('amount', 0);
+                    } else if (currentFilterType === 'expense') {
+                        transactionQuery = transactionQuery.in('transaction_type', ['withdrawal', 'transfer', 'product_buy', 'insurance_payment', 'bill_payment', 'loan_payment']).lte('amount', 0);
+                    } else {
+                        transactionQuery = transactionQuery.eq('transaction_type', currentFilterType);
+                    }
+                }
+
+                if (currentStartDate) {
+                    transactionQuery = transactionQuery.gte('created_at', currentStartDate);
+                }
+                if (currentEndDate) {
+                    transactionQuery = transactionQuery.lte('created_at', currentEndDate + 'T23:59:59');
+                }
+                if (currentMinAmount) {
+                    transactionQuery = transactionQuery.gte('amount', parseFloat(currentMinAmount));
+                }
+                if (currentMaxAmount) {
+                    transactionQuery = transactionQuery.lte('amount', parseFloat(currentMaxAmount));
+                }
+
+                let ascending = false;
+                let orderByColumn = 'created_at';
+                if (currentSortOrder === 'newest') {
+                    ascending = false;
+                    orderByColumn = 'created_at';
+                } else if (currentSortOrder === 'oldest') {
+                    ascending = true;
+                    orderByColumn = 'created_at';
+                } else if (currentSortOrder === 'highest_amount') {
+                    ascending = false;
+                    orderByColumn = 'amount';
+                } else if (currentSortOrder === 'lowest_amount') {
+                    ascending = true;
+                    orderByColumn = 'amount';
+                }
+
+                transactionQuery = transactionQuery.order(orderByColumn, { ascending: ascending });
+                const from = (page - 1) * transactionsPerPage;
+                const to = from + transactionsPerPage - 1;
+                transactionQuery = transactionQuery.range(from, to);
+
+                const { data: transactions, error: transactionError, count } = await transactionQuery;
+
+                if (transactionError) {
+                    console.error('Erreur lors de la récupération des transactions:', transactionError.message);
+                    transactionsTableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-red-500">Échec du chargement des transactions.</td></tr>';
+                    showMessage('Échec du chargement des transactions. Veuillez réessayer.', 'error');
+                    return;
+                }
+
+                const { data: userStocks, error: stockError } = await supabase
+                    .from('user_stocks')
+                    .select('id, stock_symbol, company_name, quantity, average_price, transaction_id')
+                    .eq('user_id', userId);
+
+                if (stockError) {
+                    console.error('Erreur lors de la récupération des stocks de l\'utilisateur:', stockError.message);
+                    showMessage('Échec du chargement des données de stock. Veuillez réessayer.', 'error');
+                    return;
+                }
+
+                const transactionsWithStock = transactions.map(tx => ({
+                    ...tx,
+                    user_stocks: userStocks.find(us => us.transaction_id === tx.id) || null
+                }));
+
+                renderTransactions(transactionsWithStock);
+                renderPagination(count);
+            }
+
+            function renderTransactions(transactions) {
+                const transactionTypeMap = {
+                    'deposit': 'Dépôt',
+                    'withdrawal': 'Retrait',
+                    'transfer': 'Virement',
+                    'product_sell': 'Vente de produit',
+                    'product_buy': 'Achat de produit',
+                    'insurance_payment': 'Paiement d\'assurance',
+                    'bill_payment': 'Paiement de facture',
+                    'loan_received': 'Prêt reçu',
+                    'loan_payment': 'Remboursement de prêt'
+                };
+
+                transactionsTableBody.innerHTML = '';
+                if (transactions && transactions.length > 0) {
+                    transactions.forEach(transaction => {
+                        const row = document.createElement('tr');
+                        const amountClass = parseFloat(transaction.amount) >= 0 ? 'amount-income' : 'amount-expense';
+                        const displayAmount = parseFloat(transaction.amount).toFixed(2);
+                        const formattedDate = new Date(transaction.created_at).toLocaleDateString('fr-FR', { year: 'numeric', month: 'short', day: 'numeric' });
+
+                        let stockId = null;
+                        let displayName = transaction.description || '-';
+                        let stockQuantity = null;
+                        let stockPrice = null;
+
+                        if (['product_buy', 'product_sell'].includes(transaction.transaction_type) && transaction.user_stocks) {
+                            stockId = transaction.user_stocks.id;
+                            displayName = transaction.user_stocks.company_name || transaction.user_stocks.stock_symbol;
+                            stockQuantity = transaction.user_stocks.quantity;
+                            stockPrice = transaction.user_stocks.average_price;
+                        }
+
+                        row.innerHTML = `
+                            <td data-label="Date">${formattedDate}</td>
+                            <td data-label="Description">${displayName}</td>
+                            <td data-label="Type">${transactionTypeMap[transaction.transaction_type] || transaction.transaction_type.replace(/_/g, ' ')}</td>
+                            <td data-label="Montant" class="${amountClass}">${displayAmount}</td>
+                            <td data-label="Actions" class="space-x-2">
+                                ${['product_buy', 'product_sell'].includes(transaction.transaction_type) && stockId ? `
+                                    <button class="text-blue-600 hover:text-blue-800 transition-all transform hover:scale-110" onclick="openModifyStockModal('${stockId}', '${displayName}', ${stockQuantity})">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="text-green-600 hover:text-green-800 transition-all transform hover:scale-110" onclick="openSellStockModal('${stockId}', '${displayName}', ${stockQuantity}, ${stockPrice})">
+                                        <i class="fas fa-dollar-sign"></i>
+                                    </button>
+                                ` : ''}
+                                <button class="text-red-600 hover:text-red-800 transition-all transform hover:scale-110" onclick="deleteTransaction('${transaction.id}', '${transaction.transaction_type}')">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </td>
+                        `;
+                        transactionsTableBody.appendChild(row);
+                    });
+                    noTransactionsMessage.classList.add('hidden');
+                } else {
+                    noTransactionsMessage.classList.remove('hidden');
+                }
+            }
+
+            function renderPagination(totalCount) {
+                paginationControls.innerHTML = '';
+                const totalPages = Math.ceil(totalCount / transactionsPerPage);
+
+                const prevButton = document.createElement('button');
+                prevButton.innerHTML = '<i class="fas fa-chevron-left"></i> Précédent';
+                prevButton.disabled = currentPageNum <= 1;
+                prevButton.addEventListener('click', () => fetchBusinessTransactions(currentPageNum - 1));
+                paginationControls.appendChild(prevButton);
+
+                const pageInfo = document.createElement('span');
+                pageInfo.classList.add('page-info');
+                pageInfo.textContent = `Page ${currentPageNum} sur ${totalPages || 1}`;
+                paginationControls.appendChild(pageInfo);
+
+                const nextButton = document.createElement('button');
+                nextButton.innerHTML = 'Suivant <i class="fas fa-chevron-right"></i>';
+                nextButton.disabled = currentPageNum >= totalPages;
+                nextButton.addEventListener('click', () => fetchBusinessTransactions(currentPageNum + 1));
+                paginationControls.appendChild(nextButton);
+            }
+
+            async function fetchMetrics() {
+                const { count: stockCount, error: stockError } = await supabase
+                    .from('user_stocks')
+                    .select('id', { count: 'exact' })
+                    .eq('user_id', userId)
+                    .gt('quantity', 0);
+
+                const { count: transactionCount, error: transactionError } = await supabase
+                    .from('transactions')
+                    .select('id', { count: 'exact' })
+                    .eq('user_id', userId);
+
+                if (stockError || transactionError) {
+                    console.error('Erreur lors de la récupération des métriques:', stockError?.message || transactionError?.message);
+                    showMessage('Échec du chargement des métriques.', 'error');
+                    return;
+                }
+
+                totalStockItems.textContent = stockCount || 0;
+                totalTransactions.textContent = transactionCount || 0;
+            }
+
+            async function saveStock() {
+                const stockSymbol = document.getElementById('stockSymbol').value.trim().toUpperCase();
+                const companyName = document.getElementById('companyName').value.trim() || null;
+                const quantity = parseInt(document.getElementById('stockQuantity').value);
+                const averagePrice = parseFloat(document.getElementById('stockPrice').value);
+
+                if (!stockSymbol || isNaN(quantity) || quantity <= 0 || isNaN(averagePrice) || averagePrice < 0) {
+                    showMessage('Veuillez remplir tous les champs avec des valeurs valides.', 'error');
+                    return;
+                }
+
+                const { data: stockData, error: stockError } = await supabase
+                    .from('user_stocks')
+                    .insert([
+                        {
+                            user_id: userId,
+                            stock_symbol: stockSymbol,
+                            company_name: companyName,
+                            quantity: quantity,
+                            average_price: averagePrice
+                        }
+                    ])
+                    .select();
+
+                if (stockError) {
+                    console.error('Erreur lors de l\'ajout du stock:', stockError.message);
+                    showMessage('Échec de l\'ajout du stock.', 'error');
+                    return;
+                }
+
+                const stockId = stockData[0].id;
+
+                const { data: transactionData, error: transactionError } = await supabase
+                    .from('transactions')
+                    .insert([
+                        {
+                            user_id: userId,
+                            transaction_type: 'product_buy',
+                            amount: -(quantity * averagePrice),
+                            description: `Achat de ${quantity} actions de ${stockSymbol}`,
+                            currency: 'USD',
+                            status: 'completed'
+                        }
+                    ])
+                    .select();
+
+                if (transactionError) {
+                    console.error('Erreur lors de l\'enregistrement de la transaction:', transactionError.message);
+                    showMessage('Échec de l\'enregistrement de la transaction.', 'error');
+                    return;
+                }
+
+                const transactionId = transactionData[0].id;
+
+                if (transactionId) {
+                    await supabase
+                        .from('user_stocks')
+                        .update({ transaction_id: transactionId })
+                        .eq('id', stockId);
+                }
+
+                showMessage('Stock ajouté avec succès !');
+                closeModal('addStockModal');
+                await fetchBusinessTransactions();
+                await fetchMetrics();
+            }
+
+            function openModifyStockModal(stockId, stockSymbol, currentQuantity) {
+                document.getElementById('modifyStockId').value = stockId;
+                document.getElementById('modifyStockSymbol').value = stockSymbol;
+                document.getElementById('modifyQuantity').value = '';
+                openModal('modifyStockModal');
+            }
+
+            async function modifyStock() {
+                const stockId = document.getElementById('modifyStockId').value;
+                const adjustQuantity = parseInt(document.getElementById('modifyQuantity').value);
+
+                if (isNaN(adjustQuantity)) {
+                    showMessage('Veuillez entrer une quantité valide.', 'error');
+                    return;
+                }
+
+                const { data: stock, error: fetchError } = await supabase
+                    .from('user_stocks')
+                    .select('quantity, stock_symbol, average_price')
+                    .eq('id', stockId)
+                    .single();
+
+                if (fetchError) {
+                    console.error('Erreur lors de la récupération du stock:', fetchError.message);
+                    showMessage('Échec de la récupération du stock.', 'error');
+                    return;
+                }
+
+                const newQuantity = stock.quantity + adjustQuantity;
+                if (newQuantity < 0) {
+                    showMessage('Impossible de réduire le stock en dessous de 0.', 'error');
+                    return;
+                }
+
+                const { error } = await supabase
+                    .from('user_stocks')
+                    .update({ quantity: newQuantity })
+                    .eq('id', stockId);
+
+                if (error) {
+                    console.error('Erreur lors de la mise à jour du stock:', error.message);
+                    showMessage('Échec de la mise à jour du stock.', 'error');
+                    return;
+                }
+
+                const { error: transactionError } = await supabase
+                    .from('transactions')
+                    .insert([
+                        {
+                            user_id: userId,
+                            transaction_type: adjustQuantity >= 0 ? 'product_buy' : 'product_sell',
+                            amount: -(adjustQuantity * stock.average_price),
+                            description: adjustQuantity >= 0
+                                ? `Ajout de ${adjustQuantity} actions de ${stock.stock_symbol}`
+                                : `Retrait de ${-adjustQuantity} actions de ${stock.stock_symbol}`,
+                            currency: 'USD',
+                            status: 'completed'
+                        }
+                    ]);
+
+                if (transactionError) {
+                    console.error('Erreur lors de l\'enregistrement de la transaction:', transactionError.message);
+                    showMessage('Échec de l\'enregistrement de la transaction.', 'error');
+                    return;
+                }
+
+                showMessage('Stock mis à jour avec succès !');
+                closeModal('modifyStockModal');
+                await fetchBusinessTransactions();
+                await fetchMetrics();
+            }
+
+            function openSellStockModal(stockId, stockSymbol, currentQuantity, averagePrice) {
+                document.getElementById('sellStockId').value = stockId;
+                document.getElementById('sellStockSymbol').value = stockSymbol;
+                document.getElementById('sellQuantity').value = '';
+                document.getElementById('sellPrice').value = averagePrice.toFixed(2);
+                openModal('sellStockModal');
+            }
+
+            async function sellStock() {
+                const stockId = document.getElementById('sellStockId').value;
+                const sellQuantity = parseInt(document.getElementById('sellQuantity').value);
+                const sellPrice = parseFloat(document.getElementById('sellPrice').value);
+
+                if (isNaN(sellQuantity) || sellQuantity <= 0 || isNaN(sellPrice) || sellPrice < 0) {
+                    showMessage('Veuillez entrer une quantité et un prix valides.', 'error');
+                    return;
+                }
+
+                const { data: stock, error: fetchError } = await supabase
+                    .from('user_stocks')
+                    .select('quantity, stock_symbol')
+                    .eq('id', stockId)
+                    .single();
+
+                if (fetchError) {
+                    console.error('Erreur lors de la récupération du stock:', fetchError.message);
+                    showMessage('Échec de la récupération du stock.', 'error');
+                    return;
+                }
+
+                if (sellQuantity > stock.quantity) {
+                    showMessage('Pas assez de stock à vendre.', 'error');
+                    return;
+                }
+
+                const newQuantity = stock.quantity - sellQuantity;
+                const { error: updateError } = await supabase
+                    .from('user_stocks')
+                    .update({ quantity: newQuantity })
+                    .eq('id', stockId);
+
+                if (updateError) {
+                    console.error('Erreur lors de la mise à jour du stock:', updateError.message);
+                    showMessage('Échec de la vente du stock.', 'error');
+                    return;
+                }
+
+                const { error: transactionError } = await supabase
+                    .from('transactions')
+                    .insert([
+                        {
+                            user_id: userId,
+                            transaction_type: 'product_sell',
+                            amount: sellPrice * sellQuantity,
+                            description: `Vente de ${sellQuantity} actions de ${stock.stock_symbol}`,
+                            currency: 'USD',
+                            status: 'completed'
+                        }
+                    ]);
+
+                if (transactionError) {
+                    console.error('Erreur lors de l\'enregistrement de la transaction de vente:', transactionError.message);
+                    showMessage('Échec de l\'enregistrement de la vente.', 'error');
+                    return;
+                }
+
+                showMessage('Stock vendu avec succès !');
+                closeModal('sellStockModal');
+                await fetchBusinessTransactions();
+                await fetchMetrics();
+            }
+
+            async function deleteTransaction(transactionId, transactionType) {
+                if (!confirm("Êtes-vous sûr de vouloir supprimer cette transaction ? Cette action est irréversible.")) {
+                    return;
+                }
+
+                try {
+                    // Supprimer l'entrée de stock correspondante si la transaction était un achat ou une vente
+                    if (['product_buy', 'product_sell'].includes(transactionType)) {
+                        const { error: stockError } = await supabase
+                            .from('user_stocks')
+                            .delete()
+                            .eq('transaction_id', transactionId);
+
+                        if (stockError) {
+                            console.error("Erreur lors de la suppression de l'entrée de stock :", stockError.message);
+                            throw stockError; // Rejeter pour que la suppression de la transaction ne se produise pas
+                        }
+                    }
+
+                    // Supprimer la transaction principale
+                    const { error: transactionError } = await supabase
+                        .from('transactions')
+                        .delete()
+                        .eq('id', transactionId);
+
+                    if (transactionError) {
+                        console.error("Erreur lors de la suppression de la transaction :", transactionError.message);
+                        throw transactionError; // Rejeter pour gérer l'erreur globalement
+                    }
+
+                    showMessage('Transaction supprimée avec succès !');
+                    await fetchBusinessTransactions();
+                    await fetchMetrics();
+
+                } catch (error) {
+                    console.error("Échec de la suppression de la transaction :", error.message);
+                    showMessage('Échec de la suppression de la transaction. Veuillez réessayer.', 'error');
+                }
+            }
+
+            async function downloadTransactionsCsv() {
+                const { data, error } = await supabase
+                    .from('transactions')
+                    .select('created_at,description,transaction_type,amount')
+                    .eq('user_id', userId)
+                    .order('created_at', { ascending: false });
+
+                if (error) {
+                    console.error('Erreur lors de la récupération des transactions pour le CSV:', error.message);
+                    showMessage('Échec du téléchargement des transactions.', 'error');
+                    return;
+                }
+
+                const csvContent = [
+                    'Date,Description,Type,Montant',
+                    ...data.map(row => {
+                        const formattedDate = new Date(row.created_at).toLocaleDateString('fr-FR');
+                        return `${formattedDate},"${row.description.replace(/"/g, '""')}",${row.transaction_type},${parseFloat(row.amount).toFixed(2)}`;
+                    })
+                ].join('\n');
+
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `transactions_${new Date().toISOString().split('T')[0]}.csv`;
+                link.click();
+                URL.revokeObjectURL(link.href);
+
+                showMessage('Transactions téléchargées au format CSV !');
+            }
+
+            function showMessage(message, type = 'success', duration = 3000) {
+                const messageBox = document.getElementById('messageBox');
+                messageBox.textContent = message;
+                messageBox.className = 'message-box show';
+                if (type === 'error') {
+                    messageBox.classList.add('error');
+                } else {
+                    messageBox.classList.remove('error');
+                }
+
+                setTimeout(() => {
+                    messageBox.classList.remove('show');
+                }, duration);
+            }
+        });
+    </script>
+</body>
+</html>

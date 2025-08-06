@@ -1,0 +1,2526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Admin Dashboard - nova7</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F0F2F5; /* Light gray background */
+            color: #1a202c; /* Dark text color */
+            display: flex; /* Ensure sidebar and main content are side-by-side */
+            height: 100vh; /* Full viewport height */
+            margin: 0;
+            overflow: hidden; /* Prevent body scroll, content areas will scroll */
+        }
+
+        /* Adjusted Sidebar Styles (balanced red/maroon shades) */
+        .sidebar-nova7 {
+            width: 260px;
+            background-color: #6A0505; /* Deeper, more muted red/maroon */
+            color: #F8F8F8; /* Light text color for contrast */
+            padding-top: 1rem;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            position: fixed; /* Keeps sidebar in place */
+            top: 0;
+            left: 0;
+            height: 100vh;
+            transform: translateX(0);
+            transition: transform 0.3s ease-in-out;
+            z-index: 40;
+            box-shadow: 2px 0 8px rgba(0,0,0,0.15);
+        }
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem 1rem 1.5rem;
+            border-bottom: 1px solid #8D2A2A; /* Slightly lighter red for border */
+            margin-bottom: 0.75rem;
+        }
+        .sidebar-logo-img {
+            max-height: 120px;
+            width: auto;
+            filter: brightness(0) invert(1); /* Keeps logo white */
+        }
+        .sidebar-nova7 .nav-link-sidebar {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            margin: 0.25rem 1rem;
+            font-weight: 500;
+            color: #F8F8F8; /* Light text color */
+            text-decoration: none;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .sidebar-nova7 .nav-link-sidebar:hover {
+            background-color: #A03A3A; /* Softer red on hover */
+            color: #FFFFFF; /* White text on hover */
+        }
+        .sidebar-nova7 .nav-link-sidebar.active {
+            background-color: #FFFFFF; /* White background for active link */
+            color: #6A0505; /* Muted red text for active link */
+            font-weight: 600;
+        }
+        .sidebar-nova7 .nav-link-sidebar i {
+            width: 20px;
+            margin-right: 0.75rem;
+            text-align: center;
+        }
+
+        /* Main Content Area: Stays in place, its internal content changes */
+        .main-content-area {
+            flex-grow: 1;
+            margin-left: 260px; /* Offset for the fixed sidebar */
+            padding: 1.5rem;
+            background-color: #F0F2F5; /* Matches body background */
+            overflow-y: auto; /* Allows content within this area to scroll */
+        }
+
+        /* Desktop Header (matching Chat Advisor header) */
+        .desktop-header {
+            background-color: #FFFFFF;
+            border-bottom: 1px solid #E2E8F0;
+            padding: 0.75rem 1.5rem;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem; /* Added margin for consistency with gap between header and next section */
+        }
+        .desktop-header h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1a202c;
+        }
+        .desktop-header #adminUserGreeting {
+            color: #6B7280; /* Gray for subtle text */
+        }
+
+        /* Filter and Export Section */
+        .bg-white.rounded.shadow {
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1); /* Consistent shadow */
+        }
+        /* Adjusted button red to be less intense */
+        .bg-red-600 {
+            background-color: #E04E4E; /* A slightly softer red */
+        }
+        .bg-red-600:hover {
+            background-color: #C23B3B; /* Darker red on hover */
+        }
+        .text-blue-600.underline { /* Keep blue for document link as a value */
+            color: #3182CE; /* A standard blue */
+        }
+        .text-green-600 { /* Keep green for approve */
+            color: #38A169; /* Standard green */
+        }
+        .text-red-600 { /* Keep red for reject and delete */
+            color: #E04E4E; /* Matches the button red */
+        }
+        .text-orange-600 { /* New color for flag */
+            color: #DD6B20; /* Orange for flagging */
+        }
+        .text-gray-600 { /* New color for notes/collaborate */
+            color: #718096; /* Gray for notes/collaborate */
+        }
+
+        /* Dashboard specific styles - ADJUSTED HEIGHTS HERE */
+        .kpi-card {
+            background-color: #FFFFFF;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .kpi-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1a202c;
+            margin-top: 0.5rem;
+        }
+        .kpi-label {
+            font-size: 0.9rem;
+            color: #6B7280;
+            margin-top: 0.25rem;
+        }
+        #worldMap {
+          height: 350px; /* Reduced height for better fit */
+          background-color: #e0e0e0; /* Placeholder background */
+          border-radius: 0.5rem;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+          margin-bottom: 1.5rem;
+        }
+        #mainChart { /* Renamed from kycTrendsChart for generalization */
+            height: 250px; /* Reduced height for better fit */
+            max-height: 350px;
+            overflow-y: auto; /* Add scroll if content exceeds height */
+            background-color: #FFFFFF;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            position: relative; /* Ensure proper positioning context */
+        }
+
+        /* View Switcher */
+        .view-switcher {
+          display: flex;
+          gap: 1rem;
+          margin-bottom: 1.5rem;
+        }
+        .view-switcher button {
+          background-color: #FFFFFF;
+          color: #6A0505;
+          border: 1px solid #6A0505;
+          padding: 0.75rem 1.5rem;
+          border-radius: 0.5rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s ease-in-out;
+        }
+        .view-switcher button.active {
+          background-color: #6A0505;
+          color: #FFFFFF;
+        }
+        .view-switcher button:hover:not(.active) {
+          background-color: #F0F2F5;
+        }
+
+        /* Mobile Header (from Chat Advisor for responsiveness) */
+        .mobile-header {
+            display: none; /* Hidden by default for desktop */
+            background-color: #FFFFFF;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 0.75rem 1.5rem;
+            height: 60px;
+            align-items: center;
+            justify-content: space-between;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+        }
+        .nova7-logo-header {
+            max-height: 36px;
+            width: auto;
+        }
+
+        /* Media Queries for Responsiveness (from Chat Advisor) */
+        @media (max-width: 768px) {
+            .sidebar-nova7 {
+                transform: translateX(-100%);
+                /* Adjusted for mobile: full height */
+                height: 100vh;
+            }
+            .sidebar-nova7.open {
+                transform: translateX(0);
+            }
+            .main-content-area {
+                margin-left: 0; /* No offset on mobile */
+                padding-top: 60px; /* Space for fixed mobile header */
+            }
+            .desktop-header {
+                display: none !important; /* Hide desktop header on mobile */
+            }
+            .mobile-header {
+                display: flex; /* Show mobile header */
+            }
+        }
+        @media (min-width: 769px) {
+            .sidebar-nova7 {
+                transform: translateX(0);
+            }
+            .main-content-area {
+                margin-left: 260px;
+                padding-top: 1.5rem; /* Reset padding for desktop */
+            }
+            .mobile-header {
+                display: none;
+            }
+        }
+        /* Hidden class for internal sub-views within unifiedMainContent */
+        .hidden-subview {
+            display: none;
+        }
+    </style>
+</head>
+<body class="flex">
+    <header class="mobile-header md:hidden">
+        <button id="hamburgerBtnMobile" class="p-2 text-gray-700 hover:text-red-600">
+            <i class="fas fa-bars text-2xl"></i>
+        </button>
+        <a href="#" class="flex items-center"> <img src="nova-logo.png" alt="nova7 Logo" class="nova7-logo-header"
+                onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+            <span style="display:none;" class="text-xl font-semibold text-gray-700">nova7</span>
+        </a>
+        <a href="#" id="mobileLogoutLink" class="p-2 text-gray-700 hover:text-red-600">
+            <i class="fas fa-sign-out-alt text-xl"></i>
+        </a>
+    </header>
+
+    <aside id="sidebar" class="sidebar-nova7">
+        <div class="sidebar-header">
+            <a href="#" class="flex items-center justify-center"> <img src="nova-logo.png" alt="nova7 Logo" class="sidebar-logo-img"
+                    style="filter: brightness(0) invert(1);" onerror="this.style.display='none';">
+            </a>
+        </div>
+        <nav class="flex-grow">
+            <a href="#" class="nav-link-sidebar active" data-view-id="kyc"><i class="fas fa-id-card-alt"></i>KYC Management</a>
+            <a href="#" class="nav-link-sidebar" data-view-id="dashboard-overview"><i class="fas fa-tachometer-alt"></i>Dashboard Overview</a>
+            <a href="#" class="nav-link-sidebar" data-view-id="transactions"><i class="fas fa-exchange-alt"></i>Transactions</a>
+            <a href="#" class="nav-link-sidebar" data-view-id="reports"><i class="fas fa-chart-pie"></i>Reports</a>
+            <a href="#" class="nav-link-sidebar" data-view-id="community-feed"><i class="fas fa-users"></i>Community Feed</a>
+            <a href="#" class="nav-link-sidebar" data-view-id="categories"><i class="fas fa-sitemap"></i>Categories</a>
+            <a href="#" class="nav-link-sidebar" data-view-id="marketplace"><i class="fas fa-store"></i>Marketplace</a>
+            <a href="#" class="nav-link-sidebar" data-view-id="wallet"><i class="fas fa-wallet"></i>Wallet</a>
+            <a href="#" class="nav-link-sidebar" data-view-id="add-transaction"><i class="fas fa-plus-circle"></i>Add Transaction</a>
+        </nav>
+        <div class="pb-4">
+            <a href="#" class="nav-link-sidebar" data-view-id="user-profile"><i class="fas fa-user-circle"></i>User Profile</a>
+            <a href="#" class="nav-link-sidebar" data-view-id="settings"><i class="fas fa-cog"></i>Settings</a>
+            <a href="#" id="sidebarLogoutLink" class="nav-link-sidebar"><i class="fas fa-sign-out-alt"></i>Logout</a>
+        </div>
+    </aside>
+
+    <main class="main-content-area w-full">
+        <div class="desktop-header hidden md:flex items-center justify-between">
+            <h1 class="text-2xl font-bold" id="mainViewTitle">KYC Management</h1>
+            <span id="adminUserGreeting" class="text-sm text-gray-700">Welcome, Admin</span>
+        </div>
+
+        <div id="unifiedMainContent">
+            <div id="standardDashboardTableLayout">
+                <div class="view-switcher flex justify-center mb-6">
+                    <button id="dashboardViewBtn" class="active">Dashboard View</button>
+                    <button id="tableViewBtn">Table View</button>
+                </div>
+
+                <div id="kpiSection" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    <div class="kpi-card">
+                        <div class="kpi-value" id="kpiValue1">0</div>
+                        <div class="kpi-label" id="kpiLabel1">Total Submissions</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value text-orange-600" id="kpiValue2">0</div>
+                        <div class="kpi-label" id="kpiLabel2">Pending Review</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value text-green-600" id="kpiValue3">0</div>
+                        <div class="kpi-label" id="kpiLabel3">Approved</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value text-red-600" id="kpiValue4">0</div>
+                        <div class="kpi-label" id="kpiLabel4">Rejected / Flagged</div>
+                    </div>
+                </div>
+
+                <div id="chartMapSection" class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-white rounded shadow p-4">
+                        <h2 class="text-xl font-semibold mb-4" id="mapTitle">User Activity Map</h2>
+                        <div id="worldMap" class="w-full h-80"></div>
+                        <p class="text-xs text-gray-500 mt-2" id="mapDescription">Bubbles indicate KYC submission locations.</p>
+                    </div>
+                    <div class="bg-white rounded shadow p-4">
+                        <h2 class="text-xl font-semibold mb-4" id="chartTitle">KYC Submissions (Last 7 Days)</h2>
+                        <canvas id="mainChart"></canvas>
+                    </div>
+                </div>
+
+                <div id="filtersSection" class="bg-white rounded shadow px-6 py-4 mb-6">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+                        <input id="searchInput" type="text" placeholder="Search..."
+                                class="border border-gray-300 rounded px-4 py-2 w-full sm:w-64" />
+                        <select id="statusFilter" class="border border-gray-300 rounded px-4 py-2">
+                            <option value="">All Statuses</option>
+                        </select>
+                        <select id="countryFilter" class="border border-gray-300 rounded px-4 py-2">
+                            <option value="">All Countries</option>
+                        </select>
+                        <select id="riskLevelFilter" class="border border-gray-300 rounded px-4 py-2">
+                            <option value="">All Risk Levels</option>
+                        </select>
+                        <select id="membershipLevelFilter" class="border border-gray-300 rounded px-4 py-2">
+                            <option value="">All Memberships</option>
+                        </select>
+                        <select id="accountStatusFilter" class="border border-gray-300 rounded px-4 py-2">
+                            <option value="">All Account Statuses</option>
+                        </select>
+                        <select id="categoryFilter" class="border border-gray-300 rounded px-4 py-2">
+                            <option value="">All Categories</option>
+                        </select>
+                        <select id="typeFilter" class="border border-gray-300 rounded px-4 py-2">
+                            <option value="">All Types</option>
+                        </select>
+                        <select id="visibilityFilter" class="border border-gray-300 rounded px-4 py-2">
+                            <option value="">All Visibility</option>
+                        </select>
+                    </div>
+                    <button id="exportBtn" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+                        Export CSV
+                    </button>
+                    <button id="addCategoryBtn" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 ml-2 hidden">
+                        Add New Category
+                    </button>
+                    <input type="text" id="newCategoryName" placeholder="New category name" class="border rounded px-3 py-2 ml-2 hidden w-40">
+                    <input type="text" id="newCategoryDescription" placeholder="Description (optional)" class="border rounded px-3 py-2 ml-2 hidden w-40">
+                </div>
+
+                <div id="mainTableContainer" class="bg-white rounded shadow overflow-x-auto">
+                    <table class="min-w-full text-sm text-left">
+                        <thead id="mainTableHeader" class="bg-gray-50">
+                        </thead>
+                        <tbody id="mainTableBody">
+                            <tr><td colspan="10" class="text-center py-4 text-gray-500">Select a view to load data.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="userProfilePage" class="bg-white rounded shadow p-6 hidden-subview">
+                <h2 class="text-xl font-semibold mb-4">User Profile Details</h2>
+                <div id="userProfileContent" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <p>Select a user to view their profile, or view current admin's profile.</p>
+                </div>
+            </div>
+
+            <div id="settingsPage" class="bg-white rounded shadow p-6 hidden-subview">
+                <h2 class="text-xl font-semibold mb-4">Admin Settings</h2>
+                <p class="text-gray-500">Here you can manage general system settings, user roles, notifications, and more.</p>
+                </div>
+
+        </div>
+    </main>
+
+    <div id="detailsModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden">
+        <div class="bg-white p-6 rounded-lg shadow-xl w-11/12 md:w-2/3 lg:w-1/2 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold" id="modalTitle">Details</h3>
+                <button class="text-gray-500 hover:text-gray-800 text-2xl" onclick="closeDetailsModal()">&times;</button>
+            </div>
+            <div id="modalContent">
+                <p>Loading details...</p>
+            </div>
+            <div class="mt-4 flex justify-end space-x-2">
+                <button class="bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400" onclick="closeDetailsModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        const SUPABASE_URL = 'https://nvxqorudztbpwyanakdj.supabase.co'; // Replace with your Supabase URL
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52eHFvcnVkenRicHd5YW5ha2RqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIzOTk5NTQsImV4cCI6MjA2Nzk3NTk1NH0.XvITDAnpEkjQTh4SCVOfwGKsaANS6tp58Up37SXwYRw'; // Replace with your Supabase Anon Key
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        setupRealTimeSubscriptions();
+
+        // Renamed elements to be more general
+        const mainTableBody = document.getElementById('mainTableBody');
+        const mainTableHeader = document.getElementById('mainTableHeader');
+        const searchInput = document.getElementById('searchInput');
+        const statusFilter = document.getElementById('statusFilter');
+        const countryFilter = document.getElementById('countryFilter');
+        const riskLevelFilter = document.getElementById('riskLevelFilter');
+        const membershipLevelFilter = document.getElementById('membershipLevelFilter');
+        const accountStatusFilter = document.getElementById('accountStatusFilter');
+        const categoryFilter = document.getElementById('categoryFilter'); // New filter
+        const typeFilter = document.getElementById('typeFilter');         // New filter
+        const visibilityFilter = document.getElementById('visibilityFilter'); // New filter
+        const exportBtn = document.getElementById('exportBtn');
+        const hamburgerBtnMobile = document.getElementById('hamburgerBtnMobile');
+        const sidebar = document.getElementById('sidebar');
+        const mobileLogoutLink = document.getElementById('mobileLogoutLink');
+
+        // KPI elements (now general)
+        const kpiValue1 = document.getElementById('kpiValue1');
+        const kpiLabel1 = document.getElementById('kpiLabel1');
+        const kpiValue2 = document.getElementById('kpiValue2');
+        const kpiLabel2 = document.getElementById('kpiLabel2');
+        const kpiValue3 = document.getElementById('kpiValue3');
+        const kpiLabel3 = document.getElementById('kpiLabel3');
+        const kpiValue4 = document.getElementById('kpiValue4');
+        const kpiLabel4 = document.getElementById('kpiLabel4');
+
+        // Chart and Map elements (now general)
+        const worldMap = document.getElementById('worldMap');
+        const mapTitle = document.getElementById('mapTitle');
+        const mapDescription = document.getElementById('mapDescription');
+        const mainChartCanvas = document.getElementById('mainChart');
+        const chartTitle = document.getElementById('chartTitle');
+        let mainChartInstance; // To store the Chart.js instance
+
+        // View Switcher (still for Dashboard/Table)
+        const dashboardViewBtn = document.getElementById('dashboardViewBtn');
+        const tableViewBtn = document.getElementById('tableViewBtn');
+        const kpiSection = document.getElementById('kpiSection');
+        const chartMapSection = document.getElementById('chartMapSection');
+        const filtersSection = document.getElementById('filtersSection');
+        const mainTableContainer = document.getElementById('mainTableContainer');
+        const standardDashboardTableLayout = document.getElementById('standardDashboardTableLayout');
+
+
+        // Main View Containers - These are direct children of main.main-content-area
+        const mainViewTitle = document.getElementById('mainViewTitle');
+        const unifiedMainContent = document.getElementById('unifiedMainContent'); // This is now the ONLY dynamic content div
+
+        // New view elements for dedicated pages (now fewer)
+        const userProfilePage = document.getElementById('userProfilePage');
+        const userProfileContent = document.getElementById('userProfileContent'); // To populate user profile details
+        const settingsPage = document.getElementById('settingsPage'); // Added for settings page
+
+        // Specific elements for Categories "Table View" (now moved to the filters section)
+        const newCategoryName = document.getElementById('newCategoryName');
+        const newCategoryDescription = document.getElementById('newCategoryDescription');
+        const addCategoryBtn = document.getElementById('addCategoryBtn');
+
+
+        // Modal elements
+        const detailsModal = document.getElementById('detailsModal');
+        const modalContent = document.getElementById('modalContent');
+        const modalTitle = document.getElementById('modalTitle');
+
+
+        let currentViewId = 'kyc'; // Default view
+        let allData = {
+            kyc: [],
+            transactions: [],
+            community: [],
+            communityPosts: [],
+            chatMessages: [],
+            chatSessions: [],
+            comments: [],
+            commentLikes: [],
+            likes: [],
+            loves: [],
+            marketplaceItems: [],
+            locations: [],
+            userProfile: null,
+            categories: [],
+            reports: [],
+            marketplace: [],
+            wallet: [],
+            addTransaction: [],
+        };
+        let map; // Leaflet map instance
+
+        async function checkSession() {
+            const { data: { session } = {} } = await supabase.auth.getSession();
+            if (!session) {
+                window.location.href = 'login.html';
+            } else {
+                const { data: userProfile, error } = await supabase
+                    .from('users')
+                    .select('full_name, is_admin')
+                    .eq('id', session.user.id)
+                    .single();
+
+                if (userProfile && userProfile.full_name) {
+                    document.getElementById('adminUserGreeting').textContent = `Welcome, ${userProfile.full_name} (${userProfile.is_admin ? 'Admin' : 'User'}) - Membership: ${userProfile.membership_level || 'N/A'}, Last Login: ${new Date(userProfile.last_login_at).toLocaleString()}`;
+                }
+                if (!userProfile?.is_admin) {
+                    alert("Access Denied: You do not have permission to view this page.");
+                    window.location.href = 'dashboard.html';
+                }
+            }
+        }
+
+        // --- Data Fetching Functions ---
+        async function fetchKYC() {
+            const { data: kycData, error: kycError } = await supabase
+            .from('kyc_submissions')
+            .select(`
+                id,
+                user_id,
+                full_name,
+                email,
+                country,
+                document_url,
+                status,
+                created_at,
+                internal_notes
+            `)
+            .order('created_at', { ascending: false });
+
+            if (kycError) {
+            console.error("Error fetching KYC data:", kycError);
+            alert("Error fetching KYC data: " + kycError.message);
+            allData.kyc = [];
+            return;
+            }
+
+            const userIds = [...new Set(kycData.map(k => k.user_id))];
+            const { data: usersData, error: usersError } = await supabase
+            .from('users')
+            .select(`
+                id,
+                risk_level,
+                account_status,
+                membership_level,
+                phone_number,
+                address,
+                city,
+                province,
+                date_of_birth,
+                id_number,
+                wallet_balance,
+                avatar_url,
+                profile_picture_url,
+                fingerprint_url,
+                signature_url,
+                email
+            `)
+            .in('id', userIds);
+
+            if (usersError) {
+            console.error("Error fetching users data:", usersError);
+            alert("Error fetching users data: " + usersError.message);
+            allData.kyc = kycData;
+            return;
+            }
+
+            const mergedData = kycData.map(kyc => {
+            const userProfile = usersData.find(u => u.id === kyc.user_id) || {};
+            return {
+                ...kyc,
+                users: {
+                email: userProfile.email || kyc.email || 'N/A',
+                risk_level: userProfile.risk_level || 'N/A',
+                account_status: userProfile.account_status || 'N/A',
+                membership_level: userProfile.membership_level || 'N/A',
+                phone_number: userProfile.phone_number || 'N/A',
+                address: userProfile.address || 'N/A',
+                city: userProfile.city || 'N/A',
+                province: userProfile.province || 'N/A',
+                date_of_birth: userProfile.date_of_birth || 'N/A',
+                id_number: userProfile.id_number || 'N/A',
+                wallet_balance: userProfile.wallet_balance || 0,
+                avatar_url: userProfile.avatar_url || null,
+                profile_picture_url: userProfile.profile_picture_url || null,
+                fingerprint_url: userProfile.fingerprint_url || null,
+                signature_url: userProfile.signature_url || null
+                }
+            };
+            });
+
+            allData.kyc = mergedData;
+        }
+
+        async function fetchCommunityData() {
+            try {
+                const { data, error } = await supabase
+                    .from('posts')
+                    .select(`
+                        id, content, created_at, visibility, likes_count, comments_count, media_url, media_type,
+                        users!inner(id, full_name, avatar_url),
+                        comments(id, user_id, content, created_at, users!inner(full_name, avatar_url)),
+                        post_likes(id, liker_id)
+                    `)
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+                return data;
+
+            } catch (error) {
+                console.error('Error fetching community data:', error.message);
+                throw error;
+            }
+        }
+
+        async function fetchUserProfileData(userId) {
+            const userIdToFetch = userId || (await supabase.auth.getSession()).data.session.user.id;
+            const { data: userData, error: userError } = await supabase
+            .from('users')
+            .select(`
+                id, username, email, full_name, created_at, last_login_at,
+                account_status, membership_level, risk_level, phone_number, address, city, province,
+                date_of_birth, id_number, wallet_balance, avatar_url, profile_picture_url,
+                chat_sessions(id),
+                community_posts(id),
+                comments(id),
+                comment_likes(id)
+            `)
+            .eq('id', userIdToFetch)
+            .single();
+
+            if (userError) {
+            console.error("Error fetching user profile:", userError);
+            alert("Error fetching user profile: " + userError.message);
+            allData.userProfile = null;
+            return;
+            }
+            allData.userProfile = userData;
+        }
+
+
+        async function fetchCategoriesData() {
+            try {
+                const { data, error } = await supabase
+                    .from('categories')
+                    .select('id, name, description, created_at, updated_at')
+                    .order('name', { ascending: true });
+
+                if (error) throw error;
+                allData.categories = data;
+            } catch (error) {
+                console.error('Error fetching categories:', error.message);
+                alert('Failed to load categories: ' + error.message);
+                allData.categories = [];
+            }
+        }
+
+        // --- NEW Fetching for other standard views ---
+        async function fetchReportsData() {
+            // Placeholder: In a real app, this would fetch summarized report data
+            // For now, generate dummy data
+            console.log("Fetching dummy reports data...");
+            allData.reports = [
+                { id: 'rep1', name: 'Monthly User Growth', date: '2025-06-30', status: 'generated', format: 'pdf' },
+                { id: 'rep2', name: 'Q2 Transaction Volume', date: '2025-06-30', status: 'generated', format: 'csv' },
+                { id: 'rep3', name: 'KYC Approval Rates', date: '2025-07-20', status: 'pending', format: 'xlsx' },
+            ];
+        }
+
+        async function fetchMarketplaceData() {
+            // Placeholder: In a real app, this would fetch listings/products
+            console.log("Fetching dummy marketplace data...");
+            allData.marketplace = [
+                { id: 'prod1', name: 'Product A', category: 'Electronics', price: 120.00, stock: 50, status: 'active', created_at: '2025-01-15' },
+                { id: 'prod2', name: 'Service B', category: 'Services', price: 50.00, stock: 999, status: 'active', created_at: '2025-02-01' },
+                { id: 'prod3', name: 'Vintage Item C', category: 'Collectibles', price: 250.00, stock: 1, status: 'paused', created_at: '2025-03-10' },
+            ];
+        }
+
+        async function fetchWalletData() {
+            // Placeholder: In a real app, this would fetch user wallet balances
+            console.log("Fetching dummy wallet data...");
+            allData.wallet = [
+                { userId: 'user1', username: 'Alice', balance: 1500.50, currency: 'USD', last_activity: '2025-07-24' },
+                { userId: 'user2', username: 'Bob', balance: 75.25, currency: 'USD', last_activity: '2025-07-23' },
+                { userId: 'user3', username: 'Charlie', balance: 0.00, currency: 'USD', last_activity: '2025-07-20' },
+            ];
+        }
+
+        async function fetchAddTransactionData() {
+             // For "Add Transaction", this might fetch a log of recent manual additions
+             console.log("Fetching dummy manual transactions log...");
+             allData.addTransaction = [
+                { id: 'mtx1', admin_id: 'admin1', type: 'Credit', amount: 100, user_id: 'user4', notes: 'Manual credit for promotion', created_at: '2025-07-24 10:00:00' },
+                { id: 'mtx2', admin_id: 'admin2', type: 'Debit', amount: 25, user_id: 'user5', notes: 'Refund correction', created_at: '2025-07-23 15:30:00' },
+             ];
+        }
+
+
+        async function fetchDataForView(viewId) {
+            document.querySelectorAll('#unifiedMainContent > div').forEach(div => {
+            if (div.id !== 'standardDashboardTableLayout') {
+                div.classList.add('hidden-subview');
+            }
+            });
+
+            switch (viewId) {
+            case 'kyc':
+                await fetchKYC();
+                break;
+            case 'transactions':
+                await fetchTransactionsData();
+                break;
+            case 'community-feed':
+                allData.community = await fetchCommunityData();
+                break;
+            case 'categories':
+                await fetchCategoriesData();
+                break;
+            case 'dashboard-overview':
+                await fetchKYC();
+                await fetchTransactionsData();
+                allData.community = await fetchCommunityData();
+                break;
+            case 'reports':
+                await fetchReportsData();
+                break;
+            case 'marketplace':
+                await fetchMarketplaceData();
+                await fetchCategoriesData();
+                break;
+            case 'wallet':
+                await fetchWalletData();
+                break;
+            case 'add-transaction':
+                await fetchAddTransactionData();
+                break;
+            case 'user-profile':
+                userProfilePage.classList.remove('hidden-subview');
+                await fetchUserProfileData();
+                break;
+            }
+        }
+
+        async function fetchChatMessagesData() {
+            try {
+            const { data, error } = await supabase
+                .from('chat_messages')
+                .select(`
+                id, content, sender_id, sender_type, sent_at, session_id,
+                users!sender_id(full_name, username)
+                `)
+                .order('sent_at', { ascending: false });
+            if (error) throw error;
+            allData.chatMessages = data;
+            } catch (error) {
+            console.error('Error fetching chat messages:', error.message);
+            allData.chatMessages = [];
+            }
+        }
+
+        async function fetchChatSessionsData() {
+            try {
+            const { data, error } = await supabase
+                .from('chat_sessions')
+                .select(`
+                id, title, user_id, started_at, last_active_at,
+                users!inner(full_name, username)
+                `)
+                .order('last_active_at', { ascending: false });
+            if (error) throw error;
+            allData.chatSessions = data;
+            } catch (error) {
+            console.error('Error fetching chat sessions:', error.message);
+            allData.chatSessions = [];
+            }
+        }
+
+        async function fetchCommentsData() {
+            try {
+            const { data, error } = await supabase
+                .from('comments')
+                .select(`
+                id, content, commenter_id, post_id, created_at, updated_at, edited,
+                users!commenter_id(full_name, username)
+                `)
+                .order('created_at', { ascending: false });
+            if (error) throw error;
+            allData.comments = data;
+            } catch (error) {
+            console.error('Error fetching comments:', error.message);
+            allData.comments = [];
+            }
+        }
+
+        async function fetchCommentLikesData() {
+            try {
+            const { data, error } = await supabase
+                .from('comment_likes')
+                .select(`
+                id, comment_id, liker_id, liked_at,
+                users!liker_id(full_name, username)
+                `)
+                .order('liked_at', { ascending: false });
+            if (error) throw error;
+            allData.commentLikes = data;
+            } catch (error) {
+            console.error('Error fetching comment likes:', error.message);
+            allData.commentLikes = [];
+            }
+        }
+
+        async function fetchCommunityPostsData() {
+            try {
+            const { data, error } = await supabase
+                .from('community_posts')
+                .select(`
+                id, title, content, user_id, created_at, updated_at, visibility,
+                comments_count, likes_count, loves_count, media_type, media_url,
+                users!inner(full_name, username, avatar_url)
+                `)
+                .order('created_at', { ascending: false });
+            if (error) throw error;
+            allData.communityPosts = data;
+            } catch (error) {
+            console.error('Error fetching community posts:', error.message);
+            allData.communityPosts = [];
+            }
+        }
+
+        async function fetchLikesData() {
+            try {
+            const { data, error } = await supabase
+                .from('likes')
+                .select(`
+                id, post_id, user_id, created_at,
+                users!user_id(full_name, username)
+                `)
+                .order('created_at', { ascending: false });
+            if (error) throw error;
+            allData.likes = data;
+            } catch (error) {
+            console.error('Error fetching likes:', error.message);
+            allData.likes = [];
+            }
+        }
+
+        async function fetchLovesData() {
+            try {
+            const { data, error } = await supabase
+                .from('loves')
+                .select(`
+                id, post_id, user_id, target_user_id, amount, created_at,
+                users!user_id(full_name, username)
+                `)
+                .order('created_at', { ascending: false });
+            if (error) throw error;
+            allData.loves = data;
+            } catch (error) {
+            console.error('Error fetching loves:', error.message);
+            allData.loves = [];
+            }
+        }
+
+        async function fetchMarketplaceItemsData() {
+            try {
+            const { data, error } = await supabase
+                .from('marketplace_items')
+                .select(`
+                id, seller_id, category_id, description, price, currency, status,
+                image_url, created_at,
+                users!seller_id(full_name, username),
+                categories!category_id(name)
+                `)
+                .order('created_at', { ascending: false });
+            if (error) throw error;
+            allData.marketplaceItems = data;
+            } catch (error) {
+            console.error('Error fetching marketplace items:', error.message);
+            allData.marketplaceItems = [];
+            }
+        }
+
+        async function fetchLocationsData() {
+            try {
+            const { data, error } = await supabase
+                .from('locations')
+                .select(`
+                id, user_id, city, country, latitude, longitude, recorded_at,
+                users!user_id(full_name, username)
+                `)
+                .order('recorded_at', { ascending: false });
+            if (error) throw error;
+            allData.locations = data;
+            } catch (error) {
+            console.error('Error fetching locations:', error.message);
+            allData.locations = [];
+            }
+        }
+
+        function setupRealTimeSubscriptions() {
+            supabase
+            .channel('chat_messages_changes')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'chat_messages' }, async () => {
+                await fetchChatMessagesData();
+                if (['community-feed', 'dashboard-overview', 'user-profile'].includes(currentViewId)) {
+                renderMainContent(currentViewId);
+                }
+            })
+            .subscribe();
+
+            supabase
+            .channel('chat_sessions_changes')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'chat_sessions' }, async () => {
+                await fetchChatSessionsData();
+                if (['community-feed', 'dashboard-overview', 'user-profile'].includes(currentViewId)) {
+                renderMainContent(currentViewId);
+                }
+            })
+            .subscribe();
+
+            supabase
+            .channel('comments_changes')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'comments' }, async () => {
+                await fetchCommentsData();
+                if (['community-feed', 'dashboard-overview', 'user-profile'].includes(currentViewId)) {
+                renderMainContent(currentViewId);
+                }
+            })
+            .subscribe();
+
+            supabase
+            .channel('comment_likes_changes')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'comment_likes' }, async () => {
+                await fetchCommentLikesData();
+                if (['community-feed', 'dashboard-overview', 'user-profile'].includes(currentViewId)) {
+                renderMainContent(currentViewId);
+                }
+            })
+            .subscribe();
+
+            supabase
+            .channel('community_posts_changes')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'community_posts' }, async () => {
+                await fetchCommunityPostsData();
+                if (['community-feed', 'dashboard-overview', 'user-profile'].includes(currentViewId)) {
+                renderMainContent(currentViewId);
+                }
+            })
+            .subscribe();
+
+            supabase
+            .channel('likes_changes')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'likes' }, async () => {
+                await fetchLikesData();
+                if (['community-feed', 'dashboard-overview', 'user-profile'].includes(currentViewId)) {
+                renderMainContent(currentViewId);
+                }
+            })
+            .subscribe();
+
+            supabase
+            .channel('loves_changes')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'loves' }, async () => {
+                await fetchLovesData();
+                if (['community-feed', 'dashboard-overview', 'user-profile'].includes(currentViewId)) {
+                renderMainContent(currentViewId);
+                }
+            })
+            .subscribe();
+
+            supabase
+            .channel('marketplace_items_changes')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'marketplace_items' }, async () => {
+                await fetchMarketplaceItemsData();
+                if (['marketplace', 'dashboard-overview', 'user-profile'].includes(currentViewId)) {
+                renderMainContent(currentViewId);
+                }
+            })
+            .subscribe();
+
+            supabase
+            .channel('locations_changes')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'locations' }, async () => {
+                await fetchLocationsData();
+                if (['dashboard-overview', 'user-profile'].includes(currentViewId)) {
+                renderMainContent(currentViewId);
+                }
+            })
+            .subscribe();
+        }
+
+        // --- Rendering Functions for the Unified UI ---
+
+        function updateKPIs(viewId) {
+            kpiValue1.className = 'kpi-value'; // Reset colors
+            kpiValue2.className = 'kpi-value';
+            kpiValue3.className = 'kpi-value';
+            kpiValue4.className = 'kpi-value';
+
+            switch (viewId) {
+                case 'kyc':
+                    kpiValue1.textContent = allData.kyc.length;
+                    kpiLabel1.textContent = 'Total Submissions';
+                    kpiValue2.textContent = allData.kyc.filter(k => k.status === 'pending').length;
+                    kpiLabel2.textContent = 'Pending Review';
+                    kpiValue2.classList.add('text-orange-600');
+                    kpiValue3.textContent = allData.kyc.filter(k => k.status === 'approved').length;
+                    kpiLabel3.textContent = 'Approved';
+                    kpiValue3.classList.add('text-green-600');
+                    kpiValue4.textContent = allData.kyc.filter(k => k.status === 'rejected' || k.status === 'flagged').length;
+                    kpiLabel4.textContent = 'Rejected / Flagged';
+                    kpiValue4.classList.add('text-red-600');
+                    break;
+                case 'dashboard-overview':
+                    kpiValue1.textContent = allData.kyc.length; // Example: Total KYC submissions as total users
+                    kpiLabel1.textContent = 'Total KYC Submissions';
+                    kpiValue2.textContent = allData.transactions.length; // Example: Total Transactions
+                    kpiLabel2.textContent = 'Total Transactions';
+                    kpiValue2.classList.add('text-green-600');
+                    const totalTxValue = allData.transactions.reduce((sum, t) => sum + parseFloat(t.amount || 0), 0).toFixed(2);
+                    kpiValue3.textContent = `$${totalTxValue}`;
+                    kpiLabel3.textContent = 'Total Tx Value';
+                    kpiValue3.classList.add('text-blue-600');
+                    kpiValue4.textContent = allData.community.length; // Example: Total Community Posts
+                    kpiLabel4.textContent = 'Total Community Posts';
+                    kpiValue4.classList.add('text-gray-600');
+                    break;
+                case 'transactions':
+                    kpiValue1.textContent = allData.transactions.length;
+                    kpiLabel1.textContent = 'Total Transactions';
+                    kpiValue2.textContent = allData.transactions.filter(t => t.status === 'pending').length;
+                    kpiLabel2.textContent = 'Pending Tx';
+                    kpiValue2.classList.add('text-orange-600');
+                    kpiValue3.textContent = allData.transactions.filter(t => t.status === 'completed').length;
+                    kpiLabel3.textContent = 'Completed Tx';
+                    kpiValue3.classList.add('text-green-600');
+                    kpiValue4.textContent = allData.transactions.filter(t => t.status === 'failed').length;
+                    kpiLabel4.textContent = 'Failed Tx';
+                    kpiValue4.classList.add('text-red-600');
+                    break;
+                case 'reports': // Dummy KPIs for reports
+                    kpiValue1.textContent = allData.reports.length;
+                    kpiLabel1.textContent = 'Total Reports';
+                    kpiValue2.textContent = allData.reports.filter(r => r.status === 'pending').length;
+                    kpiLabel2.textContent = 'Pending Reports';
+                    kpiValue2.classList.add('text-orange-600');
+                    kpiValue3.textContent = allData.reports.filter(r => r.format === 'pdf').length;
+                    kpiLabel3.textContent = 'PDF Reports';
+                    kpiValue3.classList.add('text-blue-600');
+                    kpiValue4.textContent = 'N/A';
+                    kpiLabel4.textContent = 'Last Generated';
+                    break;
+                case 'marketplace': // Dummy KPIs for marketplace
+                    kpiValue1.textContent = allData.marketplace.length;
+                    kpiLabel1.textContent = 'Total Listings';
+                    kpiValue2.textContent = allData.marketplace.filter(p => p.status === 'active').length;
+                    kpiLabel2.textContent = 'Active Listings';
+                    kpiValue2.classList.add('text-green-600');
+                    const totalStock = allData.marketplace.reduce((sum, p) => sum + p.stock, 0);
+                    kpiValue3.textContent = totalStock;
+                    kpiLabel3.textContent = 'Total Stock Units';
+                    kpiValue3.classList.add('text-blue-600');
+                    kpiValue4.textContent = allData.marketplace.filter(p => p.status === 'paused').length;
+                    kpiLabel4.textContent = 'Paused Listings';
+                    kpiValue4.classList.add('text-orange-600');
+                    break;
+                case 'wallet': // Dummy KPIs for wallet
+                    kpiValue1.textContent = allData.wallet.length;
+                    kpiLabel1.textContent = 'Total Wallets';
+                    const totalBalance = allData.wallet.reduce((sum, w) => sum + w.balance, 0).toFixed(2);
+                    kpiValue2.textContent = `$${totalBalance}`;
+                    kpiLabel2.textContent = 'Total Balance';
+                    kpiValue2.classList.add('text-green-600');
+                    kpiValue3.textContent = allData.wallet.filter(w => w.balance > 0).length;
+                    kpiLabel3.textContent = 'Active Balances';
+                    kpiValue3.classList.add('text-blue-600');
+                    kpiValue4.textContent = allData.wallet.filter(w => w.balance === 0).length;
+                    kpiLabel4.textContent = 'Zero Balances';
+                    kpiValue4.classList.add('text-gray-600');
+                    break;
+                case 'add-transaction': // Dummy KPIs for add transaction log
+                    kpiValue1.textContent = allData.addTransaction.length;
+                    kpiLabel1.textContent = 'Manual Additions';
+                    kpiValue2.textContent = allData.addTransaction.filter(t => t.type === 'Credit').length;
+                    kpiLabel2.textContent = 'Manual Credits';
+                    kpiValue2.classList.add('text-green-600');
+                    kpiValue3.textContent = allData.addTransaction.filter(t => t.type === 'Debit').length;
+                    kpiLabel3.textContent = 'Manual Debits';
+                    kpiValue3.classList.add('text-red-600');
+                    kpiValue4.textContent = 'N/A';
+                    kpiLabel4.textContent = 'Recent';
+                    break;
+                case 'community-feed': // KPIs for community feed
+                    kpiValue1.textContent = allData.community.length;
+                    kpiLabel1.textContent = 'Total Posts';
+                    kpiValue2.textContent = allData.community.filter(p => p.visibility === 'public').length;
+                    kpiLabel2.textContent = 'Public Posts';
+                    kpiValue2.classList.add('text-blue-600');
+                    const totalLikes = allData.community.reduce((sum, p) => sum + (p.likes_count || 0), 0);
+                    kpiValue3.textContent = totalLikes;
+                    kpiLabel3.textContent = 'Total Likes';
+                    kpiValue3.classList.add('text-pink-600');
+                    const totalComments = allData.community.reduce((sum, p) => sum + (p.comments_count || 0), 0);
+                    kpiValue4.textContent = totalComments;
+                    kpiLabel4.textContent = 'Total Comments';
+                    kpiValue4.classList.add('text-purple-600');
+                    break;
+                case 'categories': // KPIs for categories
+                    kpiValue1.textContent = allData.categories.length;
+                    kpiLabel1.textContent = 'Total Categories';
+                    kpiValue2.textContent = 'N/A';
+                    kpiLabel2.textContent = 'Active Users'; // Placeholder
+                    kpiValue3.textContent = 'N/A';
+                    kpiLabel3.textContent = 'Items Linked'; // Placeholder
+                    kpiValue4.textContent = 'N/A';
+                    kpiLabel4.textContent = 'Popular'; // Placeholder
+                    break;
+                default:
+                    kpiValue1.textContent = 'N/A';
+                    kpiLabel1.textContent = 'Data Not Available';
+                    kpiValue2.textContent = 'N/A';
+                    kpiLabel2.textContent = 'N/A';
+                    kpiValue3.textContent = 'N/A';
+                    kpiLabel3.textContent = 'N/A';
+                    kpiValue4.textContent = 'N/A';
+                    kpiLabel4.textContent = 'N/A';
+                    break;
+            }
+        }
+
+        function updateChart(viewId) {
+            if (mainChartInstance) {
+                mainChartInstance.destroy();
+            }
+
+            let labels = [];
+            let data = [];
+            let chartLabel = '';
+
+            const today = new Date();
+            const last7Days = Array.from({ length: 7 }, (_, i) => {
+                const d = new Date(today);
+                d.setDate(today.getDate() - i);
+                return d.toISOString().split('T')[0]; // YYYY-MM-DD
+            }).reverse();
+
+            switch (viewId) {
+                case 'kyc':
+                    labels = last7Days;
+                    data = labels.map(date => allData.kyc.filter(k => k.created_at.startsWith(date)).length);
+                    chartLabel = 'New KYC Submissions';
+                    chartTitle.textContent = 'KYC Submissions (Last 7 Days)';
+                    break;
+                case 'transactions':
+                    labels = last7Days;
+                    // Sum of transaction amounts per day for simplicity
+                    data = labels.map(date =>
+                        allData.transactions
+                            .filter(t => t.created_at.startsWith(date))
+                            .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0)
+                    );
+                    chartLabel = 'Daily Transaction Volume';
+                    chartTitle.textContent = 'Transaction Volume (Last 7 Days)';
+                    break;
+                case 'dashboard-overview': // Could show new user registrations or combined trends
+                    labels = last7Days;
+                    // Dummy data for example
+                    data = labels.map(date =>
+                        allData.kyc.filter(k => k.created_at.startsWith(date)).length +
+                        allData.transactions.filter(t => t.created_at.startsWith(date)).length / 10 + // scale tx data
+                        allData.community.filter(p => p.created_at.startsWith(date)).length * 2 // scale community posts
+                    );
+                    chartLabel = 'Combined Platform Activity';
+                    chartTitle.textContent = 'Platform Activity (Last 7 Days)';
+                    break;
+                case 'reports': // Dummy: Reports generated over time
+                    labels = last7Days;
+                    data = Array.from({ length: 7 }, () => Math.floor(Math.random() * 5) + 1);
+                    chartLabel = 'Reports Generated';
+                    chartTitle.textContent = 'Reports Generation Trend';
+                    break;
+                case 'marketplace': // Dummy: New listings added
+                    labels = last7Days;
+                    data = labels.map(date => allData.marketplace.filter(p => p.created_at.startsWith(date)).length);
+                    chartLabel = 'New Listings Added';
+                    chartTitle.textContent = 'Marketplace New Listings (Last 7 Days)';
+                    break;
+                case 'wallet': // Dummy: Wallet balance growth
+                    labels = last7Days;
+                    data = Array.from({ length: 7 }, (_, i) => 1000 + i * 50 + Math.floor(Math.random() * 200)); // Growing balance
+                    chartLabel = 'Total Wallet Balance (Conceptual)';
+                    chartTitle.textContent = 'Platform Wallet Balance Growth';
+                    break;
+                case 'add-transaction': // Dummy: Manual transactions per day
+                    labels = last7Days;
+                    data = labels.map(date => allData.addTransaction.filter(t => t.created_at.startsWith(date)).length);
+                    chartLabel = 'Manual Transactions';
+                    chartTitle.textContent = 'Manual Transaction Entry (Last 7 Days)';
+                    break;
+                case 'community-feed':
+                    labels = last7Days;
+                    data = labels.map(date => allData.community.filter(p => p.created_at.startsWith(date)).length);
+                    chartLabel = 'New Community Posts';
+                    chartTitle.textContent = 'Community Posts (Last 7 Days)';
+                    break;
+                case 'categories':
+                    labels = last7Days;
+                    // Dummy: New categories added
+                    data = labels.map(date => allData.categories.filter(cat => cat.created_at.startsWith(date)).length);
+                    chartLabel = 'New Categories Added';
+                    chartTitle.textContent = 'Category Growth Trend';
+                    break;
+                default:
+                    labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                    data = [0, 0, 0, 0, 0, 0, 0];
+                    chartLabel = 'No Data Available';
+                    chartTitle.textContent = 'Trends';
+                    break;
+            }
+
+            mainChartInstance = new Chart(mainChartCanvas, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: chartLabel,
+                        data: data,
+                        borderColor: '#6A0505',
+                        backgroundColor: 'rgba(106, 5, 5, 0.2)',
+                        tension: 0.1,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: chartLabel
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateMap(viewId) {
+            if (map) {
+                map.remove();
+            }
+            map = L.map('worldMap').setView([0, 0], 2);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            mapTitle.textContent = 'Geographic Activity Map';
+            mapDescription.textContent = 'Locations of activity related to the current view.';
+
+            switch (viewId) {
+                case 'kyc':
+                    mapTitle.textContent = 'User Activity Map';
+                    mapDescription.textContent = 'Conceptual locations for KYC submissions (using country centroids).';
+                    const countryCentroids = {
+                        'USA': [37.0902, -95.7129],
+                        'France': [46.6031, 1.8883],
+                        'Congo': [-4.0383, 21.7587] // Example for users like Oscar MBUYI
+                    };
+                    allData.kyc.forEach(k => {
+                        const coords = k.country && countryCentroids[k.country] ? countryCentroids[k.country] : [0, 0];
+                        L.marker(coords)
+                            .addTo(map)
+                            .bindPopup(`<b>${k.full_name || 'Anonymous'}</b><br>Status: ${k.status || 'N/A'}<br>Country: ${k.country || 'N/A'}`);
+                    });
+                    break;
+                case 'transactions':
+                    mapTitle.textContent = 'Transaction Locations';
+                    mapDescription.textContent = 'Pins indicate sender/recipient locations (conceptual).';
+                    // For transactions, you'd need lat/long for sender/recipient addresses
+                    // Dummy data for illustration
+                    const txLocations = [
+                        { lat: 34.0522, lon: -118.2437, info: "LA Transaction" },
+                        { lat: 40.7128, lon: -74.0060, info: "NY Transaction" },
+                        { lat: 51.5074, lon: 0.1278, info: "London Transaction" }
+                    ];
+                    txLocations.forEach(loc => {
+                        L.marker([loc.lat, loc.lon])
+                            .addTo(map)
+                            .bindPopup(`<b>${loc.info}</b>`);
+                    });
+                    break;
+                case 'dashboard-overview':
+                    mapTitle.textContent = 'Overall Platform Activity';
+                    mapDescription.textContent = 'Geographic distribution of all user activity.';
+                    // Combine KYC, Tx locations or use dummy global spread
+                    const allLocations = [
+                        ...allData.kyc.map(k => ({ lat: k.latitude, lon: k.longitude, info: k.full_name })),
+                        // Add more dummy locations or from other data sources
+                        { lat: 30, lon: 30, info: 'Africa hub' }, { lat: 60, lon: 100, info: 'Asia hub' }
+                    ].filter(l => l.lat && l.lon);
+                    allLocations.forEach(loc => {
+                        L.marker([loc.lat, loc.lon])
+                            .addTo(map)
+                            .bindPopup(`<b>${loc.info}</b>`);
+                    });
+                    break;
+                case 'marketplace':
+                    mapTitle.textContent = 'Listing Origins (Conceptual)';
+                    mapDescription.textContent = 'Where marketplace items are listed from.';
+                    // Dummy listing locations
+                    const marketLocations = [
+                        { lat: 34.0522, lon: -118.2437, info: "Product A Seller" },
+                        { lat: 51.5074, lon: 0.1278, info: "Service B Provider" },
+                        { lat: 48.8566, lon: 2.3522, info: "Item C Seller" }
+                    ];
+                    marketLocations.forEach(loc => {
+                        L.marker([loc.lat, loc.lon])
+                            .addTo(map)
+                            .bindPopup(`<b>${loc.info}</b>`);
+                    });
+                    break;
+                case 'wallet':
+                    mapTitle.textContent = 'User Wallet Locations (Conceptual)';
+                    mapDescription.textContent = 'Geographical distribution of users with wallets.';
+                     // Dummy wallet locations
+                    const walletLocations = [
+                        { lat: -25.2744, lon: 133.7751, info: "Australia User" },
+                        { lat: 35.9078, lon: 127.7669, info: "Korea User" },
+                        { lat: 55.3781, lon: -3.4360, info: "UK User" }
+                    ];
+                    walletLocations.forEach(loc => {
+                        L.marker([loc.lat, loc.lon])
+                            .addTo(map)
+                            .bindPopup(`<b>${loc.info}</b>`);
+                    });
+                    break;
+                case 'community-feed':
+                    mapTitle.textContent = 'Community Post Locations (Conceptual)';
+                    mapDescription.textContent = 'Origins of community posts if available.';
+                    // Dummy locations for community posts
+                    const communityLocations = [
+                        { lat: 37.7749, lon: -122.4194, info: "San Francisco Post" },
+                        { lat: 34.6937, lon: 135.5022, info: "Osaka Post" },
+                        { lat: -33.8688, lon: 151.2093, info: "Sydney Post" }
+                    ];
+                    communityLocations.forEach(loc => {
+                        L.marker([loc.lat, loc.lon])
+                            .addTo(map)
+                            .bindPopup(`<b>${loc.info}</b>`);
+                    });
+                    break;
+                case 'categories':
+                    mapTitle.textContent = 'Category Relevance Map (Conceptual)';
+                    mapDescription.textContent = 'Illustrates regional relevance or usage of categories.';
+                    // This is highly conceptual, perhaps showing popular categories in certain regions
+                    const categoryLocations = [
+                        { lat: 34.0522, lon: -118.2437, info: "Tech Categories (LA)" },
+                        { lat: 51.5074, lon: 0.1278, info: "Finance Categories (London)" },
+                        { lat: 35.6895, lon: 139.6917, info: "Art Categories (Tokyo)" }
+                    ];
+                    categoryLocations.forEach(loc => {
+                        L.marker([loc.lat, loc.lon])
+                            .addTo(map)
+                            .bindPopup(`<b>${loc.info}</b>`);
+                    });
+                    break;
+                default:
+                    // No specific markers
+                    break;
+            }
+        }
+
+        function populateFilters(viewId) {
+            // Hide all filters by default
+            searchInput.style.display = 'none';
+            statusFilter.style.display = 'none';
+            countryFilter.style.display = 'none';
+            riskLevelFilter.style.display = 'none';
+            membershipLevelFilter.style.display = 'none';
+            accountStatusFilter.style.display = 'none';
+            categoryFilter.style.display = 'none';
+            typeFilter.style.display = 'none';
+            visibilityFilter.style.display = 'none';
+            exportBtn.style.display = 'none';
+            addCategoryBtn.classList.add('hidden'); // Hide specific buttons
+            newCategoryName.classList.add('hidden');
+            newCategoryDescription.classList.add('hidden');
+
+
+            // Clear existing options
+            statusFilter.innerHTML = '<option value="">All Statuses</option>';
+            countryFilter.innerHTML = '<option value="">All Countries</option>';
+            riskLevelFilter.innerHTML = '<option value="">All Risk Levels</option>';
+            membershipLevelFilter.innerHTML = '<option value="">All Memberships</option>';
+            accountStatusFilter.innerHTML = '<option value="">All Account Statuses</option>';
+            categoryFilter.innerHTML = '<option value="">All Categories</option>';
+            typeFilter.innerHTML = '<option value="">All Types</option>';
+            visibilityFilter.innerHTML = '<option value="">All Visibility</option>';
+
+
+            searchInput.value = ''; // Clear search
+
+            switch (viewId) {
+                case 'kyc':
+                    searchInput.placeholder = 'Search by name, email, or user ID...';
+                    searchInput.style.display = 'inline-block';
+                    statusFilter.style.display = 'inline-block';
+                    countryFilter.style.display = 'inline-block';
+                    riskLevelFilter.style.display = 'inline-block';
+                    membershipLevelFilter.style.display = 'inline-block';
+                    accountStatusFilter.style.display = 'inline-block';
+                    exportBtn.style.display = 'inline-block';
+
+                    const countries = new Set();
+                    const riskLevels = new Set();
+                    const membershipLevels = new Set();
+                    const accountStatuses = new Set();
+                    allData.kyc.forEach(k => {
+                        if (k.country) countries.add(k.country);
+                        if (k.users?.risk_level) riskLevels.add(k.users.risk_level);
+                        if (k.users?.membership_level) membershipLevels.add(k.users.membership_level);
+                        if (k.users?.account_status) accountStatuses.add(k.users.account_status);
+                    });
+
+                    ['pending', 'approved', 'rejected', 'flagged', 'under_review'].forEach(s => {
+                        const option = document.createElement('option');
+                        option.value = s;
+                        option.textContent = s.charAt(0).toUpperCase() + s.slice(1);
+                        statusFilter.appendChild(option);
+                    });
+                    [...countries].sort().forEach(c => {
+                        const option = document.createElement('option');
+                        option.value = c;
+                        option.textContent = c;
+                        countryFilter.appendChild(option);
+                    });
+                    [...riskLevels].sort().forEach(r => {
+                        const option = document.createElement('option');
+                        option.value = r;
+                        option.textContent = r.charAt(0).toUpperCase() + r.slice(1);
+                        riskLevelFilter.appendChild(option);
+                    });
+                    [...membershipLevels].sort().forEach(m => {
+                        const option = document.createElement('option');
+                        option.value = m;
+                        option.textContent = m.charAt(0).toUpperCase() + m.slice(1);
+                        membershipLevelFilter.appendChild(option);
+                    });
+                    [...accountStatuses].sort().forEach(a => {
+                        const option = document.createElement('option');
+                        option.value = a;
+                        option.textContent = a.charAt(0).toUpperCase() + a.slice(1);
+                        accountStatusFilter.appendChild(option);
+                    });
+                    break;
+                case 'transactions':
+                    searchInput.placeholder = 'Search by sender, recipient, or amount...';
+                    searchInput.style.display = 'inline-block';
+                    statusFilter.style.display = 'inline-block'; // For transaction status
+                    exportBtn.style.display = 'inline-block';
+
+                    ['pending', 'completed', 'failed', 'refunded'].forEach(s => { // Example statuses
+                        const option = document.createElement('option');
+                        option.value = s;
+                        option.textContent = s.charAt(0).toUpperCase() + s.slice(1);
+                        statusFilter.appendChild(option);
+                    });
+                    break;
+                case 'reports':
+                    searchInput.placeholder = 'Search by report name...';
+                    searchInput.style.display = 'inline-block';
+                    statusFilter.style.display = 'inline-block'; // For report status
+                    exportBtn.style.display = 'inline-block';
+                    ['generated', 'pending', 'failed'].forEach(s => {
+                        const option = document.createElement('option');
+                        option.value = s;
+                        option.textContent = s.charAt(0).toUpperCase() + s.slice(1);
+                        statusFilter.appendChild(option);
+                    });
+                    break;
+                case 'marketplace':
+                    searchInput.placeholder = 'Search by product name or category...';
+                    searchInput.style.display = 'inline-block';
+                    statusFilter.style.display = 'inline-block'; // For listing status
+                    categoryFilter.style.display = 'inline-block'; // Filter by product category
+                    exportBtn.style.display = 'inline-block';
+                    ['active', 'paused', 'sold_out', 'archived'].forEach(s => {
+                        const option = document.createElement('option');
+                        option.value = s;
+                        option.textContent = s.charAt(0).toUpperCase() + s.slice(1);
+                        statusFilter.appendChild(option);
+                    });
+                    // Populate categories from marketplace data or a common category list
+                    const marketplaceCategories = new Set(allData.marketplace.map(p => p.category));
+                    [...marketplaceCategories].sort().forEach(c => {
+                        const option = document.createElement('option');
+                        option.value = c;
+                        option.textContent = c;
+                        categoryFilter.appendChild(option);
+                    });
+                    break;
+                case 'wallet':
+                    searchInput.placeholder = 'Search by user ID or username...';
+                    searchInput.style.display = 'inline-block';
+                    statusFilter.style.display = 'inline-block'; // For wallet status (e.g., active, zero, suspended)
+                    exportBtn.style.display = 'inline-block';
+                    ['active', 'zero_balance', 'suspended'].forEach(s => {
+                        const option = document.createElement('option');
+                        option.value = s;
+                        option.textContent = s.replace('_', ' ').charAt(0).toUpperCase() + s.replace('_', ' ').slice(1);
+                        statusFilter.appendChild(option);
+                    });
+                    break;
+                case 'add-transaction':
+                    searchInput.placeholder = 'Search by user ID or notes...';
+                    searchInput.style.display = 'inline-block';
+                    statusFilter.style.display = 'inline-block'; // For transaction type (credit/debit)
+                    exportBtn.style.display = 'inline-block';
+                    ['Credit', 'Debit'].forEach(s => {
+                        const option = document.createElement('option');
+                        option.value = s;
+                        option.textContent = s;
+                        statusFilter.appendChild(option);
+                    });
+                    break;
+                case 'community-feed':
+                    searchInput.placeholder = 'Search posts by title, content, or author...';
+                    searchInput.style.display = 'inline-block';
+                    typeFilter.style.display = 'inline-block'; // For post type if applicable
+                    visibilityFilter.style.display = 'inline-block'; // For post visibility
+                    exportBtn.style.display = 'inline-block';
+
+                    ['Text', 'Image', 'Video'].forEach(t => { // Example types
+                        const option = document.createElement('option');
+                        option.value = t;
+                        option.textContent = t;
+                        typeFilter.appendChild(option);
+                    });
+                    ['public', 'private', 'friends_only'].forEach(v => { // Example visibility
+                        const option = document.createElement('option');
+                        option.value = v;
+                        option.textContent = v.charAt(0).toUpperCase() + v.slice(1).replace('_', ' ');
+                        visibilityFilter.appendChild(option);
+                    });
+                    break;
+                case 'categories':
+                    searchInput.placeholder = 'Search by category name or description...';
+                    searchInput.style.display = 'inline-block';
+                    exportBtn.style.display = 'inline-block';
+                    addCategoryBtn.classList.remove('hidden'); // Show specific buttons for Categories
+                    newCategoryName.classList.remove('hidden');
+                    newCategoryDescription.classList.remove('hidden');
+                    break;
+                case 'dashboard-overview':
+                    // Overview might not have specific table filters on this page, or would need custom ones
+                    break;
+            }
+        }
+
+
+        function renderTable(viewId) {
+            mainTableHeader.innerHTML = '';
+            mainTableBody.innerHTML = '';
+
+            let tableHeaders = [];
+            let tableRowsHtml = '';
+
+            const search = searchInput.value.toLowerCase();
+            const status = statusFilter.value; // Generic status filter
+            const country = countryFilter.value; // Specific to KYC
+            const riskLevel = riskLevelFilter.value; // Specific to KYC
+            const membershipLevel = membershipLevelFilter.value; // Specific to KYC
+            const accountStatus = accountStatusFilter.value; // Specific to KYC
+            const category = categoryFilter.value; // Specific to Marketplace
+            const type = typeFilter.value; // Specific to Community Feed (media type, or post type)
+            const visibility = visibilityFilter.value; // Specific to Community Feed
+            const chatType = ''; // Remove reference to undefined chatTypeFilter
+
+            switch (viewId) {
+                case 'kyc':
+                    tableHeaders = ['Full Name', 'Email', 'User ID', 'Country', 'Risk Level', 'Account Status', 'Membership Level', 'Status', 'Submission Date', 'Actions'];
+                    const filteredKyc = allData.kyc.filter(k =>
+                        (
+                            (k.full_name ? k.full_name.toLowerCase().includes(search) : false) ||
+                            (k.email ? k.email.toLowerCase().includes(search) : false) ||
+                            (k.user_id ? k.user_id.toLowerCase().includes(search) : false)
+                        ) &&
+                        (!status || k.status === status) &&
+                        (!country || k.country === country) &&
+                        (!riskLevel || (k.users?.risk_level === riskLevel)) &&
+                        (!membershipLevel || (k.users?.membership_level === membershipLevel)) &&
+                        (!accountStatus || (k.users?.account_status === accountStatus))
+                    );
+
+                    if (filteredKyc.length === 0) {
+                        tableRowsHtml = '<tr><td colspan="10" class="text-center py-4 text-gray-500">No matching records found.</td></tr>';
+                    } else {
+                        tableRowsHtml = filteredKyc.map(k => `
+                            <tr class="border-b hover:bg-gray-50">
+                                <td class="px-4 py-2">${k.full_name || 'N/A'}</td>
+                                <td class="px-4 py-2">${k.email || 'N/A'}</td>
+                                <td class="px-4 py-2">${k.user_id || 'N/A'}</td>
+                                <td class="px-4 py-2">${k.country || 'N/A'}</td>
+                                <td class="px-4 py-2 capitalize">${k.users?.risk_level || 'N/A'}</td>
+                                <td class="px-4 py-2 capitalize">${k.users?.account_status || 'N/A'}</td>
+                                <td class="px-4 py-2 capitalize">${k.users?.membership_level || 'N/A'}</td>
+                                <td class="px-4 py-2 capitalize">${k.status || 'N/A'}</td>
+                                <td class="px-4 py-2">${new Date(k.created_at).toLocaleDateString()}</td>
+                                <td class="px-4 py-2 space-x-2 flex flex-wrap gap-2">
+                                    <button onclick="updateStatus('${k.id}', 'approved')" class="text-green-600 hover:text-green-800 text-xs">Approve</button>
+                                    <button onclick="updateStatus('${k.id}', 'rejected')" class="text-red-600 hover:text-red-800 text-xs">Reject</button>
+                                    <button onclick="updateStatus('${k.id}', 'flagged')" class="text-orange-600 hover:text-orange-800 text-xs">Flag</button>
+                                    <button onclick="deleteKYC('${k.id}')" class="text-red-600 hover:text-red-800 text-xs"><i class="fas fa-trash"></i> Delete</button>
+                                    <button onclick="requestMoreInfo('${k.id}')" class="text-blue-600 hover:text-blue-800 text-xs"><i class="fas fa-info-circle"></i> Info</button>
+                                    <button onclick="viewDetails('${k.id}', 'kyc')" class="text-gray-600 hover:text-gray-800 text-xs"><i class="fas fa-eye"></i> Details</button>
+                                </td>
+                            </tr>
+                        `).join('');
+                    }
+                    break;
+                case 'transactions':
+                    tableHeaders = ['Date', 'Sender', 'Recipient', 'Amount', 'Type', 'Status', 'Description', 'Actions'];
+                    const filteredTx = allData.transactions.filter(tx =>
+                        (tx.sender?.full_name?.toLowerCase().includes(search) || tx.recipient?.full_name?.toLowerCase().includes(search) || String(tx.amount).includes(search)) &&
+                        (!status || tx.status === status)
+                    );
+                    if (filteredTx.length === 0) {
+                        tableRowsHtml = '<tr><td colspan="8" class="text-center py-4 text-gray-500">No matching transactions found.</td></tr>';
+                    } else {
+                        tableRowsHtml = filteredTx.map(tx => `
+                            <tr class="border-b hover:bg-gray-50">
+                                <td class="px-4 py-2">${new Date(tx.created_at).toLocaleDateString()}</td>
+                                <td class="px-4 py-2">${tx.sender?.full_name || tx.sender_id || 'N/A'}</td>
+                                <td class="px-4 py-2">${tx.recipient?.full_name || tx.recipient_id || 'N/A'}</td>
+                                <td class="px-4 py-2">${parseFloat(tx.amount).toFixed(2)} ${tx.currency || 'USD'}</td>
+                                <td class="px-4 py-2 capitalize">${tx.transaction_type}</td>
+                                <td class="px-4 py-2 capitalize">${tx.status}</td>
+                                <td class="px-4 py-2 text-xs">${tx.description || 'N/A'}</td>
+                                <td class="px-4 py-2 space-x-2 flex flex-wrap gap-2">
+                                    <button onclick="viewDetails('${tx.id}', 'transaction')" class="text-gray-600 hover:text-gray-800 text-xs"><i class="fas fa-eye"></i> Details</button>
+                                </td>
+                            </tr>
+                        `).join('');
+                    }
+                    break;
+                case 'reports':
+                    tableHeaders = ['Report Name', 'Date Generated', 'Status', 'Format', 'Actions'];
+                    const filteredReports = allData.reports.filter(r =>
+                        (r.name.toLowerCase().includes(search)) && (!status || r.status === status)
+                    );
+                    if (filteredReports.length === 0) {
+                        tableRowsHtml = '<tr><td colspan="5" class="text-center py-4 text-gray-500">No matching reports found.</td></tr>';
+                    } else {
+                        tableRowsHtml = filteredReports.map(rep => `
+                            <tr class="border-b hover:bg-gray-50">
+                                <td class="px-4 py-2">${rep.name}</td>
+                                <td class="px-4 py-2">${new Date(rep.date).toLocaleDateString()}</td>
+                                <td class="px-4 py-2 capitalize">${rep.status}</td>
+                                <td class="px-4 py-2 uppercase">${rep.format}</td>
+                                <td class="px-4 py-2 space-x-2 flex flex-wrap gap-2">
+                                    <button onclick="viewDetails('${rep.id}', 'report')" class="text-blue-600 hover:text-blue-800 text-xs"><i class="fas fa-download"></i> Download</button>
+                                    <button onclick="deleteReport('${rep.id}')" class="text-red-600 hover:text-red-800 text-xs"><i class="fas fa-trash"></i> Delete</button>
+                                </td>
+                            </tr>
+                        `).join('');
+                    }
+                    break;
+                case 'marketplace':
+                    tableHeaders = ['Name', 'Category', 'Price', 'Stock', 'Status', 'Created At', 'Actions'];
+                    const filteredMarketplace = allData.marketplace.filter(p =>
+                        (p.name.toLowerCase().includes(search) || p.category.toLowerCase().includes(search)) &&
+                        (!status || p.status === status) &&
+                        (!category || p.category === category)
+                    );
+                    if (filteredMarketplace.length === 0) {
+                        tableRowsHtml = '<tr><td colspan="7" class="text-center py-4 text-gray-500">No matching listings found.</td></tr>';
+                    } else {
+                        tableRowsHtml = filteredMarketplace.map(p => `
+                            <tr class="border-b hover:bg-gray-50">
+                                <td class="px-4 py-2">${p.name}</td>
+                                <td class="px-4 py-2 capitalize">${p.category}</td>
+                                <td class="px-4 py-2">$${parseFloat(p.price).toFixed(2)}</td>
+                                <td class="px-4 py-2">${p.stock}</td>
+                                <td class="px-4 py-2 capitalize">${p.status}</td>
+                                <td class="px-4 py-2">${new Date(p.created_at).toLocaleDateString()}</td>
+                                <td class="px-4 py-2 space-x-2 flex flex-wrap gap-2">
+                                    <button onclick="viewDetails('${p.id}', 'marketplace')" class="text-gray-600 hover:text-gray-800 text-xs"><i class="fas fa-eye"></i> Details</button>
+                                    <button onclick="editListing('${p.id}')" class="text-blue-600 hover:text-blue-800 text-xs"><i class="fas fa-edit"></i> Edit</button>
+                                    <button onclick="deleteListing('${p.id}')" class="text-red-600 hover:text-red-800 text-xs"><i class="fas fa-trash"></i> Delete</button>
+                                </td>
+                            </tr>
+                        `).join('');
+                    }
+                    break;
+                case 'wallet':
+                    tableHeaders = ['User ID', 'Username', 'Balance', 'Currency', 'Last Activity', 'Actions'];
+                    const filteredWallet = allData.wallet.filter(w =>
+                        (w.userId.toLowerCase().includes(search) || w.username.toLowerCase().includes(search)) &&
+                        (!status || (status === 'active' && w.balance > 0) || (status === 'zero_balance' && w.balance === 0) || (status === 'suspended' && w.status === 'suspended'))
+                    );
+                    if (filteredWallet.length === 0) {
+                        tableRowsHtml = '<tr><td colspan="6" class="text-center py-4 text-gray-500">No matching wallets found.</td></tr>';
+                    } else {
+                        tableRowsHtml = filteredWallet.map(w => `
+                            <tr class="border-b hover:bg-gray-50">
+                                <td class="px-4 py-2">${w.userId}</td>
+                                <td class="px-4 py-2">${w.username}</td>
+                                <td class="px-4 py-2">$${parseFloat(w.balance).toFixed(2)}</td>
+                                <td class="px-4 py-2 uppercase">${w.currency}</td>
+                                <td class="px-4 py-2">${new Date(w.last_activity).toLocaleDateString()}</td>
+                                <td class="px-4 py-2 space-x-2 flex flex-wrap gap-2">
+                                    <button onclick="viewDetails('${w.userId}', 'wallet')" class="text-gray-600 hover:text-gray-800 text-xs"><i class="fas fa-eye"></i> Details</button>
+                                    <button onclick="adjustBalance('${w.userId}')" class="text-blue-600 hover:text-blue-800 text-xs"><i class="fas fa-wallet"></i> Adjust</button>
+                                </td>
+                            </tr>
+                        `).join('');
+                    }
+                    break;
+                case 'add-transaction':
+                    tableHeaders = ['Date', 'Admin ID', 'User ID', 'Type', 'Amount', 'Notes'];
+                    const filteredAddTx = allData.addTransaction.filter(tx =>
+                        (tx.user_id.toLowerCase().includes(search) || tx.notes.toLowerCase().includes(search)) && (!status || tx.type === status)
+                    );
+                    if (filteredAddTx.length === 0) {
+                        tableRowsHtml = '<tr><td colspan="6" class="text-center py-4 text-gray-500">No manual transactions logged.</td></tr>';
+                    } else {
+                        tableRowsHtml = filteredAddTx.map(tx => `
+                            <tr class="border-b hover:bg-gray-50">
+                                <td class="px-4 py-2">${new Date(tx.created_at).toLocaleString()}</td>
+                                <td class="px-4 py-2">${tx.admin_id}</td>
+                                <td class="px-4 py-2">${tx.user_id}</td>
+                                <td class="px-4 py-2 capitalize">${tx.type}</td>
+                                <td class="px-4 py-2">$${parseFloat(tx.amount).toFixed(2)}</td>
+                                <td class="px-4 py-2 text-xs">${tx.notes || 'N/A'}</td>
+                            </tr>
+                        `).join('');
+                    }
+                    break;
+                case 'community-feed':
+                    tableHeaders = ['Title', 'Author', 'Date', 'Likes', 'Comments', 'Visibility', 'Actions'];
+                    const filteredCommunity = allData.community.filter(post =>
+                        (
+                            (post.title ? post.title.toLowerCase().includes(search) : false) ||
+                            (post.content ? post.content.toLowerCase().includes(search) : false) ||
+                            (post.users?.full_name?.toLowerCase().includes(search) || false) ||
+                            (post.users?.username?.toLowerCase().includes(search) || false)
+                        ) &&
+                        (!type || post.media_type === type) &&
+                        (!visibility || post.visibility === visibility)
+                    );
+                    if (filteredCommunity.length === 0) {
+                        tableRowsHtml = '<tr><td colspan="7" class="text-center py-4 text-gray-500">No matching community posts found.</td></tr>';
+                    } else {
+                        tableRowsHtml = filteredCommunity.map(post => `
+                            <tr class="border-b hover:bg-gray-50">
+                                <td class="px-4 py-2">${post.title}</td>
+                                <td class="px-4 py-2">${post.users?.full_name || post.users?.username || 'Anonymous'}</td>
+                                <td class="px-4 py-2">${new Date(post.created_at).toLocaleDateString()}</td>
+                                <td class="px-4 py-2">${post.likes_count || 0}</td>
+                                <td class="px-4 py-2">${post.comments_count || 0}</td>
+                                <td class="px-4 py-2 capitalize">${post.visibility || 'public'}</td>
+                                <td class="px-4 py-2 space-x-2 flex flex-wrap gap-2">
+                                    <button onclick="viewDetails('${post.id}', 'community')" class="text-gray-600 hover:text-gray-800 text-xs"><i class="fas fa-eye"></i> Details</button>
+                                    <button onclick="deleteCommunityPost('${post.id}')" class="text-red-600 hover:text-red-800 text-xs"><i class="fas fa-trash"></i> Delete</button>
+                                </td>
+                            </tr>
+                        `).join('');
+                    }
+                    break;
+                case 'categories':
+                    tableHeaders = ['Name', 'Description', 'Created At', 'Updated At', 'Actions'];
+                    const filteredCategories = allData.categories.filter(cat =>
+                        (cat.name.toLowerCase().includes(search) || cat.description?.toLowerCase().includes(search))
+                    );
+                    if (filteredCategories.length === 0) {
+                        tableRowsHtml = '<tr><td colspan="5" class="text-center py-4 text-gray-500">No categories found. Add a new one using the form above.</td></tr>';
+                    } else {
+                        tableRowsHtml = filteredCategories.map(cat => `
+                            <tr class="border-b hover:bg-gray-50">
+                                <td class="px-4 py-2">${cat.name}</td>
+                                <td class="px-4 py-2">${cat.description || 'N/A'}</td>
+                                <td class="px-4 py-2">${new Date(cat.created_at).toLocaleDateString()}</td>
+                                <td class="px-4 py-2">${new Date(cat.updated_at).toLocaleDateString()}</td>
+                                <td class="px-4 py-2 space-x-2 flex flex-wrap gap-2">
+                                    <button onclick="editCategory('${cat.id}')" class="text-blue-600 hover:text-blue-800 text-xs"><i class="fas fa-edit"></i> Edit</button>
+                                    <button onclick="deleteCategory('${cat.id}')" class="text-red-600 hover:text-red-800 text-xs"><i class="fas fa-trash"></i> Delete</button>
+                                </td>
+                            </tr>
+                        `).join('');
+                    }
+                    break;
+                case 'dashboard-overview': // Dashboard view has no table by default
+                    tableHeaders = ['Metric', 'Value']; // Generic headers
+                    tableRowsHtml = '<tr><td colspan="2" class="text-center py-4 text-gray-500">Switch to "Table View" for detailed data lists on other pages. This view focuses on overall KPIs and charts.</td></tr>';
+                    break;
+                default:
+                    tableHeaders = ['Column 1', 'Column 2', 'Column 3']; // Generic headers
+                    tableRowsHtml = '<tr><td colspan="3" class="text-center py-4 text-gray-500">Table data for this view is not typically displayed here. Switch to a relevant view or a custom display is used.</td></tr>';
+                    break;
+            }
+
+            mainTableHeader.innerHTML = `<tr>${tableHeaders.map(h => `<th class="px-4 py-3">${h}</th>`).join('')}</tr>`;
+            mainTableBody.innerHTML = tableRowsHtml;
+        }
+
+        // --- Generic Details Modal ---
+        async function viewDetails(id, type) {
+            modalTitle.textContent = `${type.charAt(0).toUpperCase() + type.slice(1)} Details`;
+            modalContent.innerHTML = '<p>Loading details...</p>';
+
+            let item;
+            switch (type) {
+                case 'kyc':
+                    item = allData.kyc.find(k => k.id === id);
+                    if (!item) { 
+                        modalContent.innerHTML = '<p class="text-red-500">KYC entry not found.</p>'; 
+                        break; 
+                    }
+                    modalContent.innerHTML = `
+                        <h4 class="font-semibold text-lg mb-2">${item.full_name || 'Anonymous'}'s KYC Submission</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div><strong>User ID:</strong> ${item.user_id || 'N/A'}</div>
+                            <div><strong>Email:</strong> ${item.email || 'N/A'}</div>
+                            <div><strong>Country:</strong> ${item.country || 'N/A'}</div>
+                            <div><strong>Submission Date:</strong> ${new Date(item.created_at).toLocaleString()}</div>
+                            <div><strong>Current Status:</strong> <span class="capitalize">${item.status || 'N/A'}</span></div>
+                            <div><strong>Risk Level:</strong> <span class="capitalize">${item.users?.risk_level || 'N/A'}</span></div>
+                            <div><strong>Account Status:</strong> <span class="capitalize">${item.users?.account_status || 'N/A'}</span></div>
+                            <div><strong>Membership Level:</strong> <span class="capitalize">${item.users?.membership_level || 'N/A'}</span></div>
+                            <div><strong>Phone Number:</strong> ${item.users?.phone_number || 'N/A'}</div>
+                            <div><strong>Address:</strong> ${item.users?.address || 'N/A'}, ${item.users?.city || ''} ${item.users?.province || ''}</div>
+                            <div><strong>Date of Birth:</strong> ${item.users?.date_of_birth ? new Date(item.users.date_of_birth).toLocaleDateString() : 'N/A'}</div>
+                            <div><strong>ID Number:</strong> ${item.users?.id_number || 'N/A'}</div>
+                            <div><strong>Wallet Balance:</strong> $${item.users?.wallet_balance ? parseFloat(item.users.wallet_balance).toFixed(2) : '0.00'}</div>
+                            <div><strong>Profile Picture:</strong> ${item.users?.profile_picture_url ? `<img src="${item.users.profile_picture_url}" alt="Profile" class="w-16 h-16 rounded-full inline-block ml-2" />` : 'N/A'}</div>
+                            <div><strong>Avatar:</strong> ${item.users?.avatar_url ? `<img src="${item.users.avatar_url}" alt="Avatar" class="w-16 h-16 rounded-full inline-block ml-2" />` : 'N/A'}</div>
+                            <div><strong>Fingerprint:</strong> ${item.users?.fingerprint_url ? `<a href="${item.users.fingerprint_url}" target="_blank" class="text-blue-600 underline">View</a>` : 'N/A'}</div>
+                            <div><strong>Signature:</strong> ${item.users?.signature_url ? `<a href="${item.users.signature_url}" target="_blank" class="text-blue-600 underline">View</a>` : 'N/A'}</div>
+                            <div class="md:col-span-2 mt-2">
+                                <strong>Documents:</strong>
+                                <ul>
+                                    ${item.document_url ? `<li><a href="${item.document_url}" target="_blank" class="text-blue-600 underline">Main KYC Document</a></li>` : '<li>No document provided</li>'}
+                                </ul>
+                            </div>
+                            <div class="md:col-span-2 mt-4">
+                                <h5 class="font-semibold mb-2">Internal Notes / Collaboration:</h5>
+                                <textarea id="kycNotes-${item.id}" class="w-full border rounded p-2 text-sm" rows="4" placeholder="Add or view internal notes...">${item.internal_notes || ''}</textarea>
+                                <button onclick="saveKycNotes('${item.id}')" class="mt-2 bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-700">Save Notes</button>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 'transaction':
+                    item = allData.transactions.find(t => t.id === id);
+                    if (!item) { modalContent.innerHTML = '<p class="text-red-500">Transaction not found.</p>'; break; }
+                    modalContent.innerHTML = `
+                        <h4 class="font-semibold text-lg mb-2">Transaction ID: ${item.id}</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div><strong>Amount:</strong> ${parseFloat(item.amount).toFixed(2)} ${item.currency || 'USD'}</div>
+                            <div><strong>Type:</strong> <span class="capitalize">${item.transaction_type}</span></div>
+                            <div><strong>Status:</strong> <span class="capitalize">${item.status}</span></div>
+                            <div><strong>Date:</strong> ${new Date(item.created_at).toLocaleString()}</div>
+                            <div class="md:col-span-2"><strong>Description:</strong> ${item.description || 'N/A'}</div>
+                            <div><strong>Sender:</strong> ${item.sender?.full_name || item.sender_id || 'N/A'} (${item.sender?.email || 'N/A'})</div>
+                            <div><strong>Recipient:</strong> ${item.recipient?.full_name || item.recipient_id || 'N/A'} (${item.recipient?.email || 'N/A'})</div>
+                        </div>
+                    `;
+                    break;
+                case 'community':
+                    item = allData.community.find(p => p.id === id);
+                    if (!item) { modalContent.innerHTML = '<p class="text-red-500">Community post not found.</p>'; break; }
+                    const postUser = item.users;
+                    const postDate = new Date(item.created_at).toLocaleString();
+                    modalContent.innerHTML = `
+                        <h4 class="font-semibold text-lg mb-2">${item.title}</h4>
+                        <div class="mb-4">
+                            <div class="flex items-center mb-2">
+                                <img src="${postUser?.avatar_url || 'https://via.placeholder.com/40'}" alt="${postUser?.full_name || 'Anonymous'}" class="w-10 h-10 rounded-full mr-3">
+                                <div>
+                                    <p class="font-semibold text-gray-800">${postUser?.full_name || postUser?.username || 'Anonymous'} <span class="text-gray-500 text-xs">- ${postDate}</span></p>
+                                    <p class="text-xs text-gray-500">Visibility: ${item.visibility || 'public'}</p>
+                                </div>
+                            </div>
+                            <p class="text-gray-700 text-sm mb-3">${item.content}</p>
+                            ${item.media_url ? `<img src="${item.media_url}" alt="Post Media" class="max-w-full h-auto rounded mb-3">` : ''}
+                            <div class="flex items-center text-sm text-gray-500 space-x-4">
+                                <span><i class="fas fa-heart"></i> ${item.post_likes ? item.post_likes.length : 0} Likes</span>
+                                <span><i class="fas fa-comment"></i> ${item.comments ? item.comments.length : 0} Comments</span>
+                            </div>
+                        </div>
+                        <div class="mt-4 border-t border-gray-200 pt-4">
+                            <h5 class="font-semibold text-gray-700 mb-2">Comments:</h5>
+                            <div class="space-y-3">
+                                ${item.comments && item.comments.length > 0 ?
+                                    item.comments.map(comment => `
+                                        <div class="flex items-start text-xs bg-gray-100 p-2 rounded-md">
+                                            <img src="${comment.users?.avatar_url || 'https://via.placeholder.com/30'}" alt="${comment.users?.full_name || 'Anonymous'}" class="w-7 h-7 rounded-full mr-2 mt-1">
+                                            <div>
+                                                <p class="font-medium text-gray-700">${comment.users?.full_name || 'Anonymous'} <span class="text-gray-500 text-xs">- ${new Date(comment.created_at).toLocaleString()}</span></p>
+                                                <p class="text-gray-600">${comment.content}</p>
+                                                <button class="text-red-500 hover:text-red-700 mt-1" onclick="deleteComment('${comment.id}')"><i class="fas fa-times"></i> Delete Comment</button>
+                                            </div>
+                                        </div>
+                                    `).join('')
+                                    : '<p class="text-gray-500 text-sm">No comments yet.</p>'}
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 'report': // New details for reports
+                    item = allData.reports.find(r => r.id === id);
+                    if (!item) { modalContent.innerHTML = '<p class="text-red-500">Report not found.</p>'; break; }
+                    modalContent.innerHTML = `
+                        <h4 class="font-semibold text-lg mb-2">Report: ${item.name}</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div><strong>Generated Date:</strong> ${new Date(item.date).toLocaleDateString()}</div>
+                            <div><strong>Status:</strong> <span class="capitalize">${item.status}</span></div>
+                            <div><strong>Format:</strong> <span class="uppercase">${item.format}</span></div>
+                            <div class="md:col-span-2 mt-2">
+                                <button onclick="window.open('path/to/reports/${item.id}.${item.format}', '_blank')" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                                    <i class="fas fa-download"></i> Download Report
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 'marketplace': // New details for marketplace
+                    item = allData.marketplace.find(p => p.id === id);
+                    if (!item) { modalContent.innerHTML = '<p class="text-red-500">Listing not found.</p>'; break; }
+                    modalContent.innerHTML = `
+                        <h4 class="font-semibold text-lg mb-2">Listing: ${item.name}</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div><strong>Category:</strong> ${item.category}</div>
+                            <div><strong>Price:</strong> $${parseFloat(item.price).toFixed(2)}</div>
+                            <div><strong>Stock:</strong> ${item.stock}</div>
+                            <div><strong>Status:</strong> <span class="capitalize">${item.status}</span></div>
+                            <div><strong>Created At:</strong> ${new Date(item.created_at).toLocaleDateString()}</div>
+                            <div class="md:col-span-2"><strong>Description:</strong> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</div>
+                            <div class="md:col-span-2 mt-2">
+                                <button onclick="editListing('${item.id}')" class="bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-700">Edit Listing</button>
+                                <button onclick="deleteListing('${item.id}')" class="bg-red-600 text-white px-3 py-1 rounded text-xs hover:bg-red-700">Delete Listing</button>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 'wallet': // New details for wallet
+                    item = allData.wallet.find(w => w.userId === id);
+                    if (!item) { modalContent.innerHTML = '<p class="text-red-500">Wallet not found.</p>'; break; }
+                    modalContent.innerHTML = `
+                        <h4 class="font-semibold text-lg mb-2">Wallet for ${item.username} (ID: ${item.userId})</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div><strong>Current Balance:</strong> $${parseFloat(item.balance).toFixed(2)} ${item.currency}</div>
+                            <div><strong>Last Activity:</strong> ${new Date(item.last_activity).toLocaleDateString()}</div>
+                            <div class="md:col-span-2 mt-2">
+                                <button onclick="adjustBalance('${item.userId}')" class="bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-700">Adjust Balance</button>
+                            </div>
+                            </div>
+                    `;
+                    break;
+                default:
+                    modalContent.innerHTML = '<p class="text-gray-500">Details for this item type are not yet implemented.</p>';
+                    break;
+            }
+            detailsModal.classList.remove('hidden');
+        }
+
+        async function updateStatus(id, newStatus) {
+            const { error } = await supabase
+                .from('kyc_submissions')
+                .update({ status: newStatus })
+                .eq('id', id);
+            if (error) alert('Failed to update status: ' + error.message);
+            else {
+                await fetchKYC(); // Re-fetch to update the unified content
+                renderMainContent(currentViewId); // Re-render current view
+            }
+        }
+
+        async function deleteKYC(id) {
+            if (!confirm("Are you sure you want to delete this KYC submission? This action cannot be undone.")) {
+                return;
+            }
+            const { error } = await supabase
+                .from('kyc_submissions')
+                .delete()
+                .eq('id', id);
+            if (error) alert('Failed to delete KYC submission: ' + error.message);
+            else {
+                alert('KYC submission deleted successfully!');
+                await fetchKYC();
+                renderMainContent(currentViewId);
+            }
+        }
+
+        async function deleteCommunityPost(postId) {
+            if (!confirm("Are you sure you want to delete this post?")) return;
+            const { error } = await supabase.from('community_posts').delete().eq('id', postId);
+            if (error) {
+                alert('Error deleting post: ' + error.message);
+                console.error(error);
+            } else {
+                alert('Post deleted successfully!');
+                await fetchCommunityData();
+                renderMainContent(currentViewId);
+            }
+        }
+
+        async function deleteComment(commentId) {
+            if (!confirm("Are you sure you want to delete this comment?")) return;
+            const { error } = await supabase.from('comments').delete().eq('id', commentId);
+            if (error) {
+                alert('Error deleting comment: ' + error.message);
+                console.error(error);
+            } else {
+                alert('Comment deleted successfully!');
+                await fetchCommunityData(); // Re-fetch community data to update comment counts
+                renderMainContent(currentViewId);
+            }
+        }
+
+        function requestMoreInfo(id) {
+            alert(`Requesting more information for KYC ID: ${id}. \n(This would trigger a notification to the user and possibly open a form for specific requests)`);
+        }
+
+        async function saveKycNotes(id) {
+            const notes = document.getElementById(`kycNotes-${id}`).value;
+            const { error } = await supabase
+                .from('kyc_submissions')
+                .update({ internal_notes: notes }) // Ensure you have an 'internal_notes' column in kyc_submissions
+                .eq('id', id);
+            if (error) alert('Failed to save notes: ' + error.message);
+            else {
+                alert('Notes saved successfully!');
+                // Re-fetch and re-render the detail in the modal if you want the notes to persist immediately
+                // For now, just a confirmation
+            }
+        }
+
+        function closeDetailsModal() {
+          detailsModal.classList.add('hidden');
+        }
+
+        async function addCategory() {
+            const name = newCategoryName.value.trim();
+            const description = newCategoryDescription.value.trim();
+            if (!name) {
+                alert('Category name cannot be empty.');
+                return;
+            }
+
+            const { data, error } = await supabase
+                .from('categories')
+                .insert([{ name: name, description: description }])
+                .select(); // Select the inserted row
+
+            if (error) {
+                alert('Error adding category: ' + error.message);
+                console.error(error);
+            } else {
+                alert('Category added successfully!');
+                newCategoryName.value = '';
+                newCategoryDescription.value = '';
+                await fetchCategoriesData();
+                renderMainContent(currentViewId); // Re-render the categories table
+            }
+        }
+
+        async function editCategory(categoryId) {
+            const category = allData.categories.find(c => c.id === categoryId);
+            if (!category) return;
+
+            const newName = prompt("Enter new name for category:", category.name);
+            if (newName === null || newName.trim() === "") return;
+
+            const newDescription = prompt("Enter new description for category:", category.description || "");
+
+            const { error } = await supabase
+                .from('categories')
+                .update({ name: newName.trim(), description: newDescription.trim(), updated_at: new Date().toISOString() })
+                .eq('id', categoryId);
+
+            if (error) {
+                alert('Error updating category: ' + error.message);
+                console.error(error);
+            } else {
+                alert('Category updated successfully!');
+                await fetchCategoriesData();
+                renderMainContent(currentViewId); // Re-render the categories table
+            }
+        }
+
+        async function deleteCategory(categoryId) {
+            if (!confirm("Are you sure you want to delete this category?")) return;
+
+            const { error } = await supabase
+                .from('categories')
+                .delete()
+                .eq('id', categoryId);
+
+            if (error) {
+                alert('Error deleting category: ' + error.message);
+                console.error(error);
+            } else {
+                alert('Category deleted successfully!');
+                await fetchCategoriesData();
+                renderMainContent(currentViewId); // Re-render the categories table
+            }
+        }
+
+        // --- NEW Actions for other standard views ---
+        function deleteReport(reportId) {
+            if (confirm(`Are you sure you want to delete report ${reportId}?`)) {
+                // In a real app, you'd send a request to your backend/Supabase to delete
+                allData.reports = allData.reports.filter(r => r.id !== reportId);
+                alert(`Report ${reportId} deleted (dummy action).`);
+                renderMainContent(currentViewId);
+            }
+        }
+
+        function editListing(listingId) {
+            alert(`Editing listing ${listingId} (dummy action).`);
+            // Open a form/modal for editing
+        }
+
+        function deleteListing(listingId) {
+             if (confirm(`Are you sure you want to delete listing ${listingId}?`)) {
+                allData.marketplace = allData.marketplace.filter(p => p.id !== listingId);
+                alert(`Listing ${listingId} deleted (dummy action).`);
+                renderMainContent(currentViewId);
+            }
+        }
+
+        function adjustBalance(userId) {
+            const amount = prompt(`Enter amount to adjust for user ${userId} (e.g., 50 or -25):`);
+            if (amount !== null && !isNaN(parseFloat(amount))) {
+                // In a real app, send to backend to adjust balance
+                alert(`Adjusting balance for ${userId} by ${amount} (dummy action).`);
+            }
+        }
+
+
+        function exportCSV() {
+            let rows = [];
+            let filename = `export_${currentViewId}_${Date.now()}.csv`;
+
+            switch (currentViewId) {
+                case 'kyc':
+                    rows.push(['Full Name','Email','User ID','Country','Risk Level','Account Status','Membership Level','Status','Submission Date','Document']);
+                    allData.kyc.forEach(k => rows.push([
+                      k.full_name, k.email, k.user_id || 'N/A', k.country, k.users?.risk_level || 'N/A',
+                      k.users ? k.users.account_status : 'N/A', k.users ? k.users.membership_level : 'N/A',
+                      k.status, new Date(k.created_at).toLocaleDateString(), k.document_url
+                    ]));
+                    break;
+                case 'transactions':
+                    rows.push(['Date', 'Sender', 'Recipient', 'Amount', 'Type', 'Status', 'Description', 'Currency']);
+                    allData.transactions.forEach(tx => rows.push([
+                        new Date(tx.created_at).toLocaleDateString(), tx.sender?.full_name || tx.sender_id || 'N/A',
+                        tx.recipient?.full_name || tx.recipient_id || 'N/A', parseFloat(tx.amount).toFixed(2),
+                        tx.transaction_type, tx.status, tx.description || 'N/A', tx.currency || 'USD'
+                    ]));
+                    break;
+                case 'reports':
+                    rows.push(['Report Name', 'Date Generated', 'Status', 'Format']);
+                    allData.reports.forEach(r => rows.push([r.name, new Date(r.date).toLocaleDateString(), r.status, r.format]));
+                    break;
+                case 'marketplace':
+                    rows.push(['Name', 'Category', 'Price', 'Stock', 'Status', 'Created At']);
+                    allData.marketplace.forEach(p => rows.push([p.name, p.category, p.price, p.stock, p.status, new Date(p.created_at).toLocaleDateString()]));
+                    break;
+                case 'wallet':
+                    rows.push(['User ID', 'Username', 'Balance', 'Currency', 'Last Activity']);
+                    allData.wallet.forEach(w => rows.push([w.userId, w.username, w.balance, w.currency, new Date(w.last_activity).toLocaleDateString()]));
+                    break;
+                case 'add-transaction':
+                    rows.push(['Date', 'Admin ID', 'User ID', 'Type', 'Amount', 'Notes']);
+                    allData.addTransaction.forEach(tx => rows.push([new Date(tx.created_at).toLocaleString(), tx.admin_id, tx.user_id, tx.type, tx.amount, tx.notes]));
+                    break;
+                case 'community-feed':
+                    rows.push(['Title', 'Author', 'Date', 'Likes', 'Comments', 'Visibility', 'Media Type']);
+                    allData.community.forEach(post => rows.push([post.title, post.users?.full_name || post.users?.username || 'Anonymous', new Date(post.created_at).toLocaleDateString(), post.likes_count || 0, post.comments_count || 0, post.visibility || 'public', post.media_type || 'N/A']));
+                    break;
+                case 'chat-list':
+                    rows.push(['Chat Title', 'Participants', 'Last Message', 'Last Active', 'Type']);
+                    allData.chatSessions.forEach(session => {
+                        const participantsNames = session.participants.map(p => p.full_name || p.username).join('; ');
+                        rows.push([session.title || 'Direct Message', participantsNames, session.last_message_content, new Date(session.last_active_at).toLocaleString(), session.chat_type]);
+                    });
+                    break;
+                case 'categories':
+                    rows.push(['Name', 'Description', 'Created At', 'Updated At']);
+                    allData.categories.forEach(cat => rows.push([cat.name, cat.description || 'N/A', new Date(cat.created_at).toLocaleDateString(), new Date(cat.updated_at).toLocaleDateString()]));
+                    break;
+                default:
+                    alert('CSV export not implemented for this view.');
+                    return;
+            }
+
+            const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            link.click();
+            URL.revokeObjectURL(link.href);
+        }
+
+        // --- MAIN VIEW SWITCHER LOGIC (modified) ---
+        const viewTitles = {
+            'kyc': 'KYC Management',
+            'dashboard-overview': 'Platform Dashboard Overview',
+            'transactions': 'Transaction History',
+            'reports': 'System Reports',
+            'community-feed': 'Community Feed',
+            'categories': 'Categories Management',
+            'marketplace': 'Marketplace Listings',
+            'wallet': 'User Wallet Balances',
+            'settings': 'Admin Panel Settings',
+            'add-transaction': 'Manual Transaction Entry',
+            'user-profile': 'User Profile'
+        };
+
+        // Views that use the standard dashboard/table layout
+        const STANDARD_LAYOUT_VIEWS = [
+            'kyc', 'dashboard-overview', 'transactions', 'reports',
+            'marketplace', 'wallet', 'add-transaction',
+            'community-feed', 'categories' // THESE ARE NEWLY ADDED TO STANDARD
+        ];
+        // Views that have custom, dedicated layouts
+        const CUSTOM_LAYOUT_VIEWS = [
+            'user-profile', 'settings'
+        ];
+
+
+        async function showMainView(viewId, targetUserId = null) {
+            currentViewId = viewId; // Update global tracking
+            mainViewTitle.textContent = viewTitles[viewId]; // Update header title dynamically
+
+            // Update active sidebar link visually
+            document.querySelectorAll('.nav-link-sidebar').forEach(link => {
+                link.classList.remove('active');
+            });
+            const activeLink = document.querySelector(`.nav-link-sidebar[data-view-id="${viewId}"]`);
+            if (activeLink) {
+                activeLink.classList.add('active');
+            }
+
+            // Hide all specific content divs that are NOT the standard layout
+            document.querySelectorAll('#unifiedMainContent > div').forEach(div => {
+                if (div.id !== 'standardDashboardTableLayout') {
+                    div.classList.add('hidden-subview');
+                }
+            });
+
+            const usesStandardLayout = STANDARD_LAYOUT_VIEWS.includes(viewId);
+
+            if (usesStandardLayout) {
+                standardDashboardTableLayout.classList.remove('hidden-subview');
+                // Ensure dashboard/table buttons are visible for these views
+                dashboardViewBtn.style.display = 'inline-block';
+                tableViewBtn.style.display = 'inline-block';
+                // Reset to Dashboard View for standard pages by default unless a table view was specifically selected
+                showSubView('dashboard'); // Always start standard views in dashboard mode
+            } else {
+                standardDashboardTableLayout.classList.add('hidden-subview');
+                // Hide dashboard/table buttons for custom views
+                dashboardViewBtn.style.display = 'none';
+                tableViewBtn.style.display = 'none';
+            }
+
+            await fetchDataForView(viewId); // Fetch data for the new view
+            renderMainContent(viewId, targetUserId); // Render the fetched data into the unified content area
+        }
+
+        // This function will render content into the always-visible components OR trigger specific page renders
+        function renderMainContent(viewId, targetUserId = null) {
+            const isTableView = tableViewBtn.classList.contains('active');
+            const usesStandardLayout = STANDARD_LAYOUT_VIEWS.includes(viewId);
+
+            // Logic for standard dashboard/table layout
+            if (usesStandardLayout) {
+                if (isTableView) {
+                     kpiSection.classList.add('hidden-subview');
+                     chartMapSection.classList.add('hidden-subview');
+                     filtersSection.classList.remove('hidden-subview'); // Filters are part of table view
+                     mainTableContainer.classList.remove('hidden-subview');
+                     renderTable(viewId); // Render table for table view or categories view
+                } else { // Dashboard View
+                     kpiSection.classList.remove('hidden-subview');
+                     chartMapSection.classList.remove('hidden-subview');
+                     filtersSection.classList.add('hidden-subview'); // Filters typically hidden in dashboard
+                     mainTableContainer.classList.add('hidden-subview');
+                     mainTableBody.innerHTML = '<tr><td colspan="10" class="text-center py-4 text-gray-500">Switch to "Table View" for detailed list.</td></tr>';
+                }
+
+                // Always update KPIs, Chart, Map, Filters for standard layout views
+            if (!isTableView && viewId !== 'categories') {
+                updateKPIs(viewId);
+                updateChart(viewId);
+                updateMap(viewId);
+            }
+            populateFilters(viewId);
+                
+                // Render table based on current sub-view state (Dashboard vs. Table)
+                if (isTableView || viewId === 'categories' || viewId === 'kyc' || viewId === 'transactions' || viewId === 'reports' || viewId === 'marketplace' || viewId === 'wallet' || viewId === 'add-transaction' || viewId === 'community-feed') {
+                    renderTable(viewId);
+                } else {
+                    mainTableBody.innerHTML = '<tr><td colspan="10" class="text-center py-4 text-gray-500">Switch to "Table View" for detailed list.</td></tr>';
+                }
+            }
+
+
+            // --- Render specific page content for custom views (these are now fewer) ---
+            switch (viewId) {
+                case 'user-profile':
+                    renderUserProfilePage(targetUserId);
+                    break;
+                case 'settings':
+                    // Settings page might have static content or forms
+                    break;
+                default:
+                    // For other generic views that might use the standard layout, nothing more needed here
+                    break;
+            }
+        }
+
+        // --- Specific Page Rendering Functions (now only for truly custom pages) ---
+
+        async function renderUserProfilePage(userId = null) {
+            userProfileContent.innerHTML = '<p class="text-gray-500">Loading user profile...</p>';
+            let userToDisplay = allData.userProfile; // Assumes allData.userProfile is already fetched (e.g., admin's own profile)
+
+            // If a specific userId is provided (e.g., from clicking a user in a table), fetch that user's data
+            if (userId && (userToDisplay === null || userToDisplay.id !== userId)) {
+                await fetchUserProfileData(userId);
+                userToDisplay = allData.userProfile;
+            }
+
+            if (!userToDisplay) {
+                userProfileContent.innerHTML = '<p class="text-red-500">User profile not found or failed to load.</p>';
+                return;
+            }
+
+            const chatSessionsCount = userToDisplay.chat_sessions ? userToDisplay.chat_sessions.length : 0;
+            const communityPostsCount = userToDisplay.community_posts ? userToDisplay.community_posts.length : 0;
+            const commentsCount = userToDisplay.comments ? userToDisplay.comments.length : 0;
+            const commentLikesCount = userToDisplay.comment_likes ? userToDisplay.comment_likes.length : 0;
+
+            userProfileContent.innerHTML = `
+                <div class="col-span-1 md:col-span-2 flex items-center mb-4">
+                    <img src="${userToDisplay.profile_picture_url || userToDisplay.avatar_url || 'https://via.placeholder.com/100'}" alt="${userToDisplay.full_name || userToDisplay.username}" class="w-24 h-24 rounded-full mr-4 object-cover">
+                    <div>
+                        <h3 class="text-2xl font-bold">${userToDisplay.full_name || userToDisplay.username}</h3>
+                        <p class="text-gray-600">${userToDisplay.email}</p>
+                        <p class="text-sm text-gray-500">User ID: ${userToDisplay.id}</p>
+                    </div>
+                </div>
+
+                <div class="border-t pt-4">
+                    <h4 class="font-semibold text-lg mb-2">General Information</h4>
+                    <p><strong>Username:</strong> ${userToDisplay.username || 'N/A'}</p>
+                    <p><strong>Phone:</strong> ${userToDisplay.phone_number || 'N/A'}</p>
+                    <p><strong>Address:</strong> ${userToDisplay.address || 'N/A'}, ${userToDisplay.city || 'N/A'}, ${userToDisplay.province || 'N/A'}, ${userToDisplay.country || 'N/A'}</p>
+                    <p><strong>Date of Birth:</strong> ${userToDisplay.date_of_birth ? new Date(userToDisplay.date_of_birth).toLocaleDateString() : 'N/A'}</p>
+                    <p><strong>ID Number:</strong> ${userToDisplay.id_number || 'N/A'}</p>
+                </div>
+
+                <div class="border-t pt-4">
+                    <h4 class="font-semibold text-lg mb-2">Account Status</h4>
+                    <p><strong>Account Status:</strong> <span class="capitalize">${userToDisplay.account_status || 'N/A'}</span></p>
+                    <p><strong>Membership Level:</strong> <span class="capitalize">${userToDisplay.membership_level || 'N/A'}</span></p>
+                    <p><strong>Risk Level:</strong> <span class="capitalize">${userToDisplay.risk_level || 'N/A'}</span></p>
+                    <p><strong>Wallet Balance:</strong> $${userToDisplay.wallet_balance ? parseFloat(userToDisplay.wallet_balance).toFixed(2) : '0.00'}</p>
+                    <p><strong>Created At:</strong> ${new Date(userToDisplay.created_at).toLocaleString()}</p>
+                    <p><strong>Last Login:</strong> ${userToDisplay.last_login_at ? new Date(userToDisplay.last_login_at).toLocaleString() : 'N/A'}</p>
+                </div>
+
+                <div class="md:col-span-2 border-t pt-4">
+                    <h4 class="font-semibold text-lg mb-2">User Activity Summary</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="kpi-card text-left p-4">
+                            <div class="kpi-value text-xl">${chatSessionsCount}</div>
+                            <div class="kpi-label">Chat Sessions</div>
+                        </div>
+                        <div class="kpi-card text-left p-4">
+                            <div class="kpi-value text-xl">${communityPostsCount}</div>
+                            <div class="kpi-label">Community Posts</div>
+                        </div>
+                        <div class="kpi-card text-left p-4">
+                            <div class="kpi-value text-xl">${commentsCount}</div>
+                            <div class="kpi-label">Comments Made</div>
+                        </div>
+                        <div class="kpi-card text-left p-4">
+                            <div class="kpi-value text-xl">${commentLikesCount}</div>
+                            <div class="kpi-label">Comments Liked</div>
+                        </div>
+                    </div>
+                    <p class="mt-4 text-gray-600">
+                        <button onclick="alert('Viewing user\'s chat history (future feature)')" class="text-blue-600 underline text-sm mr-2">View Chat History</button>
+                        <button onclick="alert('Viewing user\'s community contributions (future feature)')" class="text-blue-600 underline text-sm">View Community Activity</button>
+                    </p>
+                </div>
+            `;
+        }
+
+
+
+        // --- Sub-view switcher for Dashboard vs. Table within the unified view ---
+        function showSubView(subViewId) {
+            if (subViewId === 'dashboard') {
+                dashboardViewBtn.classList.add('active');
+                tableViewBtn.classList.remove('active');
+            } else { // subViewId === 'table'
+                tableViewBtn.classList.add('active');
+                dashboardViewBtn.classList.remove('active');
+            }
+            renderMainContent(currentViewId); // Re-render the content based on the new sub-view state
+        }
+
+
+        // --- Event Listeners ---
+        document.getElementById('sidebarLogoutLink').addEventListener('click', async (e) => {
+          e.preventDefault();
+          await supabase.auth.signOut();
+          window.location.href = 'login.html';
+        });
+
+        mobileLogoutLink.addEventListener('click', async (e) => {
+          e.preventDefault();
+          await supabase.auth.signOut();
+          window.location.href = 'login.html';
+        });
+
+        // Event listeners for standard layout filters
+        searchInput.addEventListener('input', () => { if (STANDARD_LAYOUT_VIEWS.includes(currentViewId)) renderTable(currentViewId); });
+        statusFilter.addEventListener('change', () => { if (STANDARD_LAYOUT_VIEWS.includes(currentViewId)) renderTable(currentViewId); });
+        countryFilter.addEventListener('change', () => { if (STANDARD_LAYOUT_VIEWS.includes(currentViewId)) renderTable(currentViewId); });
+        riskLevelFilter.addEventListener('change', () => { if (STANDARD_LAYOUT_VIEWS.includes(currentViewId)) renderTable(currentViewId); });
+        membershipLevelFilter.addEventListener('change', () => { if (STANDARD_LAYOUT_VIEWS.includes(currentViewId)) renderTable(currentViewId); });
+        accountStatusFilter.addEventListener('change', () => { if (STANDARD_LAYOUT_VIEWS.includes(currentViewId)) renderTable(currentViewId); });
+        categoryFilter.addEventListener('change', () => { if (STANDARD_LAYOUT_VIEWS.includes(currentViewId)) renderTable(currentViewId); });
+        typeFilter.addEventListener('change', () => { if (STANDARD_LAYOUT_VIEWS.includes(currentViewId)) renderTable(currentViewId); });
+        visibilityFilter.addEventListener('change', () => { if (STANDARD_LAYOUT_VIEWS.includes(currentViewId)) renderTable(currentViewId); });
+
+
+        exportBtn.addEventListener('click', exportCSV);
+        addCategoryBtn.addEventListener('click', addCategory);
+
+
+        hamburgerBtnMobile.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+        });
+
+        document.body.addEventListener('click', (event) => {
+            if (sidebar.classList.contains('open') && !sidebar.contains(event.target) && !hamburgerBtnMobile.contains(event.target)) {
+                sidebar.classList.remove('open');
+            }
+        });
+
+        // Event listeners for main view switching via sidebar
+        document.querySelectorAll('.nav-link-sidebar').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const viewId = e.currentTarget.dataset.viewId;
+                if (viewId) {
+                    showMainView(viewId);
+                    // Close sidebar on mobile after selection
+                    if (window.innerWidth <= 768) {
+                        sidebar.classList.remove('open');
+                    }
+                }
+            });
+        });
+
+        // Event listeners for Dashboard vs Table sub-view switching (only active when standard layout is visible)
+        dashboardViewBtn.addEventListener('click', () => showSubView('dashboard'));
+        tableViewBtn.addEventListener('click', () => showSubView('table'));
+
+        // Initialize the page
+        checkSession().then(() => {
+            showMainView('kyc'); // Start with the KYC main view by default, showing its dashboard
+        });
+    </script>
+</body>
+</html>
