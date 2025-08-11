@@ -1779,6 +1779,8 @@ async function searchContent(query) {
               <div class="post-options-dropdown hidden" id="postOptions-${post.id}">
                 <button class="edit-post-btn" data-post-id="${post.id}">Edit Post</button>
                 <button class="delete-post-btn" data-post-id="${post.id}">Delete Post</button>
+                <button class="share-post-btn" data-post-id="${post.id}">Share</button>
+                <button class="share-post-btn" data-post-id="${post.id}">Share</button>
               </div>` : ''}
           </div>
           <div class="post-content">
@@ -1864,6 +1866,8 @@ async function searchContent(query) {
         const deletePostBtn = postElement.querySelector(`.delete-post-btn[data-post-id="${post.id}"]`);
         if (deletePostBtn) {
           deletePostBtn.addEventListener('click', (e) => {
+            const sharePostBtn = postElement.querySelector(`.share-post-btn[data-post-id="${post.id}"]`);
+            sharePostBtn.addEventListener('click', () => copyPostLink(post.id));
             const postId = e.target.dataset.post_id || e.target.closest('.delete-post-btn').dataset.postId;
             deletePost(postId, post.media_url);
           });

@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "adf436cd-4f6f-4ec4-b0d8-ff95428b1be5"
+      }
+    },
+    "android": {
+      "package": "com.sndatabaye.nova7"
+    }
+  }
+}

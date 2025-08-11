@@ -1,0 +1,3153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hub communautaire - nova7</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F3F2EF;
+            color: #1D2026;
+        }
+        /* Sidebar Styles */
+        .sidebar-nova7 {
+            background-color: #004182;
+            color: #E0F2FE;
+            width: 260px;
+            box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding-top: 1.5rem;
+            transition: transform 0.3s ease-in-out;
+            z-index: 40;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar-header {
+            padding: 0 1.5rem 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid #0053a0;
+            margin-bottom: 0.75rem;
+        }
+        .nova7-logo-header {
+            max-height: 36px;
+            width: auto;
+        }
+        .sidebar-logo-img {
+            max-height: 120px;
+            width: auto;
+            filter: brightness(0) invert(1);
+        }
+        .sidebar-nova7 .nav-link-sidebar {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            margin: 0.25rem 1rem;
+            font-weight: 500;
+            color: #E0F2FE;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .sidebar-nova7 .nav-link-sidebar:hover {
+            background-color: #0A66C2;
+            color: #FFFFFF;
+        }
+        .sidebar-nova7 .nav-link-sidebar.active {
+            background-color: #FFFFFF;
+            color: #0A66C2;
+            font-weight: 600;
+        }
+        .sidebar-nova7 .nav-link-sidebar i {
+            width: 20px;
+            margin-right: 0.75rem;
+            text-align: center;
+        }
+        /* Main Content Styles */
+        .main-content-area {
+            margin-left: 260px;
+            padding: 2rem;
+            width: calc(100% - 260px);
+            min-height: 100vh;
+        }
+        .btn-primary-action {
+            background-color: #0A66C2;
+            color: white;
+            border-radius: 8px;
+            padding: 0.625rem 1.25rem;
+            font-weight: 600;
+            transition: background-color 0.2s, box-shadow 0.2s, opacity 0.2s;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
+            cursor: pointer;
+        }
+        .btn-primary-action:hover {
+            background-color: #004182;
+            box-shadow: 0 2px 4px 0 rgba(0,0,0,0.1);
+        }
+        .btn-primary-action:disabled {
+            background-color: #A0AEC0;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        .btn-primary-action i {
+            margin-right: 0.5rem;
+        }
+        .btn-secondary-outline {
+            background-color: transparent;
+            color: #0A66C2;
+            border: 1px solid #0A66C2;
+            border-radius: 20px;
+            padding: 0.5rem 1.25rem;
+            font-weight: 600;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .btn-secondary-outline:hover {
+            background-color: #E0F2FE;
+        }
+        /* Community Layout */
+        .community-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+        @media (min-width: 1024px) {
+            .community-layout {
+                grid-template-columns: 1fr 320px;
+            }
+        }
+        .card-base {
+            background-color: #FFFFFF;
+            border-radius: 8px;
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.08), 0 2px 3px rgba(0,0,0,0.06);
+            padding: 1.25rem;
+        }
+        /* Create Post Card */
+        .create-post-card {
+            margin-bottom: 1rem;
+        }
+        .create-post-input-area {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        .create-post-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background-color: #0A66C2;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        .create-post-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .create-post-card textarea {
+            width: 100%;
+            min-height: 52px;
+            border: 1px solid #D1D5DB;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            resize: vertical;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        .create-post-card textarea:focus {
+            outline: none;
+            border-color: #0A66C2;
+            box-shadow: 0 0 0 2px rgba(10, 102, 194, 0.2);
+        }
+        .image-upload-placeholder {
+            border: 2px dashed #D1D5DB;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            color: #6B7280;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        .image-upload-placeholder:hover {
+            border-color: #0A66C2;
+        }
+        .video-upload-placeholder {
+            border: 2px dashed #D1D5DB;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            color: #6B7280;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        .video-upload-placeholder:hover {
+            border-color: #0A66C2;
+        }
+        .post-video {
+            max-height: 450px;
+            border-radius: 8px;
+            margin: 0.75rem 0 1rem 0;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .post-video::before {
+            content: '\f04b';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            font-size: 3rem;
+            color: #fff;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+        .post-video video {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: contain;
+        }
+        .post-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 0.5rem;
+        }
+        .post-action-buttons button, .post-action-buttons a {
+            background: none;
+            border: none;
+            color: #6B7280;
+            padding: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: color 0.2s, background-color 0.2s;
+            display: inline-flex;
+            align-items: center;
+            border-radius: 6px;
+            text-decoration: none;
+        }
+        .post-action-buttons button i, .post-action-buttons a i {
+            font-size: 1.125rem;
+            margin-right: 0.5rem;
+            color: #9CA3AF;
+        }
+        .post-action-buttons button:hover, .post-action-buttons a:hover {
+            background-color: #F3F4F6;
+            color: #0A66C2;
+        }
+        .post-action-buttons button:hover i, .post-action-buttons a:hover i {
+            color: #0A66C2;
+        }
+        /* Post Feed Item Card */
+        .post-card {
+            margin-bottom: 1rem;
+        }
+        .post-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            position: relative;
+        }
+        .post-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #0A66C2;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 0.75rem;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        .post-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .post-author-info a {
+            font-weight: 600;
+            color: #111827;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        .post-author-info a:hover {
+            text-decoration: underline;
+        }
+        .post-timestamp {
+            font-size: 0.75rem;
+            color: #6B7280;
+        }
+        .post-options-btn {
+            margin-left: auto;
+            color: #9CA3AF;
+            padding: 0.25rem 0.5rem;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        .post-options-btn:hover {
+            background-color: #F3F4F6;
+        }
+        .post-options-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: white;
+            border: 1px solid #E5E7EB;
+            border-radius: 6px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 10;
+            min-width: 120px;
+        }
+        .post-options-dropdown button {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+            color: #374151;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+        .post-options-dropdown button:hover {
+            background-color: #F3F4F6;
+        }
+        .search-result-item {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem;
+            border-bottom: 1px solid #E5E7EB;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .search-result-item:hover {
+            background-color: #F3F4F6;
+        }
+        .search-result-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #0A66C2;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 0.75rem;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        .search-result-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .search-result-info {
+            flex-grow: 1;
+        }
+        .search-result-info p {
+            font-size: 0.9rem;
+            color: #1F2937;
+        }
+        .search-result-info span {
+            font-size: 0.8rem;
+            color: #6B7280;
+        }
+        .follow-btn {
+            background-color: #0A66C2;
+            color: white;
+            border-radius: 6px;
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: background-color 0.2s;
+            border: none;
+            cursor: pointer;
+            margin-left: auto;
+        }
+        .follow-btn.following {
+            background-color: #E5E7EB;
+            color: #4B5563;
+        }
+        .follow-btn:hover {
+            background-color: #004182;
+        }
+        .follow-btn.following:hover {
+            background-color: #D1D5DB;
+        }
+        .post-content {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #1F2937;
+            margin-bottom: 1rem;
+            white-space: pre-wrap;
+        }
+        .post-content p {
+            margin-bottom: 0.75rem;
+        }
+        .post-image {
+            max-height: 450px;
+            border-radius: 8px;
+            margin: 0.75rem 0 1rem 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .post-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: contain;
+        }
+        .post-stats {
+            font-size: 0.8rem;
+            color: #6B7280;
+            padding-bottom: 0.5rem;
+            margin-bottom: 0.5rem;
+            border-bottom: 1px solid #E5E7EB;
+            display: flex;
+            gap: 1rem;
+        }
+        .post-footer {
+            display: flex;
+            justify-content: space-around;
+        }
+        .post-footer button {
+            background: none;
+            border: none;
+            color: #4B5563;
+            padding: 0.625rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            border-radius: 6px;
+            transition: background-color 0.2s, color 0.2s;
+            flex-grow: 1;
+            justify-content: center;
+        }
+        .post-footer button i {
+            font-size: 1.125rem;
+            margin-right: 0.5rem;
+        }
+        .post-footer button:hover {
+            background-color: #EFF6FF;
+            color: #0A66C2;
+        }
+        .post-footer button.liked, .post-footer button.loved {
+            color: #0A66C2;
+            font-weight: 700;
+        }
+        /* Comment Section Styles */
+        .comments-section {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #E5E7EB;
+        }
+        .comment {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+            position: relative;
+        }
+        .comment-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: #D1D5DB;
+            color: #4B5563;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        .comment-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+        .comment-content-wrapper {
+            background-color: #F3F4F6;
+            border-radius: 12px;
+            padding: 0.5rem 0.75rem;
+            flex-grow: 1;
+        }
+        .commenter-name {
+            font-weight: 600;
+            color: #111827;
+            margin-right: 0.5rem;
+        }
+        .comment-text {
+            color: #374151;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+        .comment-timestamp {
+            font-size: 0.7rem;
+            color: #9CA3AF;
+            margin-left: 0.5rem;
+        }
+        .comment-options-btn {
+            position: absolute;
+            top: 0;
+            right: 0;
+            color: #9CA3AF;
+            padding: 0.1rem 0.3rem;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+        .comment-options-btn:hover {
+            background-color: #E5E7EB;
+        }
+        .comment-options-dropdown {
+            position: absolute;
+            top: 1.5rem;
+            right: 0;
+            background-color: white;
+            border: 1px solid #E5E7EB;
+            border-radius: 6px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 10;
+            min-width: 100px;
+        }
+        .comment-options-dropdown button {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.8rem;
+            color: #374151;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+        .comment-options-dropdown button:hover {
+            background-color: #F3F4F6;
+        }
+        .add-comment-area {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .add-comment-area textarea {
+            flex-grow: 1;
+            border: 1px solid #D1D5DB;
+            border-radius: 6px;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+            resize: none;
+            min-height: 40px;
+            max-height: 100px;
+        }
+        .add-comment-area button {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.8rem;
+        }
+        .edit-comment-area textarea {
+            width: 100%;
+            border: 1px solid #0A66C2;
+            border-radius: 6px;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+            resize: vertical;
+        }
+        .edit-comment-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .edit-comment-actions button {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+        .edit-comment-actions .save-btn {
+            background-color: #0A66C2;
+            color: white;
+        }
+        .edit-comment-actions .cancel-btn {
+            background-color: #E5E7EB;
+            color: #4B5563;
+        }
+        /* Right Sidebar - Marketplace Highlights */
+        .right-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        .marketplace-card {
+            background-color: #FFFFFF;
+            border-radius: 8px;
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.08), 0 2px 3px rgba(0,0,0,0.06);
+            padding: 1.25rem;
+        }
+        .marketplace-card h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1D2026;
+            margin-bottom: 1rem;
+        }
+        .marketplace-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid #F3F4F6;
+        }
+        .marketplace-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .marketplace-item-img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-right: 0.75rem;
+            flex-shrink: 0;
+        }
+        .marketplace-item-info {
+            flex-grow: 1;
+        }
+        .marketplace-item-name {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #1D2026;
+        }
+        .marketplace-item-price {
+            font-size: 0.8rem;
+            color: #22C55E;
+            font-weight: 700;
+        }
+        /* Mobile Header */
+        .mobile-header {
+            display: none;
+            background-color: #FFFFFF;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 0 1rem;
+            height: 60px;
+            align-items: center;
+            justify-content: space-between;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+        }
+        @media (max-width: 768px) {
+            .sidebar-nova7 {
+                transform: translateX(-100%);
+                top: 0;
+                height: 100vh;
+            }
+            .sidebar-nova7.open {
+                transform: translateX(0);
+            }
+            .main-content-area {
+                margin-left: 0;
+                width: 100%;
+                padding-top: calc(60px + 1rem);
+            }
+            .desktop-header {
+                display: none;
+            }
+            .mobile-header {
+                display: flex;
+            }
+        }
+        /* Message Box Styles (for alerts) */
+        .message-box {
+            position: fixed;
+            bottom: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .message-box.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        .message-box.success { background-color: #28a745; }
+        .message-box.error { background-color: #dc3545; }
+        .message-box.info { background-color: #17a2b8; }
+        /* Message FAB and Modal Styles */
+        .message-fab {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background-color: #0A66C2;
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            z-index: 50;
+            position: relative;
+        }
+        .message-fab:hover {
+            background-color: #004182;
+        }
+        .unread-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: #dc3545;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .message-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 60;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .message-modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        .message-modal-content {
+            background-color: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 900px;
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 8px 24px rgba(107, 157, 238, 0.3);
+            overflow: hidden;
+            margin: 0 auto;
+        }
+        .message-modal-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #E2E8F0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1a202c;
+        }
+        .message-modal-header button {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #718096;
+        }
+        .message-modal-body {
+            flex-grow: 1;
+            display: flex;
+            overflow: hidden;
+        }
+        .message-sidebar {
+            width: 300px;
+            border-right: 1px solid #E2E8F0;
+            display: flex;
+            flex-direction: column;
+            background-color: #F9FAFB;
+        }
+        .message-search-bar {
+            padding: 1rem;
+            border-bottom: 1px solid #E2E8F0;
+        }
+        .message-search-bar input {
+            width: 100%;
+            padding: 0.6rem 0.75rem;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+        }
+        .message-list {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 0.5rem 0;
+        }
+        .message-list-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .message-list-item:hover,
+        .message-list-item.active {
+            background-color: #E0F2FE;
+        }
+        .message-list-item img {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            margin-right: 0.75rem;
+            object-fit: cover;
+        }
+        .message-list-item-info strong {
+            display: block;
+            font-weight: 600;
+            color: #2a73c2;
+        }
+        .message-list-item-info span {
+            font-size: 0.85rem;
+            color: #718096;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 180px;
+        }
+        .chat-area {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+            overflow: hidden;
+        }
+        .chat-area-header {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: #238bd1;
+            border-bottom: 1px solid #E2E8F0;
+            padding-bottom: 0.75rem;
+        }
+        .chat-window {
+            flex-grow: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            padding-right: 0.5rem;
+        }
+        .chat-message {
+            max-width: 70%;
+            margin-bottom: 1rem;
+            display: flex;
+            padding: 0.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        .chat-message .chat-bubble {
+            padding: 0.75rem 1rem;
+            border-radius: 1.25rem;
+            line-height: 1.4;
+            word-wrap: break-word;
+            font-size: 0.95rem;
+        }
+        .chat-message.self {
+            align-self: flex-end;
+            justify-content: flex-end;
+        }
+        .chat-input-area {
+            display: flex;
+            margin-top: 1rem;
+            gap: 0.5rem;
+        }
+        .chat-input-area input {
+            flex-grow: 1;
+            padding: 0.75rem 1rem;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+        }
+        .chat-input-area button {
+            background-color: #0A66C2;
+            color: white;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .chat-input-area button:hover {
+            background-color: #1d6db7;
+        }
+        @media (max-width: 768px) {
+            .message-modal-content {
+                width: 100%;
+                height: 100%;
+                border-radius: 0;
+            }
+            .message-modal-body {
+                flex-direction: column;
+            }
+            .message-sidebar {
+                width: 100%;
+                height: 250px;
+                border-right: none;
+                border-bottom: 1px solid #E2E8F0;
+            }
+            .chat-area {
+                padding: 1rem;
+            }
+            .chat-message {
+                max-width: 90%;
+            }
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+    <div id="messageBox" class="message-box"></div>
+
+    <header class="mobile-header md:hidden">
+        <button id="hamburgerBtnMobile" class="p-2 text-gray-700 hover:text-blue-600">
+            <i class="fas fa-bars text-2xl"></i>
+        </button>
+        <a href="dashboard.html">
+            <img src="nova-logo.png" alt="nova7 Logo" class="nova7-logo-header"
+                onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+            <span style="display:none;" class="text-xl font-semibold text-gray-700">nova7</span>
+        </a>
+        <a href="#" id="mobileLogoutLink" class="p-2 text-gray-700 hover:text-blue-600">
+            <i class="fas fa-sign-out-alt text-xl"></i>
+        </a>
+    </header>
+
+    <aside id="sidebar" class="sidebar-nova7">
+        <div class="sidebar-header">
+            <a href="dashboard.html" class="flex items-center">
+                <img src="nova-logo.png" alt="nova7 Logo" class="sidebar-logo-img"
+                    onerror="this.style.display='none';">
+            </a>
+        </div>
+        <nav class="flex-grow">
+            <a href="dashboard.html" class="nav-link-sidebar">
+                <i class="fas fa-tachometer-alt"></i>Tableau de bord
+            </a>
+            <a href="view-transactions.html" class="nav-link-sidebar">
+                <i class="fas fa-exchange-alt"></i>Transactions
+            </a>
+            <a href="reports.html" class="nav-link-sidebar">
+                <i class="fas fa-chart-pie"></i>Rapports
+            </a>
+            <a href="community.html" class="nav-link-sidebar active">
+                <i class="fas fa-users"></i>Communauté
+            </a>
+            <a href="chatbot.html" class="nav-link-sidebar">
+                <i class="fas fa-comments-dollar"></i>Conseiller virtuel
+            </a>
+            <a href="resources.html" class="nav-link-sidebar">
+                <i class="fas fa-book-open"></i>Resources
+            </a>
+            <a href="settings.html" class="nav-link-sidebar">
+                <i class="fas fa-cog"></i>Paramètres
+            </a>
+            <a href="wallet.html" class="nav-link-sidebar">
+                <i class="fas fa-wallet"></i>Portefeuille
+            </a>
+        </nav>
+        <div class="pb-4">
+            <a href="profile.html" class="nav-link-sidebar">
+                <i class="fas fa-user-circle"></i>Profil
+            </a>
+            <a href="#" id="sidebarLogoutLink" class="nav-link-sidebar">
+                <i class="fas fa-sign-out-alt"></i>Déconnexion
+            </a>
+        </div>
+    </aside>
+
+    <main class="main-content-area">
+        <header class="desktop-header hidden md:flex items-center justify-between mb-6">
+            <div></div>
+            <div class="flex items-center space-x-3">
+                <span id="desktopUserWelcome" class="text-sm text-gray-700">Welcome, User!</span>
+            </div>
+        </header>
+        <div class="community-layout">
+            <div>
+                <div class="card-base mb-4 relative">
+                    <input type="text" id="searchBar" placeholder="Search posts or users..." class="w-full border border-gray-300 rounded-full p-3 text-sm focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-200 transition-all duration-300 bg-white shadow-sm">
+                    <button id="clearSearchBtn" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none hidden">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div id="searchResults" class="mt-4 bg-white rounded-lg shadow-lg p-4 max-h-96 overflow-y-auto transition-all duration-300 opacity-0 invisible"></div>
+                <div class="card-base create-post-card">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Créer une nouvelle publication</h2>
+                    <div class="create-post-input-area">
+                        <div class="create-post-avatar" id="createPostAvatar">U</div>
+                        <textarea id="postContent" placeholder="Partagez votre message de soutien ou une demande d'aide..." rows="3"></textarea>
+                    </div>
+                    <div id="mediaPreviewContainer" class="hidden mb-3">
+                        <img id="imagePreview" src="#" alt="Aperçu de l'image" class="w-full h-auto rounded-lg max-h-64 object-contain hidden">
+                        <video id="videoPreview" controls autoplay muted playsinline class="w-full h-auto rounded-lg max-h-64 hidden">
+                            <source src="#" type="video/mp4">
+                            Votre navigateur ne prend pas en charge la balise vidéo.
+                        </video>
+                        <button id="removeMediaBtn" class="text-red-500 text-sm mt-2">Supprimer le média</button>
+                    </div>
+                    <div class="post-actions">
+                        <div class="post-action-buttons flex space-x-2">
+                            <input type="file" id="postMediaUpload" accept="image/*,video/mp4,video/webm" class="hidden">
+                            <button id="uploadMediaBtn" class="flex items-center text-blue-600 hover:text-blue-800 transition-colors duration-200">
+                                <i class="fas fa-image mr-1"></i>Média
+                            </button>
+                        </div>
+                        <button id="submitPostBtn" class="btn-primary-action">
+                            <i class="fas fa-paper-plane"></i>Publier
+                        </button>
+                    </div>
+                </div>
+                <div id="postFeed">
+                    <p class="text-gray-500 text-center py-4" id="loadingPostsMessage">Chargement des publications...</p>
+                </div>
+            </div>
+            <div class="right-sidebar">
+                <div class="marketplace-card">
+                    <h3>Points forts du marché</h3>
+                    <div id="marketplaceHighlights">
+                        <p class="text-xs text-gray-500">Chargement des articles du marché...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Message Floating Action Button and Modal -->
+        <button id="messageFab" class="message-fab">
+            <i class="fas fa-comment"></i>
+            <span id="unreadBadge" class="unread-badge hidden">0</span>
+        </button>
+        <div id="messageModalOverlay" class="message-modal-overlay">
+            <div class="message-modal-content">
+                <div class="message-modal-header">
+                    Messages
+                    <button id="closeMessageModalButton">&times;</button>
+                </div>
+                <div class="message-modal-body">
+                    <div class="message-sidebar">
+                        <div class="message-search-bar">
+                            <input type="text" id="chatUserSearch" placeholder="Rechercher des utilisateurs ou des discussions...">
+                        </div>
+                        <div id="chatUserList" class="message-list"></div>
+                    </div>
+                    <div class="chat-area">
+                        <div class="chat-area-header" id="activeChatHeader">Sélectionner une discussion</div>
+                        <div id="chatWindow" class="chat-window"></div>
+                        <div class="chat-input-area">
+                            <input type="text" id="chatInput" placeholder="Écrire un message...">
+                            <button id="sendChatMessageButton" class="btn-primary-action">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// Supabase client initialization
+const SUPABASE_URL = 'https://nvxqorudztbpwyanakdj.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52eHFvcnVkenRicHd5YW5ha2RqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIzOTk5NTQsImV4cCI6MjA2Nzk3NTk1NH0.XvITDAnpEkjQTh4SCVOfwGKsaANS6tp58Up37SXwYRw';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const LOVE_AMOUNT = 1.00; // $1 per love
+let currentUser = null;
+let currentBalance = 0;
+let activeChatSessionId = null;
+
+// Function to send email notification (client-side placeholder, assumes backend endpoint)
+async function sendEmailNotification(recipientId, senderName, messageContent) {
+    try {
+        const { data: recipient } = await supabase
+            .from('users')
+            .select('email')
+            .eq('id', recipientId)
+            .single();
+        if (!recipient?.email) {
+            console.error('Recipient email not found.');
+            return;
+        }
+        // Assuming a backend endpoint '/send-email' exists
+        const response = await fetch('/send-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                to: recipient.email,
+                subject: `New Message from ${senderName}`,
+                body: `You have received a new message: "${messageContent.substring(0, 50)}..." Log in to view the full message.`
+            })
+        });
+        if (!response.ok) throw new Error('Failed to send email');
+        console.log('Email notification sent to:', recipient.email);
+    } catch (error) {
+        console.error('Error sending email notification:', error.message);
+    }
+}
+
+// Function to update unread message count on FAB
+async function updateUnreadMessageCount() {
+    try {
+        const { data: chats, error: chatError } = await supabase
+            .from('chats_users')
+            .select('chat_id')
+            .eq('user_id', currentUser.id);
+        if (chatError) throw chatError;
+        const chatIds = chats.map(c => c.chat_id);
+        if (chatIds.length === 0) {
+            document.getElementById('unreadBadge').classList.add('hidden');
+            return;
+        }
+        const { data: unreadMessages, error } = await supabase
+            .from('messages')
+            .select('id')
+            .in('chat_id', chatIds)
+            .eq('read', false)
+            .neq('sender_id', currentUser.id);
+        if (error) throw error;
+        const unreadCount = unreadMessages.length;
+        const unreadBadge = document.getElementById('unreadBadge');
+        if (unreadCount > 0) {
+            unreadBadge.textContent = unreadCount;
+            unreadBadge.classList.remove('hidden');
+        } else {
+            unreadBadge.classList.add('hidden');
+        }
+    } catch (error) {
+        console.error('Error updating unread message count:', error.message);
+    }
+}
+
+// Like, Love, and Comment functions
+async function likePost(postId, button) {
+    try {
+        const { data: existingLike } = await supabase
+            .from('likes')
+            .select('id')
+            .eq('post_id', postId)
+            .eq('user_id', currentUser.id)
+            .maybeSingle();
+        
+        if (existingLike) {
+            await supabase.from('likes').delete().eq('id', existingLike.id);
+            button.classList.remove('liked');
+            button.style.color = '#4B5563';
+        } else {
+            await supabase.from('likes').insert([{ post_id: postId, user_id: currentUser.id }]);
+            button.classList.add('liked');
+            button.style.color = '#0A66C2';
+        }
+        // Fetch updated counts
+        const { data: post } = await supabase
+            .from('posts')
+            .select('likes_count, loves_count, comments_count')
+            .eq('id', postId)
+            .single();
+        document.getElementById(`likesCount-${postId}`).textContent = post.likes_count || 0;
+        document.getElementById(`lovesCount-${postId}`).textContent = post.loves_count || 0;
+        document.getElementById(`commentsCount-${postId}`).textContent = post.comments_count || 0;
+    } catch (error) {
+        console.error('Error liking post:', error.message);
+        showMessage('Failed to like post.', 'error');
+    }
+}
+
+async function lovePost(postId, button, recipientId) {
+    if (currentBalance < LOVE_AMOUNT) {
+        showMessage('Insufficient balance to love post.', 'error');
+        return;
+    }
+    try {
+        await supabase.from('transactions').insert([{
+            user_id: currentUser.id,
+            recipient_id: recipientId,
+            amount: -LOVE_AMOUNT,
+            type: 'love',
+            status: 'completed',
+            description: postId,
+            created_at: new Date().toISOString()
+        }]);
+        button.classList.add('loved');
+        button.style.color = '#0A66C2';
+        currentBalance -= LOVE_AMOUNT;
+        showMessage('Love sent successfully!', 'success');
+        await fetchUserBalance();
+        // Fetch updated counts
+        const { data: post } = await supabase
+            .from('posts')
+            .select('likes_count, loves_count, comments_count')
+            .eq('id', postId)
+            .single();
+        document.getElementById(`likesCount-${postId}`).textContent = post.likes_count || 0;
+        document.getElementById(`lovesCount-${postId}`).textContent = post.loves_count || 0;
+        document.getElementById(`commentsCount-${postId}`).textContent = post.comments_count || 0;
+    } catch (error) {
+        console.error('Error loving post:', error.message);
+        showMessage('Failed to love post.', 'error');
+    }
+}
+
+async function addComment(postId, textarea) {
+    const content = textarea.value.trim();
+    if (!content) {
+        showMessage('Comment cannot be empty.', 'error');
+        return;
+    }
+    try {
+        await supabase.from('comments').insert([{
+            post_id: postId,
+            user_id: currentUser.id,
+            content,
+            created_at: new Date().toISOString()
+        }]);
+        textarea.value = '';
+        await fetchComments(postId);
+        // Fetch updated counts
+        const { data: post } = await supabase
+            .from('posts')
+            .select('likes_count, loves_count, comments_count')
+            .eq('id', postId)
+            .single();
+        document.getElementById(`likesCount-${postId}`).textContent = post.likes_count || 0;
+        document.getElementById(`lovesCount-${postId}`).textContent = post.loves_count || 0;
+        document.getElementById(`commentsCount-${postId}`).textContent = post.comments_count || 0;
+        showMessage('Comment added successfully!', 'success');
+    } catch (error) {
+        console.error('Error adding comment:', error.message);
+        showMessage('Failed to add comment.', 'error');
+    }
+}
+
+// Real-time subscriptions
+function subscribeToPosts() {
+    supabase
+        .channel('posts-channel')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'posts' }, async (payload) => {
+            if (payload.eventType === 'UPDATE' || payload.eventType === 'INSERT') {
+                const postId = payload.new.id;
+                const { likes_count, loves_count, comments_count } = payload.new;
+                const likesCountElement = document.getElementById(`likesCount-${postId}`);
+                const lovesCountElement = document.getElementById(`lovesCount-${postId}`);
+                const commentsCountElement = document.getElementById(`commentsCount-${postId}`);
+                if (likesCountElement) likesCountElement.textContent = likes_count || 0;
+                if (lovesCountElement) lovesCountElement.textContent = loves_count || 0;
+                if (commentsCountElement) commentsCountElement.textContent = comments_count || 0;
+            }
+            if (payload.eventType === 'INSERT') {
+                await fetchPosts();
+            }
+        })
+        .subscribe();
+}
+
+function subscribeToLikes() {
+    supabase
+        .channel('likes-channel')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'likes' }, async (payload) => {
+            const postId = payload.new?.post_id || payload.old?.post_id;
+            const { data: post } = await supabase
+                .from('posts')
+                .select('likes_count, loves_count, comments_count')
+                .eq('id', postId)
+                .single();
+            document.getElementById(`likesCount-${postId}`).textContent = post.likes_count || 0;
+            document.getElementById(`lovesCount-${postId}`).textContent = post.loves_count || 0;
+            document.getElementById(`commentsCount-${postId}`).textContent = post.comments_count || 0;
+            if (payload.eventType === 'INSERT' && payload.new.user_id === currentUser.id) {
+                const likeButton = document.querySelector(`.like-btn[data-post-id="${postId}"]`);
+                if (likeButton) {
+                    likeButton.classList.add('liked');
+                    likeButton.style.color = '#0A66C2';
+                }
+            } else if (payload.eventType === 'DELETE' && payload.old.user_id === currentUser.id) {
+                const likeButton = document.querySelector(`.like-btn[data-post-id="${postId}"]`);
+                if (likeButton) {
+                    likeButton.classList.remove('liked');
+                    likeButton.style.color = '#4B5563';
+                }
+            }
+        })
+        .subscribe();
+}
+
+function subscribeToComments() {
+    supabase
+        .channel('comments-channel')
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'comments' }, async (payload) => {
+            const postId = payload.new.post_id;
+            const commentsSection = document.getElementById(`commentsSection-${postId}`);
+            if (commentsSection && !commentsSection.classList.contains('hidden')) {
+                await fetchComments(postId);
+            }
+            const { data: post } = await supabase
+                .from('posts')
+                .select('likes_count, loves_count, comments_count')
+                .eq('id', postId)
+                .single();
+            document.getElementById(`likesCount-${postId}`).textContent = post.likes_count || 0;
+            document.getElementById(`lovesCount-${postId}`).textContent = post.loves_count || 0;
+            document.getElementById(`commentsCount-${postId}`).textContent = post.comments_count || 0;
+        })
+        .subscribe();
+}
+
+function subscribeToMessages() {
+    supabase
+        .channel('messages-channel')
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, async (payload) => {
+            if (payload.new.chat_id === activeChatSessionId) {
+                await loadChatSession(payload.new.chat_id, document.getElementById('activeChatHeader').textContent);
+            }
+            await updateUnreadMessageCount();
+            // Send email notification to recipient
+            const { data: chatUsers } = await supabase
+                .from('chats_users')
+                .select('user_id')
+                .eq('chat_id', payload.new.chat_id)
+                .neq('user_id', currentUser.id)
+                .single();
+            if (chatUsers) {
+                await sendEmailNotification(chatUsers.user_id, currentUser.full_name || currentUser.email.split('@')[0], payload.new.content);
+            }
+        })
+        .subscribe();
+}
+
+// Chat functions
+async function populateChatUserList() {
+    const chatUserList = document.getElementById('chatUserList');
+    if (chatUserList) chatUserList.innerHTML = '<p class="text-center text-gray-500">Loading conversations...</p>';
+    try {
+        const { data: chatUsers, error } = await supabase
+            .from('chats_users')
+            .select(`
+                chat_id,
+                chats!chats_users_chat_id_fkey (
+                    id,
+                    title,
+                    created_at
+                ),
+                users!chats_users_user_id_fkey (
+                    id,
+                    full_name,
+                    avatar_url
+                )
+            `)
+            .eq('user_id', currentUser.id)
+            .order('created_at', { referencedTable: 'chats', ascending: false });
+        if (error) throw error;
+        if (!chatUsers || chatUsers.length === 0) {
+            if (chatUserList) chatUserList.innerHTML = '<p class="text-center text-gray-500">No conversations found.</p>';
+            return;
+        }
+        const chatIds = chatUsers.map(cu => cu.chat_id);
+        const { data: lastMessages, error: messagesError } = await supabase
+            .from('messages')
+            .select('chat_id, content, created_at, read')
+            .in('chat_id', chatIds)
+            .order('created_at', { ascending: false });
+        if (messagesError) throw messagesError;
+        const { data: unreadCounts, error: unreadError } = await supabase
+            .from('messages')
+            .select('chat_id, read')
+            .in('chat_id', chatIds)
+            .eq('read', false)
+            .neq('sender_id', currentUser.id);
+        if (unreadError) throw unreadError;
+        const unreadByChat = {};
+        unreadCounts.forEach(msg => {
+            unreadByChat[msg.chat_id] = (unreadByChat[msg.chat_id] || 0) + 1;
+        });
+        chatUserList.innerHTML = '';
+        const users = await Promise.all(chatUsers.map(async cu => {
+            const chat = cu.chats;
+            const otherUser = await getOtherChatUser(chat.id);
+            const lastMessage = lastMessages.find(lm => lm.chat_id === chat.id);
+            return {
+                id: chat.id,
+                name: otherUser?.full_name || chat.title || 'Chat',
+                avatar: otherUser?.avatar_url || 'https://placehold.co/50x50',
+                lastMessage: lastMessage ? lastMessage.content : 'No messages yet',
+                created_at: chat.created_at,
+                unreadCount: unreadByChat[chat.id] || 0
+            };
+        }));
+        users.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        users.forEach(user => {
+            const userItem = document.createElement('div');
+            userItem.className = `message-list-item ${activeChatSessionId === user.id ? 'active' : ''}`;
+            userItem.dataset.chatId = user.id;
+            userItem.innerHTML = `
+                <img src="${user.avatar}" alt="${user.name}">
+                <div class="message-list-item-info">
+                    <strong>${user.name}</strong>
+                    <span>${user.lastMessage}</span>
+                    ${user.unreadCount > 0 ? `<span class="unread-count">${user.unreadCount}</span>` : ''}
+                </div>
+            `;
+            userItem.addEventListener('click', async () => {
+                await supabase
+                    .from('messages')
+                    .update({ read: true })
+                    .eq('chat_id', user.id)
+                    .eq('read', false)
+                    .neq('sender_id', currentUser.id);
+                loadChatSession(user.id, user.name);
+                await updateUnreadMessageCount();
+            });
+            chatUserList.appendChild(userItem);
+        });
+        await updateUnreadMessageCount();
+    } catch (error) {
+        console.error('Error fetching chat users:', error.message);
+        chatUserList.innerHTML = '<p class="text-red-500 text-center text-sm">Failed to load conversations.</p>';
+    }
+}
+
+async function getOtherChatUser(chatId) {
+    try {
+        const { data: chatUsers, error } = await supabase
+            .from('chats_users')
+            .select(`
+                user_id,
+                users!chats_users_user_id_fkey (
+                    id,
+                    full_name,
+                    avatar_url
+                )
+            `)
+            .eq('chat_id', chatId)
+            .neq('user_id', currentUser.id)
+            .single();
+        if (error) throw error;
+        return chatUsers?.users || null;
+    } catch (error) {
+        console.error('Error fetching other chat user:', error.message);
+        return null;
+    }
+}
+
+async function searchUsersForChat(query) {
+    const chatUserList = document.getElementById('chatUserList');
+    chatUserList.innerHTML = '<p class="text-center text-gray-500">Searching users...</p>';
+    try {
+        if (!query.trim()) {
+            await populateChatUserList();
+            return;
+        }
+        const { data: users, error } = await supabase
+            .from('users')
+            .select('id, full_name, avatar_url')
+            .ilike('full_name', `%${query}%`)
+            .neq('id', currentUser.id)
+            .limit(10);
+        if (error) throw error;
+        if (!users || users.length === 0) {
+            chatUserList.innerHTML = '<p class="text-center text-gray-500">No users found.</p>';
+            return;
+        }
+        chatUserList.innerHTML = '';
+        users.forEach(user => {
+            const userItem = document.createElement('div');
+            userItem.className = 'message-list-item';
+            userItem.dataset.userId = user.id;
+            userItem.innerHTML = `
+                <img src="${user.avatar_url || 'https://placehold.co/50x50'}" alt="${user.full_name}">
+                <div class="message-list-item-info">
+                    <strong>${user.full_name}</strong>
+                    <span>Start a new chat</span>
+                </div>
+            `;
+            userItem.addEventListener('click', async () => {
+                const chatId = await startChatWithUser(user.id, user.full_name);
+                if (chatId) {
+                    loadChatSession(chatId, user.full_name);
+                    populateChatUserList();
+                }
+            });
+            chatUserList.appendChild(userItem);
+        });
+    } catch (error) {
+        console.error('Error searching users:', error.message);
+        chatUserList.innerHTML = '<p class="text-red-500 text-center text-sm">Failed to search users.</p>';
+    }
+}
+
+async function startChatWithUser(userId, userName) {
+    try {
+        const { data: userChats, error: userError } = await supabase
+            .from('chats_users')
+            .select('chat_id')
+            .eq('user_id', currentUser.id);
+        if (userError) throw userError;
+        const { data: targetChats, error: targetError } = await supabase
+            .from('chats_users')
+            .select('chat_id')
+            .eq('user_id', userId);
+        if (targetError) throw targetError;
+        const commonChat = userChats.find(uc => targetChats.some(tc => tc.chat_id === uc.chat_id));
+        if (commonChat) {
+            return commonChat.chat_id;
+        }
+        const { data: newChat, error: chatError } = await supabase
+            .from('chats')
+            .insert([{ chat_type: 'one-on-one', created_at: new Date().toISOString() }])
+            .select('id')
+            .single();
+        if (chatError) throw chatError;
+        const chatId = newChat.id;
+        const { error: usersError } = await supabase
+            .from('chats_users')
+            .insert([
+                { chat_id: chatId, user_id: currentUser.id, created_at: new Date().toISOString() },
+                { chat_id: chatId, user_id: userId, created_at: new Date().toISOString() }
+            ]);
+        if (usersError) throw usersError;
+        return chatId;
+    } catch (error) {
+        console.error('Error starting chat:', error.message);
+        showMessage('Failed to start chat.', 'error');
+        return null;
+    }
+}
+
+async function loadChatSession(chatId, userName) {
+    activeChatSessionId = chatId;
+    const chatWindow = document.getElementById('chatWindow');
+    const activeChatHeader = document.getElementById('activeChatHeader');
+    activeChatHeader.textContent = userName || 'Chat';
+    try {
+        const { data: messages, error } = await supabase
+            .from('messages')
+            .select(`
+                id,
+                content,
+                media_content,
+                media_type,
+                created_at,
+                sender_id,
+                edited,
+                read,
+                users!messages_sender_id_fkey (
+                    id,
+                    full_name,
+                    avatar_url
+                )
+            `)
+            .eq('chat_id', chatId)
+            .order('created_at', { ascending: true });
+        if (error) throw error;
+        chatWindow.innerHTML = '';
+        if (!messages || messages.length === 0) {
+            chatWindow.innerHTML = '<p class="text-center text-gray-500">No messages in this chat.</p>';
+            return;
+        }
+        messages.forEach(message => {
+            const messageElement = document.createElement('div');
+            const isSelf = message.sender_id === currentUser.id;
+            const formattedTime = timeDifference(new Date(), new Date(message.created_at));
+            messageElement.className = `chat-message ${isSelf ? 'self' : 'other'} mb-2 p-3 rounded-lg shadow-sm max-w-[70%]`;
+            let contentHtml = '';
+            if (message.media_type === 'audio' && message.media_content) {
+                contentHtml = `
+                    <audio controls class="w-full">
+                        <source src="data:audio/wav;base64,${message.media_content}" type="audio/wav">
+                        Your browser does not support the audio element.
+                    </audio>
+                    <div class="chat-timestamp text-xs text-gray-400 mt-1">
+                        ${formattedTime}
+                    </div>
+                `;
+            } else {
+                contentHtml = `
+                    <div class="chat-bubble">
+                        ${message.content || ''}
+                        <div class="chat-timestamp text-xs text-gray-400 mt-1">
+                            ${formattedTime}${message.edited ? ' (edited)' : ''}
+                        </div>
+                    </div>
+                `;
+            }
+            messageElement.innerHTML = contentHtml + (isSelf && (!message.media_type || message.media_type === 'text') ? `
+                <button class="edit-message-btn text-xs text-blue-500 mt-1" data-message-id="${message.id}" data-current-content="${message.content || ''}">
+                    Edit
+                </button>` : '');
+            if (isSelf && (!message.media_type || message.media_type === 'text')) {
+                const editButton = messageElement.querySelector('.edit-message-btn');
+                editButton.addEventListener('click', () => editChatMessage(message.id, message.content || '', messageElement));
+            }
+            chatWindow.appendChild(messageElement);
+        });
+        await supabase
+            .from('messages')
+            .update({ read: true })
+            .eq('chat_id', chatId)
+            .eq('read', false)
+            .neq('sender_id', currentUser.id);
+        document.querySelectorAll('.message-list-item').forEach(item => {
+            item.classList.remove('active');
+            if (item.dataset.chatId === chatId) {
+                item.classList.add('active');
+            }
+        });
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+        await updateUnreadMessageCount();
+    } catch (error) {
+        console.error('Error loading chat session:', error.message);
+        chatWindow.innerHTML = '<p class="text-red-500 text-center text-sm">Failed to load messages.</p>';
+    }
+}
+
+async function sendChatMessage() {
+    if (!activeChatSessionId) {
+        showMessage('Please select a chat to send a message.', 'error');
+        return;
+    }
+    const chatInput = document.getElementById('chatInput');
+    const messageContent = chatInput.value.trim();
+    if (!messageContent) {
+        showMessage('Message cannot be empty.', 'error');
+        return;
+    }
+    try {
+        const newMessage = {
+            chat_id: activeChatSessionId,
+            sender_id: currentUser.id,
+            content: messageContent,
+            media_type: 'text',
+            created_at: new Date().toISOString(),
+            edited: false,
+            read: false
+        };
+        const chatWindow = document.getElementById('chatWindow');
+        const messageElement = document.createElement('div');
+        messageElement.className = 'chat-message self mb-2 p-3 rounded-lg bg-blue-100 shadow-sm max-w-[70%]';
+        const formattedTime = timeDifference(new Date(), new Date(newMessage.created_at));
+        messageElement.innerHTML = `
+            <div class="chat-bubble">
+                ${newMessage.content}
+                <div class="chat-timestamp text-xs text-gray-500 mt-1">${formattedTime}</div>
+            </div>
+            <button class="edit-message-btn text-xs text-blue-500 mt-1" data-message-id="temp-${Date.now()}" data-current-content="${newMessage.content}">
+                Edit
+            </button>
+        `;
+        chatWindow.appendChild(messageElement);
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+        const { data, error } = await supabase
+            .from('messages')
+            .insert([newMessage])
+            .select()
+            .single();
+        if (error) throw error;
+        messageElement.querySelector('.edit-message-btn').dataset.messageId = data.id;
+        messageElement.querySelector('.edit-message-btn').addEventListener('click', () => editChatMessage(data.id, data.content, messageElement));
+        chatInput.value = '';
+        await updateUnreadMessageCount();
+    } catch (error) {
+        console.error('Error sending message:', error.message);
+        showMessage(`Failed to send message: ${error.message}`, 'error');
+        chatWindow.removeChild(messageElement);
+    }
+}
+
+async function editChatMessage(messageId, currentContent, messageElement) {
+    const chatBubble = messageElement.querySelector('.chat-bubble');
+    const originalHtml = chatBubble.innerHTML;
+    chatBubble.innerHTML = `
+        <textarea class="w-full border border-blue-500 rounded-md p-2 text-sm">${currentContent}</textarea>
+        <div class="flex justify-end gap-2 mt-2">
+            <button class="cancel-edit-btn text-xs text-gray-500">Cancel</button>
+            <button class="save-edit-btn text-xs text-blue-500">Save</button>
+        </div>
+    `;
+    const textarea = chatBubble.querySelector('textarea');
+    const saveBtn = chatBubble.querySelector('.save-edit-btn');
+    const cancelBtn = chatBubble.querySelector('.cancel-edit-btn');
+    textarea.focus();
+    saveBtn.addEventListener('click', async () => {
+        const newContent = textarea.value.trim();
+        if (!newContent) {
+            showMessage('Message cannot be empty.', 'error');
+            return;
+        }
+        try {
+            const { error } = await supabase
+                .from('messages')
+                .update({ content: newContent, edited: true })
+                .eq('id', messageId)
+                .eq('sender_id', currentUser.id);
+            if (error) throw error;
+            const formattedTime = timeDifference(new Date(), new Date());
+            chatBubble.innerHTML = `
+                ${newContent}
+                <div class="chat-timestamp text-xs text-gray-500 mt-1">${formattedTime} (edited)</div>
+            `;
+        } catch (error) {
+            console.error(`Error updating message ${messageId}:`, error.message);
+            showMessage(`Failed to update message: ${error.message}`, 'error');
+            chatBubble.innerHTML = originalHtml;
+        }
+    });
+    cancelBtn.addEventListener('click', () => {
+        chatBubble.innerHTML = originalHtml;
+    });
+}
+
+// DOMContentLoaded and event listeners
+document.addEventListener('DOMContentLoaded', async function() {
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    if (sessionError || !session) {
+        console.log("Community: No active session. Redirecting to login.");
+        showMessage('No active session. Please log in.', 'error');
+        window.location.href = 'login.html';
+        return;
+    }
+    currentUser = session.user;
+    console.log("Current user:", currentUser);
+    await fetchUserProfile();
+    const desktopUserWelcomeElement = document.getElementById('desktopUserWelcome');
+    if (desktopUserWelcomeElement && currentUser.full_name) {
+        desktopUserWelcomeElement.textContent = `Welcome, ${currentUser.full_name}!`;
+    } else if (desktopUserWelcomeElement && currentUser.email) {
+        desktopUserWelcomeElement.textContent = `Welcome, ${currentUser.email.split('@')[0]}!`;
+    }
+    const createPostAvatar = document.getElementById('createPostAvatar');
+    if (createPostAvatar) {
+        if (currentUser.full_name) {
+            createPostAvatar.textContent = currentUser.full_name.charAt(0).toUpperCase();
+        } else if (currentUser.email) {
+            createPostAvatar.textContent = currentUser.email.charAt(0).toUpperCase();
+        }
+        if (currentUser.avatar_url) {
+            createPostAvatar.innerHTML = `<img src="${currentUser.avatar_url}" alt="Profile" class="w-full h-full rounded-full object-cover">`;
+        } else {
+            createPostAvatar.innerHTML = `<span>${createPostAvatar.textContent}</span>`;
+        }
+    }
+    await fetchUserBalance();
+    await fetchPosts();
+    await fetchMarketplaceHighlights();
+    await populateChatUserList();
+    subscribeToPosts();
+    subscribeToLikes();
+    subscribeToComments();
+    subscribeToMessages();
+    document.getElementById('submitPostBtn').addEventListener('click', createPost);
+    document.getElementById('uploadMediaBtn').addEventListener('click', () => document.getElementById('postMediaUpload').click());
+    document.getElementById('postMediaUpload').addEventListener('change', previewMedia);
+    document.getElementById('removeMediaBtn').addEventListener('click', removeMedia);
+    const sidebarLogoutLink = document.getElementById('sidebarLogoutLink');
+    if (sidebarLogoutLink) sidebarLogoutLink.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); });
+    const mobileLogoutLink = document.getElementById('mobileLogoutLink');
+    if (mobileLogoutLink) mobileLogoutLink.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); });
+    const hamburgerBtnMobile = document.getElementById('hamburgerBtnMobile');
+    const sidebar = document.getElementById('sidebar');
+    if (hamburgerBtnMobile && sidebar) {
+        hamburgerBtnMobile.addEventListener('click', (e) => { e.stopPropagation(); sidebar.classList.toggle('open'); });
+    }
+    document.addEventListener('click', (e) => {
+        if (sidebar && sidebar.classList.contains('open') && !sidebar.contains(e.target) && (!hamburgerBtnMobile || !hamburgerBtnMobile.contains(e.target))) {
+            sidebar.classList.remove('open');
+        }
+        document.querySelectorAll('.post-options-dropdown:not(.hidden), .comment-options-dropdown:not(.hidden)').forEach(dropdown => {
+            if (!dropdown.contains(e.target) && !e.target.closest('.post-options-btn') && !e.target.closest('.comment-options-btn')) {
+                dropdown.classList.add('hidden');
+            }
+        });
+    });
+    document.getElementById('searchBar')?.addEventListener('input', (e) => searchContent(e.target.value));
+    document.getElementById('messageFab')?.addEventListener('click', () => {
+        document.getElementById('messageModalOverlay').classList.add('show');
+        document.getElementById('chatUserSearch').focus();
+    });
+    document.getElementById('closeMessageModalButton')?.addEventListener('click', () => {
+        document.getElementById('messageModalOverlay').classList.remove('show');
+    });
+    document.getElementById('chatUserSearch')?.addEventListener('input', (e) => searchUsersForChat(e.target.value));
+    document.getElementById('sendChatMessageButton')?.addEventListener('click', sendChatMessage);
+    document.getElementById('chatInput')?.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendChatMessage();
+    });
+});
+
+async function searchContent(query) {
+    const searchResultsDiv = document.getElementById('searchResults');
+    searchResultsDiv.innerHTML = '<p class="text-gray-500 text-center py-2">Recherche en cours...</p>';
+    try {
+        if (!query.trim()) {
+            searchResultsDiv.innerHTML = '';
+            await fetchPosts();
+            return;
+        }
+        const { data: posts, error: postError } = await supabase
+            .from('posts')
+            .select(`
+                id,
+                content,
+                media_url,
+                media_type,
+                created_at,
+                likes_count,
+                loves_count,
+                comments_count,
+                users (
+                    id,
+                    full_name,
+                    avatar_url,
+                    email
+                )
+            `)
+            .ilike('content', `%${query}%`)
+            .order('created_at', { ascending: false })
+            .limit(10);
+        if (postError) throw postError;
+        const { data: users, error: userError } = await supabase
+            .from('users')
+            .select('id, full_name, avatar_url, email')
+            .ilike('full_name', `%${query}%`)
+            .neq('id', currentUser.id)
+            .limit(10);
+        if (userError) throw userError;
+        searchResultsDiv.innerHTML = '';
+        if (posts.length === 0 && users.length === 0) {
+            searchResultsDiv.innerHTML = '<p class="text-gray-500 text-center py-2">Aucun résultat trouvé.</p>';
+            searchResultsDiv.classList.add('opacity-0', 'invisible');
+            return;
+        }
+        searchResultsDiv.classList.remove('opacity-0', 'invisible');
+        searchResultsDiv.classList.add('opacity-100', 'visible');
+
+        // Afficher les résultats de recherche des utilisateurs
+        if (users.length > 0) {
+            const userSection = document.createElement('div');
+            userSection.innerHTML = '<h3 class="text-sm font-semibold text-gray-700 mb-2">Utilisateurs</h3>';
+            users.forEach(user => {
+                const userItem = document.createElement('div');
+                userItem.className = 'search-result-item';
+                userItem.innerHTML = `
+                    <div class="search-result-avatar">
+                        ${user.avatar_url ? `<img src="${user.avatar_url}" alt="${user.full_name}">` : user.full_name.charAt(0).toUpperCase()}
+                    </div>
+                    <div class="search-result-info">
+                        <p>${user.full_name}</p>
+                        <span>${user.email}</span>
+                    </div>
+                    <button class="follow-btn" data-user-id="${user.id}">
+                        Suivre
+                    </button>
+                `;
+                userItem.querySelector('.follow-btn').addEventListener('click', async () => {
+                    await toggleFollow(user.id, userItem.querySelector('.follow-btn'));
+                });
+                userSection.appendChild(userItem);
+            });
+            searchResultsDiv.appendChild(userSection);
+        }
+
+        // Afficher les résultats de recherche des publications
+        if (posts.length > 0) {
+            const postSection = document.createElement('div');
+            postSection.innerHTML = '<h3 class="text-sm font-semibold text-gray-700 mb-2 mt-4">Publications</h3>';
+            posts.forEach(post => {
+                const postItem = document.createElement('div');
+                postItem.className = 'search-result-item post-search-result';
+                postItem.innerHTML = `
+                    <div class="search-result-avatar">
+                        ${post.users.avatar_url ? `<img src="${post.users.avatar_url}" alt="${post.users.full_name}">` : post.users.full_name.charAt(0).toUpperCase()}
+                    </div>
+                    <div class="search-result-info">
+                        <p>${post.users.full_name}</p>
+                        <span>${post.content.substring(0, 50)}${post.content.length > 50 ? '...' : ''}</span>
+                    </div>
+                `;
+                postItem.addEventListener('click', () => {
+                    document.getElementById('searchBar').value = '';
+                    searchResultsDiv.innerHTML = '';
+                    searchResultsDiv.classList.add('opacity-0', 'invisible');
+                    scrollToPost(post.id);
+                });
+                postSection.appendChild(postItem);
+            });
+            searchResultsDiv.appendChild(postSection);
+        }
+    } catch (error) {
+        console.error('Erreur lors de la recherche de contenu :', error.message);
+        searchResultsDiv.innerHTML = '<p class="text-red-500 text-center py-2">Échec de la recherche.</p>';
+        searchResultsDiv.classList.remove('opacity-0', 'invisible');
+        searchResultsDiv.classList.add('opacity-100', 'visible');
+    }
+}
+
+async function scrollToPost(postId) {
+    const postElement = document.getElementById(`post-${postId}`);
+    if (postElement) {
+        postElement.scrollIntoView({ behavior: 'smooth' });
+        postElement.classList.add('highlight');
+        setTimeout(() => postElement.classList.remove('highlight'), 2000);
+    } else {
+        await fetchPosts(postId);
+    }
+}
+
+async function toggleFollow(userId, button) {
+    try {
+        const { data: existingFollow } = await supabase
+            .from('follows')
+            .select('id')
+            .eq('follower_id', currentUser.id)
+            .eq('followed_id', userId)
+            .maybeSingle();
+        
+        if (existingFollow) {
+            await supabase.from('follows').delete().eq('id', existingFollow.id);
+            button.textContent = 'Suivre';
+            button.classList.remove('following');
+        } else {
+            await supabase.from('follows').insert([{ follower_id: currentUser.id, followed_id: userId }]);
+            button.textContent = 'Abonné';
+            button.classList.add('following');
+        }
+    } catch (error) {
+        console.error('Erreur lors du suivi/désabonnement :', error.message);
+        showMessage('Échec de la mise à jour du statut de suivi.', 'error');
+    }
+}
+
+async function fetchUserProfile() {
+    try {
+        const { data, error } = await supabase
+            .from('users')
+            .select('id, full_name, avatar_url, email')
+            .eq('id', currentUser.id)
+            .single();
+        if (error) throw error;
+        currentUser = { ...currentUser, ...data };
+        const createPostAvatar = document.getElementById('createPostAvatar');
+        if (createPostAvatar) {
+            createPostAvatar.innerHTML = currentUser.avatar_url 
+                ? `<img src="${currentUser.avatar_url}" alt="Profil" class="w-full h-full rounded-full object-cover">`
+                : `<span>${currentUser.full_name?.charAt(0).toUpperCase() || currentUser.email.charAt(0).toUpperCase()}</span>`;
+        }
+    } catch (error) {
+        console.error('Erreur lors de la récupération du profil utilisateur :', error.message);
+        showMessage('Échec du chargement du profil utilisateur.', 'error');
+    }
+}
+
+async function fetchUserBalance() {
+    try {
+        const { data: transactions, error } = await supabase
+            .from('transactions')
+            .select('amount')
+            .eq('user_id', currentUser.id)
+            .eq('status', 'completed');
+        if (error) throw error;
+        currentBalance = transactions.reduce((sum, t) => sum + t.amount, 0);
+    } catch (error) {
+        console.error('Erreur lors de la récupération du solde :', error.message);
+        showMessage('Échec du chargement du solde.', 'error');
+    }
+}
+
+async function createPost() {
+    const content = document.getElementById('postContent').value.trim();
+    const mediaFile = document.getElementById('postMediaUpload').files[0];
+    let mediaUrl = null;
+    let mediaType = null;
+
+    if (!content && !mediaFile) {
+        showMessage('Le contenu ou le média de la publication est requis.', 'error');
+        return;
+    }
+
+    try {
+        if (mediaFile) {
+            const fileExt = mediaFile.name.split('.').pop().toLowerCase();
+            mediaType = mediaFile.type.startsWith('video') ? 'video' : 'image';
+            const fileName = `${currentUser.id}/${Date.now()}.${fileExt}`;
+            const { error: uploadError } = await supabase.storage
+                .from('post-media')
+                .upload(fileName, mediaFile);
+            if (uploadError) throw uploadError;
+            const { data } = supabase.storage.from('post-media').getPublicUrl(fileName);
+            mediaUrl = data.publicUrl;
+        }
+
+        const { error } = await supabase.from('posts').insert([{
+            user_id: currentUser.id,
+            content,
+            media_url: mediaUrl,
+            media_type: mediaType,
+            created_at: new Date().toISOString(),
+            likes_count: 0,
+            loves_count: 0,
+            comments_count: 0
+        }]);
+        if (error) throw error;
+
+        document.getElementById('postContent').value = '';
+        document.getElementById('postMediaUpload').value = '';
+        document.getElementById('mediaPreviewContainer').classList.add('hidden');
+        document.getElementById('imagePreview').classList.add('hidden');
+        document.getElementById('videoPreview').classList.add('hidden');
+        showMessage('Publication créée avec succès !', 'success');
+        await fetchPosts();
+    } catch (error) {
+        console.error('Erreur lors de la création de la publication :', error.message);
+        showMessage('Échec de la création de la publication.', 'error');
+    }
+}
+
+async function fetchPosts(highlightPostId = null) {
+    const postFeed = document.getElementById('postFeed');
+    postFeed.innerHTML = '<p class="text-gray-500 text-center py-4">Chargement des publications...</p>';
+    try {
+        const { data: posts, error } = await supabase
+            .from('posts')
+            .select(`
+                id,
+                content,
+                media_url,
+                media_type,
+                created_at,
+                likes_count,
+                loves_count,
+                comments_count,
+                users (
+                    id,
+                    full_name,
+                    avatar_url,
+                    email
+                )
+            `)
+            .order('created_at', { ascending: false })
+            .limit(20);
+        if (error) throw error;
+
+        const { data: userLikes } = await supabase
+            .from('likes')
+            .select('post_id')
+            .eq('user_id', currentUser.id);
+        const likedPostIds = userLikes.map(like => like.post_id);
+
+        const { data: userLoves } = await supabase
+            .from('transactions')
+            .select('description')
+            .eq('user_id', currentUser.id)
+            .eq('type', 'love')
+            .eq('status', 'completed');
+        const lovedPostIds = userLoves.map(t => t.description);
+
+        postFeed.innerHTML = '';
+        if (posts.length === 0) {
+            postFeed.innerHTML = '<p class="text-gray-500 text-center py-4">Aucune publication trouvée.</p>';
+            return;
+        }
+
+        posts.forEach(post => {
+            const postElement = document.createElement('div');
+            postElement.id = `post-${post.id}`;
+            postElement.className = `card-base post-card ${highlightPostId === post.id ? 'highlight' : ''}`;
+            const formattedTime = timeDifference(new Date(), new Date(post.created_at));
+            const isOwnPost = post.users.id === currentUser.id;
+            postElement.innerHTML = `
+                <div class="post-header">
+                    <div class="post-avatar">
+                        ${post.users.avatar_url ? `<img src="${post.users.avatar_url}" alt="${post.users.full_name}">` : post.users.full_name.charAt(0).toUpperCase()}
+                    </div>
+                    <div class="post-author-info">
+                        <a href="#" class="post-author-link" data-user-id="${post.users.id}">${post.users.full_name}</a>
+                        <div class="post-timestamp">${formattedTime}</div>
+                    </div>
+                    ${isOwnPost ? `
+                    <button class="post-options-btn"><i class="fas fa-ellipsis-h"></i></button>
+                    <div class="post-options-dropdown hidden">
+                        <button class="delete-post-btn" data-post-id="${post.id}">Supprimer la publication</button>
+                    </div>
+                    ` : ''}
+                </div>
+                <div class="post-content">${post.content}</div>
+                ${post.media_url && post.media_type === 'image' ? `
+                    <div class="post-image">
+                        <img src="${post.media_url}" alt="Média de la publication">
+                    </div>
+                ` : ''}
+                ${post.media_url && post.media_type === 'video' ? `
+                    <div class="post-video">
+                        <video controls autoplay muted playsinline>
+                            <source src="${post.media_url}" type="video/mp4">
+                            Votre navigateur ne prend pas en charge la balise vidéo.
+                        </video>
+                    </div>
+                ` : ''}
+                <div class="post-stats">
+                    <span id="likesCount-${post.id}">${post.likes_count || 0}</span> J'aime
+                    <span id="lovesCount-${post.id}">${post.loves_count || 0}</span> Love
+                    <span id="commentsCount-${post.id}">${post.comments_count || 0}</span> Commentaires
+                </div>
+                <div class="post-footer">
+                    <button class="like-btn ${likedPostIds.includes(post.id) ? 'liked' : ''}" data-post-id="${post.id}" style="color: ${likedPostIds.includes(post.id) ? '#0A66C2' : '#4B5563'}">
+                        <i class="fas fa-thumbs-up"></i>J'aime
+                    </button>
+                    <button class="love-btn ${lovedPostIds.includes(post.id.toString()) ? 'loved' : ''}" data-post-id="${post.id}" data-user-id="${post.users.id}" style="color: ${lovedPostIds.includes(post.id.toString()) ? '#0A66C2' : '#4B5563'}">
+                        <i class="fas fa-heart"></i>Love
+                    </button>
+                    <button class="comment-btn" data-post-id="${post.id}">
+                        <i class="fas fa-comment"></i>Commenter
+                    </button>
+                    <a href="#" class="share-btn" data-post-id="${post.id}">
+                        <i class="fas fa-share"></i>Partager
+                    </a>
+                </div>
+                <div id="commentsSection-${post.id}" class="comments-section hidden">
+                    <div id="comments-${post.id}"></div>
+                    <div class="add-comment-area">
+                        <div class="comment-avatar">
+                            ${currentUser.avatar_url ? `<img src="${currentUser.avatar_url}" alt="Profil">` : (currentUser.full_name?.charAt(0).toUpperCase() || currentUser.email.charAt(0).toUpperCase())}
+                        </div>
+                        <textarea placeholder="Écrire un commentaire..." class="comment-textarea" data-post-id="${post.id}"></textarea>
+                        <button class="btn-primary-action add-comment-btn" data-post-id="${post.id}">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            postElement.querySelector('.like-btn')?.addEventListener('click', () => likePost(post.id, postElement.querySelector('.like-btn')));
+            postElement.querySelector('.love-btn')?.addEventListener('click', () => lovePost(post.id, postElement.querySelector('.love-btn'), post.users.id));
+            postElement.querySelector('.comment-btn')?.addEventListener('click', async () => {
+                const commentsSection = document.getElementById(`commentsSection-${post.id}`);
+                commentsSection.classList.toggle('hidden');
+                if (!commentsSection.classList.contains('hidden')) {
+                    await fetchComments(post.id);
+                }
+            });
+            postElement.querySelector('.add-comment-btn')?.addEventListener('click', () => addComment(post.id, postElement.querySelector('.comment-textarea')));
+            postElement.querySelector('.post-author-link')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                window.location.href = `profile.html?userId=${post.users.id}`;
+            });
+            postElement.querySelector('.share-btn')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                sharePost(post.id);
+            });
+            if (isOwnPost) {
+                postElement.querySelector('.post-options-btn')?.addEventListener('click', () => {
+                    const dropdown = postElement.querySelector('.post-options-dropdown');
+                    dropdown.classList.toggle('hidden');
+                });
+                postElement.querySelector('.delete-post-btn')?.addEventListener('click', () => deletePost(post.id));
+            }
+            postFeed.appendChild(postElement);
+            if (highlightPostId === post.id) {
+                setTimeout(() => postElement.classList.remove('highlight'), 2000);
+            }
+        });
+    } catch (error) {
+        console.error('Erreur lors de la récupération des publications :', error.message);
+        postFeed.innerHTML = '<p class="text-red-500 text-center py-4">Échec du chargement des publications.</p>';
+    }
+}
+
+async function fetchComments(postId) {
+    const commentsContainer = document.getElementById(`comments-${postId}`);
+    commentsContainer.innerHTML = '<p class="text-gray-500 text-sm">Chargement des commentaires...</p>';
+    try {
+        const { data: comments, error } = await supabase
+            .from('comments')
+            .select(`
+                id,
+                content,
+                created_at,
+                user_id,
+                users (
+                    full_name,
+                    avatar_url
+                )
+            `)
+            .eq('post_id', postId)
+            .order('created_at', { ascending: true });
+        if (error) throw error;
+        commentsContainer.innerHTML = '';
+        if (comments.length === 0) {
+            commentsContainer.innerHTML = '<p class="text-gray-500 text-sm">Aucun commentaire pour le moment.</p>';
+            return;
+        }
+        comments.forEach(comment => {
+            const commentElement = document.createElement('div');
+            commentElement.className = 'comment';
+            const formattedTime = timeDifference(new Date(), new Date(comment.created_at));
+            const isOwnComment = comment.user_id === currentUser.id;
+            commentElement.innerHTML = `
+                <div class="comment-avatar">
+                    ${comment.users.avatar_url ? `<img src="${comment.users.avatar_url}" alt="${comment.users.full_name}">` : comment.users.full_name.charAt(0).toUpperCase()}
+                </div>
+                <div class="comment-content-wrapper">
+                    <span class="commenter-name">${comment.users.full_name}</span>
+                    <span class="comment-timestamp">${formattedTime}</span>
+                    <p class="comment-text">${comment.content}</p>
+                    ${isOwnComment ? `
+                    <button class="comment-options-btn"><i class="fas fa-ellipsis-h"></i></button>
+                    <div class="comment-options-dropdown hidden">
+                        <button class="edit-comment-btn" data-comment-id="${comment.id}" data-content="${comment.content}">Modifier</button>
+                        <button class="delete-comment-btn" data-comment-id="${comment.id}">Supprimer</button>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+            if (isOwnComment) {
+                commentElement.querySelector('.comment-options-btn')?.addEventListener('click', () => {
+                    commentElement.querySelector('.comment-options-dropdown').classList.toggle('hidden');
+                });
+                commentElement.querySelector('.edit-comment-btn')?.addEventListener('click', () => editComment(comment.id, comment.content, commentElement));
+                commentElement.querySelector('.delete-comment-btn')?.addEventListener('click', () => deleteComment(comment.id, postId));
+            }
+            commentsContainer.appendChild(commentElement);
+        });
+    } catch (error) {
+        console.error('Erreur lors de la récupération des commentaires :', error.message);
+        commentsContainer.innerHTML = '<p class="text-red-500 text-sm">Échec du chargement des commentaires.</p>';
+    }
+}
+
+async function editComment(commentId, currentContent, commentElement) {
+    const contentWrapper = commentElement.querySelector('.comment-content-wrapper');
+    const originalHtml = contentWrapper.innerHTML;
+    contentWrapper.innerHTML = `
+        <div class="edit-comment-area">
+            <textarea class="edit-comment-textarea">${currentContent}</textarea>
+            <div class="edit-comment-actions">
+                <button class="cancel-btn">Annuler</button>
+                <button class="save-btn">Enregistrer</button>
+            </div>
+        </div>
+    `;
+    const textarea = contentWrapper.querySelector('.edit-comment-textarea');
+    textarea.focus();
+    contentWrapper.querySelector('.save-btn').addEventListener('click', async () => {
+        const newContent = textarea.value.trim();
+        if (!newContent) {
+            showMessage('Le commentaire ne peut pas être vide.', 'error');
+            return;
+        }
+        try {
+            await supabase
+                .from('comments')
+                .update({ content: newContent })
+                .eq('id', commentId)
+                .eq('user_id', currentUser.id);
+            await fetchComments(commentElement.closest('.comments-section').id.split('-')[1]);
+            showMessage('Commentaire modifié avec succès !', 'success');
+        } catch (error) {
+            console.error('Erreur lors de la modification du commentaire :', error.message);
+            showMessage('Échec de la modification du commentaire.', 'error');
+            contentWrapper.innerHTML = originalHtml;
+        }
+    });
+    contentWrapper.querySelector('.cancel-btn').addEventListener('click', () => {
+        contentWrapper.innerHTML = originalHtml;
+    });
+}
+
+async function deleteComment(commentId, postId) {
+    try {
+        await supabase
+            .from('comments')
+            .delete()
+            .eq('id', commentId)
+            .eq('user_id', currentUser.id);
+        await fetchComments(postId);
+        showMessage('Commentaire supprimé avec succès !', 'success');
+    } catch (error) {
+        console.error('Erreur lors de la suppression du commentaire :', error.message);
+        showMessage('Échec de la suppression du commentaire.', 'error');
+    }
+}
+
+async function deletePost(postId) {
+    try {
+        await supabase
+            .from('posts')
+            .delete()
+            .eq('id', postId)
+            .eq('user_id', currentUser.id);
+        document.getElementById(`post-${postId}`)?.remove();
+        showMessage('Publication supprimée avec succès !', 'success');
+    } catch (error) {
+        console.error('Erreur lors de la suppression de la publication :', error.message);
+        showMessage('Échec de la suppression de la publication.', 'error');
+    }
+}
+
+async function sharePost(postId) {
+    const shareUrl = `${window.location.origin}/community.html?postId=${postId}`;
+    try {
+        await navigator.clipboard.writeText(shareUrl);
+        showMessage('Lien de la publication copié dans le presse-papiers !', 'success');
+    } catch (error) {
+        console.error('Erreur lors du partage de la publication :', error.message);
+        showMessage('Échec du partage de la publication.', 'error');
+    }
+}
+
+async function fetchMarketplaceHighlights() {
+    const marketplaceHighlights = document.getElementById('marketplaceHighlights');
+    marketplaceHighlights.innerHTML = '<p class="text-xs text-gray-500">Chargement des articles du marché...</p>';
+    try {
+        const { data: items, error } = await supabase
+            .from('marketplace_items')
+            .select('id, title, price, image_url')
+            .order('created_at', { ascending: false })
+            .limit(3);
+        if (error) throw error;
+        marketplaceHighlights.innerHTML = '';
+        if (items.length === 0) {
+            marketplaceHighlights.innerHTML = '<p class="text-xs text-gray-500">Aucun article trouvé.</p>';
+            return;
+        }
+        items.forEach(item => {
+            const itemElement = document.createElement('div');
+            itemElement.className = 'marketplace-item';
+            itemElement.innerHTML = `
+                <img src="${item.image_url || 'https://placehold.co/50x50'}" alt="${item.title}" class="marketplace-item-img">
+                <div class="marketplace-item-info">
+                    <div class="marketplace-item-name">${item.title}</div>
+                    <div class="marketplace-item-price">$${item.price.toFixed(2)}</div>
+                </div>
+            `;
+            marketplaceHighlights.appendChild(itemElement);
+        });
+    } catch (error) {
+        console.error('Erreur lors de la récupération des articles du marché :', error.message);
+        marketplaceHighlights.innerHTML = '<p class="text-red-500 text-xs">Échec du chargement des articles.</p>';
+    }
+}
+
+function showMessage(message, type) {
+    const messageBox = document.getElementById('messageBox');
+    messageBox.textContent = message;
+    messageBox.className = `message-box show ${type}`;
+    setTimeout(() => {
+        messageBox.classList.remove('show');
+    }, 3000);
+}
+
+function timeDifference(current, previous) {
+    const msPerMinute = 60 * 1000;
+    const msPerHour = msPerMinute * 60;
+    const msPerDay = msPerHour * 24;
+    const msPerWeek = msPerDay * 7;
+    const elapsed = current - previous;
+
+    if (elapsed < msPerMinute) {
+        return Math.round(elapsed / 1000) + 's';
+    } else if (elapsed < msPerHour) {
+        return Math.round(elapsed / msPerMinute) + 'min';
+    } else if (elapsed < msPerDay) {
+        return Math.round(elapsed / msPerHour) + 'h';
+    } else if (elapsed < msPerWeek) {
+        return Math.round(elapsed / msPerDay) + 'j';
+    } else {
+        return previous.toLocaleDateString('fr-FR');
+    }
+}
+
+async function previewMedia(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const mediaPreviewContainer = document.getElementById('mediaPreviewContainer');
+    const imagePreview = document.getElementById('imagePreview');
+    const videoPreview = document.getElementById('videoPreview');
+    mediaPreviewContainer.classList.remove('hidden');
+    if (file.type.startsWith('image/')) {
+        imagePreview.src = URL.createObjectURL(file);
+        imagePreview.classList.remove('hidden');
+        videoPreview.classList.add('hidden');
+    } else if (file.type.startsWith('video/')) {
+        videoPreview.src = URL.createObjectURL(file);
+        videoPreview.classList.remove('hidden');
+        imagePreview.classList.add('hidden');
+    }
+}
+
+function removeMedia() {
+    document.getElementById('postMediaUpload').value = '';
+    document.getElementById('mediaPreviewContainer').classList.add('hidden');
+    document.getElementById('imagePreview').classList.add('hidden');
+    document.getElementById('videoPreview').classList.add('hidden');
+}
+
+async function handleLogout() {
+    try {
+        await supabase.auth.signOut();
+        window.location.href = 'login.html';
+    } catch (error) {
+        console.error('Erreur lors de la déconnexion :', error.message);
+        showMessage('Échec de la déconnexion.', 'error');
+    }
+}
+
+// Like, Love, and Comment functions
+async function likePost(postId, button) {
+    try {
+        const { data: existingLike } = await supabase
+            .from('likes')
+            .select('id')
+            .eq('post_id', postId)
+            .eq('user_id', currentUser.id)
+            .maybeSingle();
+        
+        if (existingLike) {
+            await supabase.from('likes').delete().eq('id', existingLike.id);
+            button.classList.remove('liked');
+            button.style.color = '#4B5563';
+        } else {
+            await supabase.from('likes').insert([{ post_id: postId, user_id: currentUser.id }]);
+            button.classList.add('liked');
+            button.style.color = '#0A66C2';
+        }
+        // Fetch updated counts
+        const { data: post } = await supabase
+            .from('posts')
+            .select('likes_count, loves_count, comments_count')
+            .eq('id', postId)
+            .single();
+        document.getElementById(`likesCount-${postId}`).textContent = post.likes_count || 0;
+        document.getElementById(`lovesCount-${postId}`).textContent = post.loves_count || 0;
+        document.getElementById(`commentsCount-${postId}`).textContent = post.comments_count || 0;
+    } catch (error) {
+        console.error('Erreur lors du like de la publication :', error.message);
+        showMessage('Échec du like de la publication.', 'error');
+    }
+}
+
+async function lovePost(postId, button, recipientId) {
+    if (currentBalance < LOVE_AMOUNT) {
+        showMessage('Solde insuffisant pour envoyer un love.', 'error');
+        return;
+    }
+    try {
+        await supabase.from('transactions').insert([{
+            user_id: currentUser.id,
+            recipient_id: recipientId,
+            amount: -LOVE_AMOUNT,
+            type: 'love',
+            status: 'completed',
+            description: postId,
+            created_at: new Date().toISOString()
+        }]);
+        button.classList.add('loved');
+        button.style.color = '#0A66C2';
+        currentBalance -= LOVE_AMOUNT;
+        showMessage('Love envoyé avec succès !', 'success');
+        await fetchUserBalance();
+        // Fetch updated counts
+        const { data: post } = await supabase
+            .from('posts')
+            .select('likes_count, loves_count, comments_count')
+            .eq('id', postId)
+            .single();
+        document.getElementById(`likesCount-${postId}`).textContent = post.likes_count || 0;
+        document.getElementById(`lovesCount-${postId}`).textContent = post.loves_count || 0;
+        document.getElementById(`commentsCount-${postId}`).textContent = post.comments_count || 0;
+    } catch (error) {
+        console.error('Erreur lors de l\'envoi du love :', error.message);
+        showMessage('Échec de l\'envoi du love.', 'error');
+    }
+}
+
+async function addComment(postId, textarea) {
+    const content = textarea.value.trim();
+    if (!content) {
+        showMessage('Le commentaire ne peut pas être vide.', 'error');
+        return;
+    }
+    try {
+        await supabase.from('comments').insert([{
+            post_id: postId,
+            user_id: currentUser.id,
+            content,
+            created_at: new Date().toISOString()
+        }]);
+        textarea.value = '';
+        await fetchComments(postId);
+        // Fetch updated counts
+        const { data: post } = await supabase
+            .from('posts')
+            .select('likes_count, loves_count, comments_count')
+            .eq('id', postId)
+            .single();
+        document.getElementById(`likesCount-${postId}`).textContent = post.likes_count || 0;
+        document.getElementById(`lovesCount-${postId}`).textContent = post.loves_count || 0;
+        document.getElementById(`commentsCount-${postId}`).textContent = post.comments_count || 0;
+        showMessage('Commentaire ajouté avec succès !', 'success');
+    } catch (error) {
+        console.error('Erreur lors de l\'ajout du commentaire :', error.message);
+        showMessage('Échec de l\'ajout du commentaire.', 'error');
+    }
+}
+
+// Real-time subscriptions
+function subscribeToPosts() {
+    supabase
+        .channel('posts-channel')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'posts' }, async (payload) => {
+            if (payload.eventType === 'UPDATE' || payload.eventType === 'INSERT') {
+                const postId = payload.new.id;
+                const { likes_count, loves_count, comments_count } = payload.new;
+                const likesCountElement = document.getElementById(`likesCount-${postId}`);
+                const lovesCountElement = document.getElementById(`lovesCount-${postId}`);
+                const commentsCountElement = document.getElementById(`commentsCount-${postId}`);
+                if (likesCountElement) likesCountElement.textContent = likes_count || 0;
+                if (lovesCountElement) lovesCountElement.textContent = loves_count || 0;
+                if (commentsCountElement) commentsCountElement.textContent = comments_count || 0;
+            }
+            if (payload.eventType === 'INSERT') {
+                await fetchPosts();
+            }
+            if (payload.eventType === 'DELETE') {
+                document.getElementById(`post-${payload.old.id}`)?.remove();
+            }
+        })
+        .subscribe();
+}
+
+function subscribeToLikes() {
+    supabase
+        .channel('likes-channel')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'likes' }, async (payload) => {
+            const postId = payload.new?.post_id || payload.old?.post_id;
+            const { data: post } = await supabase
+                .from('posts')
+                .select('likes_count, loves_count, comments_count')
+                .eq('id', postId)
+                .single();
+            document.getElementById(`likesCount-${postId}`).textContent = post.likes_count || 0;
+            document.getElementById(`lovesCount-${postId}`).textContent = post.loves_count || 0;
+            document.getElementById(`commentsCount-${postId}`).textContent = post.comments_count || 0;
+            if (payload.eventType === 'INSERT' && payload.new.user_id === currentUser.id) {
+                const likeButton = document.querySelector(`.like-btn[data-post-id="${postId}"]`);
+                if (likeButton) {
+                    likeButton.classList.add('liked');
+                    likeButton.style.color = '#0A66C2';
+                }
+            } else if (payload.eventType === 'DELETE' && payload.old.user_id === currentUser.id) {
+                const likeButton = document.querySelector(`.like-btn[data-post-id="${postId}"]`);
+                if (likeButton) {
+                    likeButton.classList.remove('liked');
+                    likeButton.style.color = '#4B5563';
+                }
+            }
+        })
+        .subscribe();
+}
+
+function subscribeToComments() {
+    supabase
+        .channel('comments-channel')
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'comments' }, async (payload) => {
+            const postId = payload.new.post_id;
+            const commentsSection = document.getElementById(`commentsSection-${postId}`);
+            if (commentsSection && !commentsSection.classList.contains('hidden')) {
+                await fetchComments(postId);
+            }
+            const { data: post } = await supabase
+                .from('posts')
+                .select('likes_count, loves_count, comments_count')
+                .eq('id', postId)
+                .single();
+            document.getElementById(`likesCount-${postId}`).textContent = post.likes_count || 0;
+            document.getElementById(`lovesCount-${postId}`).textContent = post.loves_count || 0;
+            document.getElementById(`commentsCount-${postId}`).textContent = post.comments_count || 0;
+        })
+        .subscribe();
+}
+
+function subscribeToMessages() {
+    supabase
+        .channel('messages-channel')
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, async (payload) => {
+            if (payload.new.chat_id === activeChatSessionId) {
+                await loadChatSession(payload.new.chat_id, document.getElementById('activeChatHeader').textContent);
+            }
+            await updateUnreadMessageCount();
+            // Send email notification to recipient
+            const { data: chatUsers } = await supabase
+                .from('chats_users')
+                .select('user_id')
+                .eq('chat_id', payload.new.chat_id)
+                .neq('user_id', currentUser.id)
+                .single();
+            if (chatUsers) {
+                await sendEmailNotification(chatUsers.user_id, currentUser.full_name || currentUser.email.split('@')[0], payload.new.content);
+            }
+        })
+        .subscribe();
+}
+
+// Chat functions
+async function populateChatUserList() {
+    const chatUserList = document.getElementById('chatUserList');
+    if (chatUserList) chatUserList.innerHTML = '<p class="text-center text-gray-500">Chargement des conversations...</p>';
+    try {
+        const { data: chatUsers, error } = await supabase
+            .from('chats_users')
+            .select(`
+                chat_id,
+                chats!chats_users_chat_id_fkey (
+                    id,
+                    title,
+                    created_at
+                ),
+                users!chats_users_user_id_fkey (
+                    id,
+                    full_name,
+                    avatar_url
+                )
+            `)
+            .eq('user_id', currentUser.id)
+            .order('created_at', { referencedTable: 'chats', ascending: false });
+        if (error) throw error;
+        if (!chatUsers || chatUsers.length === 0) {
+            if (chatUserList) chatUserList.innerHTML = '<p class="text-center text-gray-500">Aucune conversation trouvée.</p>';
+            return;
+        }
+        const chatIds = chatUsers.map(cu => cu.chat_id);
+        const { data: lastMessages, error: messagesError } = await supabase
+            .from('messages')
+            .select('chat_id, content, created_at, read')
+            .in('chat_id', chatIds)
+            .order('created_at', { ascending: false });
+        if (messagesError) throw messagesError;
+        const { data: unreadCounts, error: unreadError } = await supabase
+            .from('messages')
+            .select('chat_id, read')
+            .in('chat_id', chatIds)
+            .eq('read', false)
+            .neq('sender_id', currentUser.id);
+        if (unreadError) throw unreadError;
+        const unreadByChat = {};
+        unreadCounts.forEach(msg => {
+            unreadByChat[msg.chat_id] = (unreadByChat[msg.chat_id] || 0) + 1;
+        });
+        chatUserList.innerHTML = '';
+        const users = await Promise.all(chatUsers.map(async cu => {
+            const chat = cu.chats;
+            const otherUser = await getOtherChatUser(chat.id);
+            const lastMessage = lastMessages.find(lm => lm.chat_id === chat.id);
+            return {
+                id: chat.id,
+                name: otherUser?.full_name || chat.title || 'Chat',
+                avatar: otherUser?.avatar_url || 'https://placehold.co/50x50',
+                lastMessage: lastMessage ? lastMessage.content : 'Aucun message pour le moment',
+                created_at: chat.created_at,
+                unreadCount: unreadByChat[chat.id] || 0
+            };
+        }));
+        users.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        users.forEach(user => {
+            const userItem = document.createElement('div');
+            userItem.className = `message-list-item ${activeChatSessionId === user.id ? 'active' : ''}`;
+            userItem.dataset.chatId = user.id;
+            userItem.innerHTML = `
+                <img src="${user.avatar}" alt="${user.name}">
+                <div class="message-list-item-info">
+                    <strong>${user.name}</strong>
+                    <span>${user.lastMessage}</span>
+                    ${user.unreadCount > 0 ? `<span class="unread-count">${user.unreadCount}</span>` : ''}
+                </div>
+            `;
+            userItem.addEventListener('click', async () => {
+                await supabase
+                    .from('messages')
+                    .update({ read: true })
+                    .eq('chat_id', user.id)
+                    .eq('read', false)
+                    .neq('sender_id', currentUser.id);
+                loadChatSession(user.id, user.name);
+                await updateUnreadMessageCount();
+            });
+            chatUserList.appendChild(userItem);
+        });
+        await updateUnreadMessageCount();
+    } catch (error) {
+        console.error('Erreur lors de la récupération des utilisateurs de chat :', error.message);
+        chatUserList.innerHTML = '<p class="text-red-500 text-center text-sm">Échec du chargement des conversations.</p>';
+    }
+}
+
+async function getOtherChatUser(chatId) {
+    try {
+        const { data: chatUsers, error } = await supabase
+            .from('chats_users')
+            .select(`
+                user_id,
+                users!chats_users_user_id_fkey (
+                    id,
+                    full_name,
+                    avatar_url
+                )
+            `)
+            .eq('chat_id', chatId)
+            .neq('user_id', currentUser.id)
+            .single();
+        if (error) throw error;
+        return chatUsers?.users || null;
+    } catch (error) {
+        console.error('Erreur lors de la récupération de l\'autre utilisateur du chat :', error.message);
+        return null;
+    }
+}
+
+async function searchUsersForChat(query) {
+    const chatUserList = document.getElementById('chatUserList');
+    chatUserList.innerHTML = '<p class="text-center text-gray-500">Recherche d\'utilisateurs...</p>';
+    try {
+        if (!query.trim()) {
+            await populateChatUserList();
+            return;
+        }
+        const { data: users, error } = await supabase
+            .from('users')
+            .select('id, full_name, avatar_url')
+            .ilike('full_name', `%${query}%`)
+            .neq('id', currentUser.id)
+            .limit(10);
+        if (error) throw error;
+        if (!users || users.length === 0) {
+            chatUserList.innerHTML = '<p class="text-center text-gray-500">Aucun utilisateur trouvé.</p>';
+            return;
+        }
+        chatUserList.innerHTML = '';
+        users.forEach(user => {
+            const userItem = document.createElement('div');
+            userItem.className = 'message-list-item';
+            userItem.dataset.userId = user.id;
+            userItem.innerHTML = `
+                <img src="${user.avatar_url || 'https://placehold.co/50x50'}" alt="${user.full_name}">
+                <div class="message-list-item-info">
+                    <strong>${user.full_name}</strong>
+                    <span>Démarrer une nouvelle discussion</span>
+                </div>
+            `;
+            userItem.addEventListener('click', async () => {
+                const chatId = await startChatWithUser(user.id, user.full_name);
+                if (chatId) {
+                    loadChatSession(chatId, user.full_name);
+                    populateChatUserList();
+                }
+            });
+            chatUserList.appendChild(userItem);
+        });
+    } catch (error) {
+        console.error('Erreur lors de la recherche d\'utilisateurs :', error.message);
+        chatUserList.innerHTML = '<p class="text-red-500 text-center text-sm">Échec de la recherche d\'utilisateurs.</p>';
+    }
+}
+
+async function startChatWithUser(userId, userName) {
+    try {
+        const { data: userChats, error: userError } = await supabase
+            .from('chats_users')
+            .select('chat_id')
+            .eq('user_id', currentUser.id);
+        if (userError) throw userError;
+        const { data: targetChats, error: targetError } = await supabase
+            .from('chats_users')
+            .select('chat_id')
+            .eq('user_id', userId);
+        if (targetError) throw targetError;
+        const commonChat = userChats.find(uc => targetChats.some(tc => tc.chat_id === uc.chat_id));
+        if (commonChat) {
+            return commonChat.chat_id;
+        }
+        const { data: newChat, error: chatError } = await supabase
+            .from('chats')
+            .insert([{ chat_type: 'one-on-one', created_at: new Date().toISOString() }])
+            .select('id')
+            .single();
+        if (chatError) throw chatError;
+        const chatId = newChat.id;
+        const { error: usersError } = await supabase
+            .from('chats_users')
+            .insert([
+                { chat_id: chatId, user_id: currentUser.id, created_at: new Date().toISOString() },
+                { chat_id: chatId, user_id: userId, created_at: new Date().toISOString() }
+            ]);
+        if (usersError) throw usersError;
+        return chatId;
+    } catch (error) {
+        console.error('Erreur lors du démarrage du chat :', error.message);
+        showMessage('Échec du démarrage du chat.', 'error');
+        return null;
+    }
+}
+
+async function loadChatSession(chatId, userName) {
+    activeChatSessionId = chatId;
+    const chatWindow = document.getElementById('chatWindow');
+    const activeChatHeader = document.getElementById('activeChatHeader');
+    activeChatHeader.textContent = userName || 'Chat';
+    try {
+        const { data: messages, error } = await supabase
+            .from('messages')
+            .select(`
+                id,
+                content,
+                media_content,
+                media_type,
+                created_at,
+                sender_id,
+                edited,
+                read,
+                users!messages_sender_id_fkey (
+                    id,
+                    full_name,
+                    avatar_url
+                )
+            `)
+            .eq('chat_id', chatId)
+            .order('created_at', { ascending: true });
+        if (error) throw error;
+        chatWindow.innerHTML = '';
+        if (!messages || messages.length === 0) {
+            chatWindow.innerHTML = '<p class="text-center text-gray-500">Aucun message dans cette discussion.</p>';
+            return;
+        }
+        messages.forEach(message => {
+            const messageElement = document.createElement('div');
+            const isSelf = message.sender_id === currentUser.id;
+            const formattedTime = timeDifference(new Date(), new Date(message.created_at));
+            messageElement.className = `chat-message ${isSelf ? 'self' : 'other'} mb-2 p-3 rounded-lg shadow-sm max-w-[70%]`;
+            let contentHtml = '';
+            if (message.media_type === 'audio' && message.media_content) {
+                contentHtml = `
+                    <audio controls class="w-full">
+                        <source src="data:audio/wav;base64,${message.media_content}" type="audio/wav">
+                        Votre navigateur ne prend pas en charge l'élément audio.
+                    </audio>
+                    <div class="chat-timestamp text-xs text-gray-400 mt-1">
+                        ${formattedTime}
+                    </div>
+                `;
+            } else {
+                contentHtml = `
+                    <div class="chat-bubble">
+                        ${message.content || ''}
+                        <div class="chat-timestamp text-xs text-gray-400 mt-1">
+                            ${formattedTime}${message.edited ? ' (modifié)' : ''}
+                        </div>
+                    </div>
+                `;
+            }
+            messageElement.innerHTML = contentHtml + (isSelf && (!message.media_type || message.media_type === 'text') ? `
+                <button class="edit-message-btn text-xs text-blue-500 mt-1" data-message-id="${message.id}" data-current-content="${message.content || ''}">
+                    Modifier
+                </button>` : '');
+            if (isSelf && (!message.media_type || message.media_type === 'text')) {
+                const editButton = messageElement.querySelector('.edit-message-btn');
+                editButton.addEventListener('click', () => editChatMessage(message.id, message.content || '', messageElement));
+            }
+            chatWindow.appendChild(messageElement);
+        });
+        await supabase
+            .from('messages')
+            .update({ read: true })
+            .eq('chat_id', chatId)
+            .eq('read', false)
+            .neq('sender_id', currentUser.id);
+        document.querySelectorAll('.message-list-item').forEach(item => {
+            item.classList.remove('active');
+            if (item.dataset.chatId === chatId) {
+                item.classList.add('active');
+            }
+        });
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+        await updateUnreadMessageCount();
+    } catch (error) {
+        console.error('Erreur lors du chargement de la session de chat :', error.message);
+        chatWindow.innerHTML = '<p class="text-red-500 text-center text-sm">Échec du chargement des messages.</p>';
+    }
+}
+
+async function sendChatMessage() {
+    if (!activeChatSessionId) {
+        showMessage('Veuillez sélectionner une discussion pour envoyer un message.', 'error');
+        return;
+    }
+    const chatInput = document.getElementById('chatInput');
+    const messageContent = chatInput.value.trim();
+    if (!messageContent) {
+        showMessage('Le message ne peut pas être vide.', 'error');
+        return;
+    }
+    try {
+        const newMessage = {
+            chat_id: activeChatSessionId,
+            sender_id: currentUser.id,
+            content: messageContent,
+            media_type: 'text',
+            created_at: new Date().toISOString(),
+            edited: false,
+            read: false
+        };
+        const chatWindow = document.getElementById('chatWindow');
+        const messageElement = document.createElement('div');
+        messageElement.className = 'chat-message self mb-2 p-3 rounded-lg bg-blue-100 shadow-sm max-w-[70%]';
+        const formattedTime = timeDifference(new Date(), new Date(newMessage.created_at));
+        messageElement.innerHTML = `
+            <div class="chat-bubble">
+                ${newMessage.content}
+                <div class="chat-timestamp text-xs text-gray-500 mt-1">${formattedTime}</div>
+            </div>
+            <button class="edit-message-btn text-xs text-blue-500 mt-1" data-message-id="temp-${Date.now()}" data-current-content="${newMessage.content}">
+                Modifier
+            </button>
+        `;
+        chatWindow.appendChild(messageElement);
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+        const { data, error } = await supabase
+            .from('messages')
+            .insert([newMessage])
+            .select()
+            .single();
+        if (error) throw error;
+        messageElement.querySelector('.edit-message-btn').dataset.messageId = data.id;
+        messageElement.querySelector('.edit-message-btn').addEventListener('click', () => editChatMessage(data.id, data.content, messageElement));
+        chatInput.value = '';
+        await updateUnreadMessageCount();
+    } catch (error) {
+        console.error('Erreur lors de l\'envoi du message :', error.message);
+        showMessage(`Échec de l'envoi du message : ${error.message}`, 'error');
+        chatWindow.removeChild(messageElement);
+    }
+}
+
+async function editChatMessage(messageId, currentContent, messageElement) {
+    const chatBubble = messageElement.querySelector('.chat-bubble');
+    const originalHtml = chatBubble.innerHTML;
+    chatBubble.innerHTML = `
+        <textarea class="w-full border border-blue-500 rounded-md p-2 text-sm">${currentContent}</textarea>
+        <div class="flex justify-end gap-2 mt-2">
+            <button class="cancel-edit-btn text-xs text-gray-500">Annuler</button>
+            <button class="save-edit-btn text-xs text-blue-500">Enregistrer</button>
+        </div>
+    `;
+    const textarea = chatBubble.querySelector('textarea');
+    const saveBtn = chatBubble.querySelector('.save-edit-btn');
+    const cancelBtn = chatBubble.querySelector('.cancel-edit-btn');
+    textarea.focus();
+    saveBtn.addEventListener('click', async () => {
+        const newContent = textarea.value.trim();
+        if (!newContent) {
+            showMessage('Le message ne peut pas être vide.', 'error');
+            return;
+        }
+        try {
+            const { error } = await supabase
+                .from('messages')
+                .update({ content: newContent, edited: true })
+                .eq('id', messageId)
+                .eq('sender_id', currentUser.id);
+            if (error) throw error;
+            const formattedTime = timeDifference(new Date(), new Date());
+            chatBubble.innerHTML = `
+                ${newContent}
+                <div class="chat-timestamp text-xs text-gray-500 mt-1">${formattedTime} (modifié)</div>
+            `;
+        } catch (error) {
+            console.error(`Erreur lors de la mise à jour du message ${messageId} :`, error.message);
+            showMessage(`Échec de la mise à jour du message : ${error.message}`, 'error');
+            chatBubble.innerHTML = originalHtml;
+        }
+    });
+    cancelBtn.addEventListener('click', () => {
+        chatBubble.innerHTML = originalHtml;
+    });
+}
+
+// Email notification function (client-side placeholder, assumes backend endpoint)
+async function sendEmailNotification(recipientId, senderName, messageContent) {
+    try {
+        const { data: recipient } = await supabase
+            .from('users')
+            .select('email')
+            .eq('id', recipientId)
+            .single();
+        if (!recipient?.email) {
+            console.error('Email du destinataire non trouvé.');
+            return;
+        }
+        // Assuming a backend endpoint '/send-email' exists
+        const response = await fetch('/send-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                to: recipient.email,
+                subject: `Nouveau message de ${senderName}`,
+                body: `Vous avez reçu un nouveau message : "${messageContent.substring(0, 50)}..." Connectez-vous pour voir le message complet.`
+            })
+        });
+        if (!response.ok) throw new Error('Échec de l\'envoi de l\'email');
+        console.log('Notification email envoyée à :', recipient.email);
+    } catch (error) {
+        console.error('Erreur lors de l\'envoi de la notification email :', error.message);
+    }
+}
+
+// Update unread message count
+async function updateUnreadMessageCount() {
+    try {
+        const { data: chats, error: chatError } = await supabase
+            .from('chats_users')
+            .select('chat_id')
+            .eq('user_id', currentUser.id);
+        if (chatError) throw chatError;
+        const chatIds = chats.map(c => c.chat_id);
+        if (chatIds.length === 0) {
+            document.getElementById('unreadBadge').classList.add('hidden');
+            return;
+        }
+        const { data: unreadMessages, error } = await supabase
+            .from('messages')
+            .select('id')
+            .in('chat_id', chatIds)
+            .eq('read', false)
+            .neq('sender_id', currentUser.id);
+        if (error) throw error;
+        const unreadCount = unreadMessages.length;
+        const unreadBadge = document.getElementById('unreadBadge');
+        if (unreadCount > 0) {
+            unreadBadge.textContent = unreadCount;
+            unreadBadge.classList.remove('hidden');
+        } else {
+            unreadBadge.classList.add('hidden');
+        }
+    } catch (error) {
+        console.error('Erreur lors de la mise à jour du compteur de messages non lus :', error.message);
+    }
+}
+
+// DOMContentLoaded and event listeners
+document.addEventListener('DOMContentLoaded', async function() {
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    if (sessionError || !session) {
+        console.log("Communauté : Aucune session active. Redirection vers la connexion.");
+        showMessage('Aucune session active. Veuillez vous connecter.', 'error');
+        window.location.href = 'login.html';
+        return;
+    }
+    currentUser = session.user;
+    console.log("Utilisateur actuel :", currentUser);
+    await fetchUserProfile();
+    const desktopUserWelcomeElement = document.getElementById('desktopUserWelcome');
+    if (desktopUserWelcomeElement && currentUser.full_name) {
+        desktopUserWelcomeElement.textContent = `Bienvenue, ${currentUser.full_name} !`;
+    } else if (desktopUserWelcomeElement && currentUser.email) {
+        desktopUserWelcomeElement.textContent = `Bienvenue, ${currentUser.email.split('@')[0]} !`;
+    }
+    await fetchUserBalance();
+    await fetchPosts();
+    await fetchMarketplaceHighlights();
+    await populateChatUserList();
+    subscribeToPosts();
+    subscribeToLikes();
+    subscribeToComments();
+    subscribeToMessages();
+    document.getElementById('submitPostBtn').addEventListener('click', createPost);
+    document.getElementById('uploadMediaBtn').addEventListener('click', () => document.getElementById('postMediaUpload').click());
+    document.getElementById('postMediaUpload').addEventListener('change', previewMedia);
+    document.getElementById('removeMediaBtn').addEventListener('click', removeMedia);
+    const sidebarLogoutLink = document.getElementById('sidebarLogoutLink');
+    if (sidebarLogoutLink) sidebarLogoutLink.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); });
+    const mobileLogoutLink = document.getElementById('mobileLogoutLink');
+    if (mobileLogoutLink) mobileLogoutLink.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); });
+    const hamburgerBtnMobile = document.getElementById('hamburgerBtnMobile');
+    const sidebar = document.getElementById('sidebar');
+    if (hamburgerBtnMobile && sidebar) {
+        hamburgerBtnMobile.addEventListener('click', (e) => { e.stopPropagation(); sidebar.classList.toggle('open'); });
+    }
+    document.addEventListener('click', (e) => {
+        if (sidebar && sidebar.classList.contains('open') && !sidebar.contains(e.target) && (!hamburgerBtnMobile || !hamburgerBtnMobile.contains(e.target))) {
+            sidebar.classList.remove('open');
+        }
+        document.querySelectorAll('.post-options-dropdown:not(.hidden), .comment-options-dropdown:not(.hidden)').forEach(dropdown => {
+            if (!dropdown.contains(e.target) && !e.target.closest('.post-options-btn') && !e.target.closest('.comment-options-btn')) {
+                dropdown.classList.add('hidden');
+            }
+        });
+    });
+    document.getElementById('searchBar')?.addEventListener('input', (e) => searchContent(e.target.value));
+    document.getElementById('messageFab')?.addEventListener('click', () => {
+        document.getElementById('messageModalOverlay').classList.add('show');
+        document.getElementById('chatUserSearch').focus();
+    });
+    document.getElementById('closeMessageModalButton')?.addEventListener('click', () => {
+        document.getElementById('messageModalOverlay').classList.remove('show');
+    });
+    document.getElementById('chatUserSearch')?.addEventListener('input', (e) => searchUsersForChat(e.target.value));
+    document.getElementById('sendChatMessageButton')?.addEventListener('click', sendChatMessage);
+    document.getElementById('chatInput')?.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendChatMessage();
+    });
+    // Handle shared post from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const postId = urlParams.get('postId');
+    if (postId) {
+        scrollToPost(postId);
+    }
+});
+</script>
+</html>
