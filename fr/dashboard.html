@@ -273,6 +273,9 @@
         <a href="wallet.html" class="nav-link-sidebar">
           <i class="fas fa-wallet"></i>Portefeuille
         </a>
+        <a href="marketplace.html" class="nav-link-sidebar">
+          <i class="fas fa-store"></i>Marché
+        </a>
       </nav>
       <div class="pb-4">
         <a href="profile.html" class="nav-link-sidebar">
@@ -375,10 +378,11 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
       document.addEventListener('DOMContentLoaded', async function() {
-        // Initialisation du client Supabase
+        // Initialize Supabase client
         const SUPABASE_URL = 'https://nvxqorudztbpwyanakdj.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52eHFvcnVkenRicHd5YW5ha2RqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIzOTk5NTQsImV4cCI6MjA2Nzk3NTk1NH0.XvITDAnpEkjQTh4SCVOfwGKsaANS6tp58Up37SXwYRw';
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const TRANSACTION_FEE_RATE = 0.001; // 0.1% fee
         console.log("Client Supabase initialisé.");
 
         const aiSummaryText = document.getElementById('aiSummaryText');
@@ -386,21 +390,22 @@
         const dashboardContent = document.getElementById('dashboardContent');
         const resendButton = document.getElementById('resendVerification');
         let userName = "Utilisateur";
-        let userBalance = 0.00;
+        let userId = null;
         let recentTransactions = [];
 
-        // Fonction pour formater la devise pour le Québec/Canada français
+        // Format currency for Quebec/Canada (French)
         function formatCurrency(value) {
-            const number = Number(value) || 0;
-            // Ajoute un espace insécable pour séparer les milliers et utilise une virgule pour les décimales.
-            return number.toLocaleString('fr-CA', { style: 'currency', currency: 'CAD' });
+          const number = Number(value) || 0;
+          return number.toLocaleString('fr-CA', { style: 'currency', currency: 'CAD' });
         }
 
+        // Show message function
         function showMessage(element, message, type = 'success') {
           element.innerHTML = message;
           element.className = `ai-summary-text ${type === 'success' ? 'text-green-600' : 'text-red-600'}`;
         }
 
+        // Handle logout
         async function handleLogout() {
           console.log("Tableau de bord : Déconnexion et redirection vers login.html");
           await supabase.auth.signOut();
@@ -412,6 +417,7 @@
         const mobileLogoutLink = document.getElementById('mobileLogoutLink');
         if (mobileLogoutLink) mobileLogoutLink.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); });
 
+        // Mobile sidebar toggle
         const hamburgerBtnMobile = document.getElementById('hamburgerBtnMobile');
         const sidebar = document.getElementById('sidebar');
         if (hamburgerBtnMobile && sidebar) {
@@ -423,6 +429,7 @@
           }
         });
 
+        // Fetch user session
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         if (sessionError || !session) {
           console.log("Tableau de bord : Aucune session Supabase active. Redirection vers la connexion.");
@@ -431,8 +438,10 @@
         }
 
         const user = session.user;
+        userId = user.id;
         console.log("Utilisateur Supabase:", user);
 
+        // Check email verification
         if (user && !user.email_confirmed_at && user.email) {
           verificationMessage.classList.remove('hidden');
           dashboardContent.classList.add('hidden');
@@ -486,6 +495,7 @@
         dashboardContent.classList.remove('hidden');
 
         try {
+          // Fetch user profile
           const { data: profile, error: profileError } = await supabase
             .from('users')
             .select('full_name')
@@ -499,6 +509,7 @@
             userName = profile?.full_name || "Utilisateur";
           }
 
+          // Update greeting
           const greetingElement = document.getElementById('personalizedGreeting');
           const desktopUserWelcomeElement = document.getElementById('desktopUserWelcome');
           if (greetingElement) {
@@ -509,32 +520,51 @@
           }
           if (desktopUserWelcomeElement) desktopUserWelcomeElement.textContent = `Bienvenue, ${userName}!`;
 
+          // Fetch transactions with product_id validation
           const { data: transactions, error: transactionsError } = await supabase
             .from('transactions')
-            .select('amount, transaction_type, created_at')
-            .eq('user_id', user.id)
+            .select('id, amount, transaction_type, created_at, user_id, recipient_id, product_id, status')
+            .or(`user_id.eq.${user.id},recipient_id.eq.${user.id}`)
+            .eq('status', 'completed')
             .order('created_at', { ascending: false })
             .limit(100);
 
           if (transactionsError) {
             console.error('Erreur lors de la récupération des transactions:', transactionsError.message);
-            showMessage(aiSummaryText, "Impossible de charger les données des transactions. Veuillez vous assurer que les politiques RLS sont définies.", 'error');
+            showMessage(aiSummaryText, "Impossible de charger les données des transactions. Veuillez vérifier les politiques RLS.", 'error');
             recentTransactions = [];
           } else {
-            recentTransactions = transactions || [];
+            // Filter valid product_buy transactions
+            recentTransactions = transactions.filter(t => {
+              if (t.transaction_type === 'product_buy' && t.user_id === userId) {
+                return t.product_id && transactions.some(t2 => 
+                  t2.transaction_type === 'product_sell' && 
+                  t2.product_id === t.product_id && 
+                  t2.status === 'completed' && 
+                  new Date(t2.created_at) >= new Date(t.created_at) && 
+                  new Date(t2.created_at) <= new Date(t.created_at).setMinutes(new Date(t.created_at).getMinutes() + 1)
+                );
+              }
+              return true;
+            });
           }
 
+          // Calculate financial metrics
           let totalIncome = 0;
           let totalExpenses = 0;
           recentTransactions.forEach(t => {
             const amount = parseFloat(t.amount) || 0;
-            if (amount > 0 && ['deposit', 'transfer_received', 'product_sell', 'loan_received'].includes(t.transaction_type)) {
+            if (t.user_id === userId && ['deposit', 'product_sell', 'loan_received'].includes(t.transaction_type)) {
               totalIncome += amount;
-            } else if (amount < 0 && (t.transaction_type.startsWith('withdrawal') || ['transfer_sent', 'product_buy', 'insurance_payment'].includes(t.transaction_type))) {
+            } else if (t.transaction_type === 'transfer' && t.recipient_id === userId) {
+              totalIncome += amount * (1 - TRANSACTION_FEE_RATE);
+            } else if (t.transaction_type === 'money_request' && t.user_id === userId && t.status === 'completed') {
+              totalIncome += amount;
+            } else if (t.user_id === userId && ['withdrawal', 'bill_payment', 'loan_payment', 'insurance_payment', 'product_buy'].includes(t.transaction_type)) {
               totalExpenses += Math.abs(amount);
             }
           });
-          userBalance = totalIncome - totalExpenses;
+          const userBalance = totalIncome - totalExpenses;
 
           document.getElementById('totalIncomeDisplay').textContent = formatCurrency(totalIncome);
           document.getElementById('totalExpensesDisplay').textContent = formatCurrency(totalExpenses);
@@ -549,6 +579,7 @@
           document.getElementById('overdueInvoicesDisplay').textContent = formatCurrency(0);
           document.getElementById('overdueInvoicesCount').textContent = `0`;
 
+          // Update AI summary
           if (aiSummaryText) {
             let summaryMessage = `Votre solde net actuel est de <strong>${formatCurrency(userBalance)}</strong>. `;
             if (totalIncome > totalExpenses) {
@@ -561,6 +592,7 @@
             aiSummaryText.innerHTML = summaryMessage;
           }
 
+          // Render charts
           renderSalesTrendChart(recentTransactions);
           renderExpenseBreakdownChart(recentTransactions);
           renderCashFlowChart(recentTransactions);
@@ -570,8 +602,9 @@
           showMessage(aiSummaryText, "Échec du chargement des données du tableau de bord. Veuillez réessayer.", 'error');
         }
 
+        // Render sales trend chart
         function renderSalesTrendChart(transactions) {
-          const salesData = transactions.filter(t => t.transaction_type === 'product_sell');
+          const salesData = transactions.filter(t => t.transaction_type === 'product_sell' && t.recipient_id === userId);
           const labels = salesData.map(t => new Date(t.created_at).toLocaleDateString('fr-CA'));
           const data = salesData.map(t => parseFloat(t.amount));
           const ctx = document.getElementById('salesTrendChart').getContext('2d');
@@ -592,9 +625,27 @@
           });
         }
 
+        // Render expense breakdown chart
         function renderExpenseBreakdownChart(transactions) {
-          const expenseData = transactions.filter(t => ['product_buy', 'transfer_sent', 'insurance_payment'].includes(t.transaction_type) || t.transaction_type.startsWith('withdrawal'));
-          const categories = {'Achat de produit': 'product_buy', 'Retrait': 'withdrawal', 'Transfert envoyé': 'transfer_sent', 'Paiement d\'assurance': 'insurance_payment'};
+          const expenseData = transactions.filter(t => 
+            t.user_id === userId && 
+            (['product_buy', 'transfer_sent', 'insurance_payment'].includes(t.transaction_type) || t.transaction_type.startsWith('withdrawal')) &&
+            (t.transaction_type !== 'product_buy' || 
+             (t.product_id && transactions.some(t2 => 
+               t2.transaction_type === 'product_sell' && 
+               t2.product_id === t.product_id && 
+               t2.status === 'completed' && 
+               new Date(t2.created_at) >= new Date(t.created_at) && 
+               new Date(t2.created_at) <= new Date(t.created_at).setMinutes(new Date(t.created_at).getMinutes() + 1)
+             ))
+            )
+          );
+          const categories = {
+            'Achat de produit': 'product_buy',
+            'Retrait': 'withdrawal',
+            'Transfert envoyé': 'transfer_sent',
+            'Paiement d\'assurance': 'insurance_payment'
+          };
           const data = Object.values(categories).map(catKey => {
             return expenseData.filter(t => {
               const normalizedType = t.transaction_type.toLowerCase().replace(/ /g, '_');
@@ -620,21 +671,33 @@
           });
         }
 
+        // Render cash flow chart
         function renderCashFlowChart(transactions) {
-          const cashFlowData = transactions.map(t => ({
+          const cashFlowData = transactions.filter(t => {
+            if (t.transaction_type === 'product_buy' && t.user_id === userId) {
+              return t.product_id && transactions.some(t2 => 
+                t2.transaction_type === 'product_sell' && 
+                t2.product_id === t.product_id && 
+                t2.status === 'completed' && 
+                new Date(t2.created_at) >= new Date(t.created_at) && 
+                new Date(t2.created_at) <= new Date(t.created_at).setMinutes(new Date(t.created_at).getMinutes() + 1)
+              );
+            }
+            return true;
+          }).map(t => ({
             date: new Date(t.created_at),
             amount: parseFloat(t.amount)
-          })).sort((a,b) => a.date - b.date);
-          
+          })).sort((a, b) => a.date - b.date);
+
           const aggregatedCashFlow = cashFlowData.reduce((acc, current) => {
             const dateKey = current.date.toLocaleDateString('fr-CA');
             if (!acc[dateKey]) {
-                acc[dateKey] = { inflow: 0, outflow: 0 };
+              acc[dateKey] = { inflow: 0, outflow: 0 };
             }
-            if (current.amount > 0) {
-                acc[dateKey].inflow += current.amount;
-            } else {
-                acc[dateKey].outflow += Math.abs(current.amount);
+            if (current.amount > 0 && (current.user_id === userId || ['transfer'].includes(current.transaction_type))) {
+              acc[dateKey].inflow += current.amount;
+            } else if (current.amount < 0 && current.user_id === userId) {
+              acc[dateKey].outflow += Math.abs(current.amount);
             }
             return acc;
           }, {});
@@ -642,7 +705,7 @@
           const labels = Object.keys(aggregatedCashFlow);
           const inflowData = labels.map(label => aggregatedCashFlow[label].inflow);
           const outflowData = labels.map(label => aggregatedCashFlow[label].outflow);
-          
+
           const ctx = document.getElementById('cashFlowChart').getContext('2d');
           if (window.cashFlowChartInstance) window.cashFlowChartInstance.destroy();
           window.cashFlowChartInstance = new Chart(ctx, {
