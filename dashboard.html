@@ -262,7 +262,7 @@
           <i class="fas fa-users"></i>Community
         </a>
         <a href="chatbot.html" class="nav-link-sidebar">
-          <i class="fas fa-comments-dollar"></i>Chat Advisor
+          <i class="fas fa-comments-dollar"></i>Virtual Advisor
         </a>
         <a href="resources.html" class="nav-link-sidebar">
           <i class="fas fa-book-open"></i>Resources
@@ -272,6 +272,9 @@
         </a>
         <a href="wallet.html" class="nav-link-sidebar">
           <i class="fas fa-wallet"></i>Wallet
+        </a>
+        <a href="marketplace.html" class="nav-link-sidebar">
+          <i class="fas fa-store"></i>Marketplace
         </a>
       </nav>
       <div class="pb-4">
@@ -291,15 +294,15 @@
         </div>
       </header>
       <div id="verificationMessage" class="greeting-summary-card hidden">
-        <h1 class="greeting-text">Please Verify Your Email</h1>
+        <h1 class="greeting-text">Please verify your email</h1>
         <p class="ai-summary-text">
           Your account is not yet verified. Please check your email for the verification link.
-          <button id="resendVerification" class="btn-resend mt-4">Resend Verification Email</button>
+          <button id="resendVerification" class="btn-resend mt-4">Resend verification email</button>
         </p>
       </div>
       <div id="dashboardContent" class="hidden">
         <div class="greeting-summary-card">
-          <h1 id="personalizedGreeting" class="greeting-text">Good morning, User!</h1>
+          <h1 id="personalizedGreeting" class="greeting-text">Hello, User!</h1>
           <p class="ai-summary-text" id="aiSummaryText">
             Loading your financial summary...
           </p>
@@ -308,7 +311,7 @@
           <div class="metric-card">
             <div>
               <div class="metric-card-header">
-                <h2>Total Income</h2>
+                <h2>Total Revenue</h2>
                 <i class="fas fa-dollar-sign metric-card-icon text-green-500"></i>
               </div>
               <p class="metric-card-value text-green-600" id="totalIncomeDisplay">$0.00</p>
@@ -353,7 +356,7 @@
               </div>
               <p class="metric-card-value text-orange-600" id="overdueInvoicesDisplay">$0.00</p>
             </div>
-            <p class="metric-card-footer">(<span id="overdueInvoicesCount">0</span>) Total outstanding</p>
+            <p class="metric-card-footer">(<span id="overdueInvoicesCount">0</span>) Total unpaid</p>
           </div>
         </div>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
@@ -362,12 +365,12 @@
             <canvas id="salesTrendChart" width="400" height="200"></canvas>
           </div>
           <div class="chart-placeholder-container">
-            <h3>Expense Breakdown (Donut Chart)</h3>
+            <h3>Expense Breakdown (Doughnut Chart)</h3>
             <canvas id="expenseBreakdownChart" width="400" height="200"></canvas>
           </div>
         </div>
         <div class="chart-placeholder-container">
-          <h3>Cash Flow Over Time (Area Chart)</h3>
+          <h3>Cash Flow (Area Chart)</h3>
           <canvas id="cashFlowChart" width="400" height="200"></canvas>
         </div>
       </div>
@@ -375,10 +378,11 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
       document.addEventListener('DOMContentLoaded', async function() {
-        // Supabase client initialization
+        // Initialize Supabase client
         const SUPABASE_URL = 'https://nvxqorudztbpwyanakdj.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52eHFvcnVkenRicHd5YW5ha2RqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIzOTk5NTQsImV4cCI6MjA2Nzk3NTk1NH0.XvITDAnpEkjQTh4SCVOfwGKsaANS6tp58Up37SXwYRw';
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const TRANSACTION_FEE_RATE = 0.001; // 0.1% fee
         console.log("Supabase client initialized.");
 
         const aiSummaryText = document.getElementById('aiSummaryText');
@@ -386,23 +390,28 @@
         const dashboardContent = document.getElementById('dashboardContent');
         const resendButton = document.getElementById('resendVerification');
         let userName = "User";
-        let userBalance = 0.00;
+        let userId = null;
         let recentTransactions = [];
 
-        // Function to show messages
+        // Format currency for US/Canada (English)
+        function formatCurrency(value) {
+          const number = Number(value) || 0;
+          return number.toLocaleString('en-CA', { style: 'currency', currency: 'CAD' });
+        }
+
+        // Show message function
         function showMessage(element, message, type = 'success') {
           element.innerHTML = message;
           element.className = `ai-summary-text ${type === 'success' ? 'text-green-600' : 'text-red-600'}`;
         }
 
-        // Function to handle logout
+        // Handle logout
         async function handleLogout() {
           console.log("Dashboard: Logging out and redirecting to login.html");
           await supabase.auth.signOut();
           window.location.href = 'login.html';
         }
 
-        // Event listeners for logout links
         const sidebarLogoutLink = document.getElementById('sidebarLogoutLink');
         if (sidebarLogoutLink) sidebarLogoutLink.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); });
         const mobileLogoutLink = document.getElementById('mobileLogoutLink');
@@ -429,9 +438,10 @@
         }
 
         const user = session.user;
+        userId = user.id;
         console.log("Supabase User:", user);
 
-        // Check email verification status
+        // Check email verification
         if (user && !user.email_confirmed_at && user.email) {
           verificationMessage.classList.remove('hidden');
           dashboardContent.classList.add('hidden');
@@ -441,7 +451,6 @@
             'error'
           );
 
-          // Resend verification email
           if (resendButton) {
             resendButton.addEventListener('click', async () => {
               resendButton.disabled = true;
@@ -475,19 +484,18 @@
                 );
               } finally {
                 resendButton.disabled = false;
-                resendButton.textContent = 'Resend Verification Email';
+                resendButton.textContent = 'Resend verification email';
               }
             });
           }
           return;
         }
 
-        // Show dashboard content for verified users
         verificationMessage.classList.add('hidden');
         dashboardContent.classList.remove('hidden');
 
         try {
-          // Fetch user profile from 'users' table
+          // Fetch user profile
           const { data: profile, error: profileError } = await supabase
             .from('users')
             .select('full_name')
@@ -507,27 +515,38 @@
           if (greetingElement) {
             const currentHour = new Date().getHours();
             let timeOfDayGreeting = "Hello";
-            if (currentHour < 12) timeOfDayGreeting = "Good morning";
-            else if (currentHour < 18) timeOfDayGreeting = "Good afternoon";
-            else timeOfDayGreeting = "Good evening";
+            if (currentHour >= 18) timeOfDayGreeting = "Good evening";
             greetingElement.textContent = `${timeOfDayGreeting}, ${userName}!`;
           }
           if (desktopUserWelcomeElement) desktopUserWelcomeElement.textContent = `Welcome, ${userName}!`;
 
-          // Fetch recent transactions from 'transactions' table
+          // Fetch transactions with product_id validation
           const { data: transactions, error: transactionsError } = await supabase
             .from('transactions')
-            .select('amount, transaction_type, created_at')
-            .eq('user_id', user.id)
+            .select('id, amount, transaction_type, created_at, user_id, recipient_id, product_id, status')
+            .or(`user_id.eq.${user.id},recipient_id.eq.${user.id}`)
+            .eq('status', 'completed')
             .order('created_at', { ascending: false })
             .limit(100);
 
           if (transactionsError) {
             console.error('Error fetching transactions:', transactionsError.message);
-            showMessage(aiSummaryText, "Could not load transactions data. Please ensure RLS policies are set.", 'error');
+            showMessage(aiSummaryText, "Unable to load transaction data. Please check RLS policies.", 'error');
             recentTransactions = [];
           } else {
-            recentTransactions = transactions || [];
+            // Filter valid product_buy transactions
+            recentTransactions = transactions.filter(t => {
+              if (t.transaction_type === 'product_buy' && t.user_id === userId) {
+                return t.product_id && transactions.some(t2 => 
+                  t2.transaction_type === 'product_sell' && 
+                  t2.product_id === t.product_id && 
+                  t2.status === 'completed' && 
+                  new Date(t2.created_at) >= new Date(t.created_at) && 
+                  new Date(t2.created_at) <= new Date(t.created_at).setMinutes(new Date(t.created_at).getMinutes() + 1)
+                );
+              }
+              return true;
+            });
           }
 
           // Calculate financial metrics
@@ -535,17 +554,21 @@
           let totalExpenses = 0;
           recentTransactions.forEach(t => {
             const amount = parseFloat(t.amount) || 0;
-            if (amount > 0 && ['deposit', 'transfer_received', 'product_sell', 'loan_received'].includes(t.transaction_type)) {
+            if (t.user_id === userId && ['deposit', 'product_sell', 'loan_received'].includes(t.transaction_type)) {
               totalIncome += amount;
-            } else if (amount < 0 && (t.transaction_type.startsWith('withdrawal') || ['transfer_sent', 'product_buy', 'insurance_payment'].includes(t.transaction_type))) {
+            } else if (t.transaction_type === 'transfer' && t.recipient_id === userId) {
+              totalIncome += amount * (1 - TRANSACTION_FEE_RATE);
+            } else if (t.transaction_type === 'money_request' && t.user_id === userId && t.status === 'completed') {
+              totalIncome += amount;
+            } else if (t.user_id === userId && ['withdrawal', 'bill_payment', 'loan_payment', 'insurance_payment', 'product_buy'].includes(t.transaction_type)) {
               totalExpenses += Math.abs(amount);
             }
           });
-          userBalance = totalIncome - totalExpenses;
+          const userBalance = totalIncome - totalExpenses;
 
-          document.getElementById('totalIncomeDisplay').textContent = `$${totalIncome.toFixed(2)}`;
-          document.getElementById('totalExpensesDisplay').textContent = `$${totalExpenses.toFixed(2)}`;
-          document.getElementById('netBalanceDisplay').textContent = `$${userBalance.toFixed(2)}`;
+          document.getElementById('totalIncomeDisplay').textContent = formatCurrency(totalIncome);
+          document.getElementById('totalExpensesDisplay').textContent = formatCurrency(totalExpenses);
+          document.getElementById('netBalanceDisplay').textContent = formatCurrency(userBalance);
 
           let profitMargin = 0;
           if (totalIncome > 0) {
@@ -553,41 +576,39 @@
           }
           document.getElementById('profitMarginDisplay').textContent = `${profitMargin.toFixed(1)}%`;
 
-          // Placeholder for overdue invoices
-          document.getElementById('overdueInvoicesDisplay').textContent = `$0.00`;
+          document.getElementById('overdueInvoicesDisplay').textContent = formatCurrency(0);
           document.getElementById('overdueInvoicesCount').textContent = `0`;
 
+          // Update AI summary
           if (aiSummaryText) {
-            let summaryMessage = `Your current net balance is <strong>$${userBalance.toFixed(2)}</strong>. `;
+            let summaryMessage = `Your current net balance is <strong>${formatCurrency(userBalance)}</strong>. `;
             if (totalIncome > totalExpenses) {
-              summaryMessage += `You're profitable with a margin of <strong>${profitMargin.toFixed(1)}%</strong>. Keep up the good work!`;
+              summaryMessage += `You are profitable with a margin of <strong>${profitMargin.toFixed(1)}%</strong>. Keep up the good work!`;
             } else if (totalExpenses > 0) {
-              summaryMessage += `You've spent more than you earned this period. Review your expenses.`;
+              summaryMessage += `You have spent more than you earned this period. Review your expenses.`;
             } else {
-              summaryMessage += `Start by adding some income and expense transactions to see your financial picture.`;
+              summaryMessage += `Start by adding revenue and expense transactions to see your financial overview.`;
             }
             aiSummaryText.innerHTML = summaryMessage;
           }
 
-          // Render charts with fetched data
+          // Render charts
           renderSalesTrendChart(recentTransactions);
           renderExpenseBreakdownChart(recentTransactions);
           renderCashFlowChart(recentTransactions);
 
         } catch (error) {
-          console.error("Dashboard: Error fetching data from Supabase:", error);
+          console.error("Dashboard: Error fetching Supabase data:", error);
           showMessage(aiSummaryText, "Failed to load dashboard data. Please try again.", 'error');
         }
 
-        // Chart rendering functions
+        // Render sales trend chart
         function renderSalesTrendChart(transactions) {
-          const salesData = transactions.filter(t => t.transaction_type === 'product_sell');
-          const labels = salesData.map(t => new Date(t.created_at).toLocaleDateString());
+          const salesData = transactions.filter(t => t.transaction_type === 'product_sell' && t.recipient_id === userId);
+          const labels = salesData.map(t => new Date(t.created_at).toLocaleDateString('en-CA'));
           const data = salesData.map(t => parseFloat(t.amount));
           const ctx = document.getElementById('salesTrendChart').getContext('2d');
-          if (window.salesTrendChartInstance) {
-            window.salesTrendChartInstance.destroy();
-          }
+          if (window.salesTrendChartInstance) window.salesTrendChartInstance.destroy();
           window.salesTrendChartInstance = new Chart(ctx, {
             type: 'bar',
             data: {
@@ -600,90 +621,100 @@
                 borderWidth: 1
               }]
             },
-            options: {
-              scales: {
-                y: {
-                  beginAtZero: true
-                }
-              }
-            }
+            options: { scales: { y: { beginAtZero: true } } }
           });
         }
 
+        // Render expense breakdown chart
         function renderExpenseBreakdownChart(transactions) {
-          const expenseData = transactions.filter(t => ['product_buy', 'transfer_sent', 'insurance_payment'].includes(t.transaction_type) || t.transaction_type.startsWith('withdrawal'));
-          const categories = ['Product Buy', 'Withdrawal', 'Transfer Sent', 'Insurance Payment'];
-          const data = categories.map(cat => {
+          const expenseData = transactions.filter(t => 
+            t.user_id === userId && 
+            (['product_buy', 'transfer_sent', 'insurance_payment'].includes(t.transaction_type) || t.transaction_type.startsWith('withdrawal')) &&
+            (t.transaction_type !== 'product_buy' || 
+             (t.product_id && transactions.some(t2 => 
+               t2.transaction_type === 'product_sell' && 
+               t2.product_id === t.product_id && 
+               t2.status === 'completed' && 
+               new Date(t2.created_at) >= new Date(t.created_at) && 
+               new Date(t2.created_at) <= new Date(t.created_at).setMinutes(new Date(t.created_at).getMinutes() + 1)
+             ))
+            )
+          );
+          const categories = {
+            'Product Purchase': 'product_buy',
+            'Withdrawal': 'withdrawal',
+            'Transfer Sent': 'transfer_sent',
+            'Insurance Payment': 'insurance_payment'
+          };
+          const data = Object.values(categories).map(catKey => {
             return expenseData.filter(t => {
-              const normalizedType = t.transaction_type.toLowerCase().replace(' ', '_');
-              if (cat === 'Withdrawal') return normalizedType.startsWith('withdrawal');
-              return normalizedType === cat.toLowerCase().replace(' ', '_');
+              const normalizedType = t.transaction_type.toLowerCase().replace(/ /g, '_');
+              if (catKey === 'withdrawal') return normalizedType.startsWith('withdrawal');
+              return normalizedType === catKey;
             }).reduce((sum, t) => sum + Math.abs(parseFloat(t.amount)), 0);
           });
           const ctx = document.getElementById('expenseBreakdownChart').getContext('2d');
-          if (window.expenseBreakdownChartInstance) {
-            window.expenseBreakdownChartInstance.destroy();
-          }
+          if (window.expenseBreakdownChartInstance) window.expenseBreakdownChartInstance.destroy();
           window.expenseBreakdownChartInstance = new Chart(ctx, {
             type: 'doughnut',
             data: {
-              labels: categories,
+              labels: Object.keys(categories),
               datasets: [{
                 label: 'Expenses',
                 data: data,
-                backgroundColor: [
-                  'rgba(255, 99, 132, 0.6)',
-                  'rgba(54, 162, 235, 0.6)',
-                  'rgba(255, 206, 86, 0.6)',
-                  'rgba(153, 102, 255, 0.6)'
-                ],
-                borderColor: [
-                  'rgba(255, 99, 132, 1)',
-                  'rgba(54, 162, 235, 1)',
-                  'rgba(255, 206, 86, 1)',
-                  'rgba(153, 102, 255, 1)'
-                ],
+                backgroundColor: ['rgba(255, 99, 132, 0.6)', 'rgba(54, 162, 235, 0.6)', 'rgba(255, 206, 86, 0.6)', 'rgba(153, 102, 255, 0.6)'],
+                borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)', 'rgba(153, 102, 255, 1)'],
                 borderWidth: 1
               }]
             },
-            options: {
-              responsive: true,
-              plugins: {
-                legend: {
-                  position: 'top',
-                }
-              }
-            }
+            options: { responsive: true, plugins: { legend: { position: 'top' } } }
           });
         }
 
+        // Render cash flow chart
         function renderCashFlowChart(transactions) {
-          const cashFlowData = transactions.map(t => ({
-            date: new Date(t.created_at).toLocaleDateString(),
+          const cashFlowData = transactions.filter(t => {
+            if (t.transaction_type === 'product_buy' && t.user_id === userId) {
+              return t.product_id && transactions.some(t2 => 
+                t2.transaction_type === 'product_sell' && 
+                t2.product_id === t.product_id && 
+                t2.status === 'completed' && 
+                new Date(t2.created_at) >= new Date(t.created_at) && 
+                new Date(t2.created_at) <= new Date(t.created_at).setMinutes(new Date(t.created_at).getMinutes() + 1)
+              );
+            }
+            return true;
+          }).map(t => ({
+            date: new Date(t.created_at),
             amount: parseFloat(t.amount)
-          }));
+          })).sort((a, b) => a.date - b.date);
+
           const aggregatedCashFlow = cashFlowData.reduce((acc, current) => {
-            acc[current.date] = (acc[current.date] || 0) + current.amount;
+            const dateKey = current.date.toLocaleDateString('en-CA');
+            if (!acc[dateKey]) {
+              acc[dateKey] = { inflow: 0, outflow: 0 };
+            }
+            if (current.amount > 0 && (current.user_id === userId || ['transfer'].includes(current.transaction_type))) {
+              acc[dateKey].inflow += current.amount;
+            } else if (current.amount < 0 && current.user_id === userId) {
+              acc[dateKey].outflow += Math.abs(current.amount);
+            }
             return acc;
           }, {});
-          const labels = Object.keys(aggregatedCashFlow).sort((a, b) => new Date(a) - new Date(b));
-          const inflowData = labels.map(label => {
-            return cashFlowData.filter(d => d.date === label && d.amount > 0).reduce((sum, d) => sum + d.amount, 0);
-          });
-          const outflowData = labels.map(label => {
-            return cashFlowData.filter(d => d.date === label && d.amount < 0).reduce((sum, d) => sum + Math.abs(d.amount), 0);
-          });
+
+          const labels = Object.keys(aggregatedCashFlow);
+          const inflowData = labels.map(label => aggregatedCashFlow[label].inflow);
+          const outflowData = labels.map(label => aggregatedCashFlow[label].outflow);
+
           const ctx = document.getElementById('cashFlowChart').getContext('2d');
-          if (window.cashFlowChartInstance) {
-            window.cashFlowChartInstance.destroy();
-          }
+          if (window.cashFlowChartInstance) window.cashFlowChartInstance.destroy();
           window.cashFlowChartInstance = new Chart(ctx, {
             type: 'line',
             data: {
               labels: labels,
               datasets: [
                 {
-                  label: 'Inflow',
+                  label: 'Inflows',
                   data: inflowData,
                   fill: true,
                   backgroundColor: 'rgba(75, 192, 192, 0.2)',
@@ -691,7 +722,7 @@
                   tension: 0.1
                 },
                 {
-                  label: 'Outflow',
+                  label: 'Outflows',
                   data: outflowData,
                   fill: true,
                   backgroundColor: 'rgba(255, 99, 132, 0.2)',
@@ -700,13 +731,7 @@
                 }
               ]
             },
-            options: {
-              scales: {
-                y: {
-                  beginAtZero: true
-                }
-              }
-            }
+            options: { scales: { y: { beginAtZero: true } } }
           });
         }
       });
