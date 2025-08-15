@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Community Hub - nova7</title>
+    <title>Hub communautaire - nova7</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -14,6 +13,7 @@
             background-color: #F3F2EF;
             color: #1D2026;
         }
+        /* Sidebar Styles */
         .sidebar-nova7 {
             background-color: #004182;
             color: #E0F2FE;
@@ -70,6 +70,7 @@
             margin-right: 0.75rem;
             text-align: center;
         }
+        /* Main Content Styles */
         .main-content-area {
             margin-left: 260px;
             padding: 2rem;
@@ -102,6 +103,19 @@
         .btn-primary-action i {
             margin-right: 0.5rem;
         }
+        .btn-secondary-outline {
+            background-color: transparent;
+            color: #0A66C2;
+            border: 1px solid #0A66C2;
+            border-radius: 20px;
+            padding: 0.5rem 1.25rem;
+            font-weight: 600;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .btn-secondary-outline:hover {
+            background-color: #E0F2FE;
+        }
+        /* Community Layout */
         .community-layout {
             display: grid;
             grid-template-columns: 1fr;
@@ -118,6 +132,7 @@
             box-shadow: 0 0 0 1px rgba(0,0,0,0.08), 0 2px 3px rgba(0,0,0,0.06);
             padding: 1.25rem;
         }
+        /* Create Post Card */
         .create-post-card {
             margin-bottom: 1rem;
         }
@@ -195,7 +210,9 @@
             align-items: center;
         }
         .post-video::before {
-            content: '\f04b';
+
+            content: '\f04b'; /* Font Awesome play icon */
+
             font-family: 'Font Awesome 6 Free';
             font-weight: 900;
             position: absolute;
@@ -251,6 +268,7 @@
         .post-action-buttons button:hover i, .post-action-buttons a:hover i {
             color: #0A66C2;
         }
+        /* Post Feed Item Card */
         .post-card {
             margin-bottom: 1rem;
         }
@@ -455,6 +473,7 @@
             color: #0A66C2;
             font-weight: 700;
         }
+        /* Comment Section Styles */
         .comments-section {
             margin-top: 1rem;
             padding-top: 1rem;
@@ -591,6 +610,7 @@
             background-color: #E5E7EB;
             color: #4B5563;
         }
+        /* Right Sidebar - Marketplace Highlights */
         .right-sidebar {
             display: flex;
             flex-direction: column;
@@ -641,6 +661,7 @@
             color: #22C55E;
             font-weight: 700;
         }
+        /* Mobile Header */
         .mobile-header {
             display: none;
             background-color: #FFFFFF;
@@ -676,6 +697,7 @@
                 display: flex;
             }
         }
+        /* Message Box Styles (for alerts) */
         .message-box {
             position: fixed;
             bottom: 1rem;
@@ -697,6 +719,7 @@
         .message-box.success { background-color: #28a745; }
         .message-box.error { background-color: #dc3545; }
         .message-box.info { background-color: #17a2b8; }
+        /* Message FAB and Modal Styles */
         .message-fab {
             position: fixed;
             bottom: 2rem;
@@ -865,6 +888,7 @@
             align-self: flex-end;
             justify-content: flex-end;
         }
+
         .chat-input-area {
             display: flex;
             margin-top: 1rem;
@@ -923,7 +947,7 @@
                 onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
             <span style="display:none;" class="text-xl font-semibold text-gray-700">nova7</span>
         </a>
-        <a href="#" id="mobileLogout suena como un sueñoLogoutLink" class="p-2 text-gray-700 hover:text-blue-600">
+        <a href="#" id="mobileLogoutLink" class="p-2 text-gray-700 hover:text-blue-600">
             <i class="fas fa-sign-out-alt text-xl"></i>
         </a>
     </header>
@@ -937,36 +961,36 @@
         </div>
         <nav class="flex-grow">
             <a href="dashboard.html" class="nav-link-sidebar">
-                <i class="fas fa-tachometer-alt"></i>Dashboard
+                <i class="fas fa-tachometer-alt"></i>Tableau de bord
             </a>
             <a href="view-transactions.html" class="nav-link-sidebar">
                 <i class="fas fa-exchange-alt"></i>Transactions
             </a>
             <a href="reports.html" class="nav-link-sidebar">
-                <i class="fas fa-chart-pie"></i>Reports
+                <i class="fas fa-chart-pie"></i>Rapports
             </a>
             <a href="community.html" class="nav-link-sidebar active">
-                <i class="fas fa-users"></i>Community
+                <i class="fas fa-users"></i>Communauté
             </a>
             <a href="chatbot.html" class="nav-link-sidebar">
-                <i class="fas fa-comments-dollar"></i>Virtual Advisor
+                <i class="fas fa-comments-dollar"></i>Conseiller virtuel
             </a>
             <a href="resources.html" class="nav-link-sidebar">
                 <i class="fas fa-book-open"></i>Resources
             </a>
             <a href="settings.html" class="nav-link-sidebar">
-                <i class="fas fa-cog"></i>Settings
+                <i class="fas fa-cog"></i>Paramètres
             </a>
             <a href="wallet.html" class="nav-link-sidebar">
-                <i class="fas fa-wallet"></i>Wallet
+                <i class="fas fa-wallet"></i>Portefeuille
             </a>
         </nav>
         <div class="pb-4">
             <a href="profile.html" class="nav-link-sidebar">
-                <i class="fas fa-user-circle"></i>Profile
+                <i class="fas fa-user-circle"></i>Profil
             </a>
             <a href="#" id="sidebarLogoutLink" class="nav-link-sidebar">
-                <i class="fas fa-sign-out-alt"></i>Logout
+                <i class="fas fa-sign-out-alt"></i>Déconnexion
             </a>
         </div>
     </aside>
@@ -980,1299 +1004,1677 @@
         </header>
         <div class="community-layout">
             <div>
-                <div class="card-base mb-4 relative">
-                    <input type="text" id="searchBar" placeholder="Search posts or users..." class="w-full border border-gray-300 rounded-full p-3 text-sm focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-200 transition-all duration-300 bg-white shadow-sm">
-                    <button id="clearSearchBtn" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none hidden">
-                        <i class="fas fa-times"></i>
+            <div class="card-base mb-4 relative">
+                <input type="text" id="searchBar" placeholder="Search posts or users..." class="w-full border border-gray-300 rounded-full p-3 text-sm focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-200 transition-all duration-300 bg-white shadow-sm">
+                <button id="clearSearchBtn" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none hidden">
+                <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="searchResults" class="mt-4 bg-white rounded-lg shadow-lg p-4 max-h-96 overflow-y-auto transition-all duration-300 opacity-0 invisible"></div>
+            <div class="card-base create-post-card">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">Créer une nouvelle publication</h2>
+                <div class="create-post-input-area">
+                <div class="create-post-avatar" id="createPostAvatar">U</div>
+                <textarea id="postContent" placeholder="Partagez votre message de soutien ou une demande d'aide..." rows="3"></textarea>
+                </div>
+                <div id="mediaPreviewContainer" class="hidden mb-3">
+                <img id="imagePreview" src="#" alt="Aperçu de l'image" class="w-full h-auto rounded-lg max-h-64 object-contain hidden">
+                <video id="videoPreview" controls autoplay muted playsinline class="w-full h-auto rounded-lg max-h-64 hidden">
+                    <source src="#" type="video/mp4">
+                    Votre navigateur ne prend pas en charge la balise vidéo.
+                </video>
+                <button id="removeMediaBtn" class="text-red-500 text-sm mt-2">Supprimer le média</button>
+                </div>
+                <div class="post-actions">
+                <div class="post-action-buttons flex space-x-2">
+                    <input type="file" id="postMediaUpload" accept="image/*,video/mp4,video/webm" class="hidden">
+                    <button id="uploadMediaBtn" class="flex items-center text-blue-600 hover:text-blue-800 transition-colors duration-200">
+                    <i class="fas fa-image mr-1"></i>Média
                     </button>
                 </div>
-                <div id="searchResults" class="mt-4 bg-white rounded-lg shadow-lg p-4 max-h-96 overflow-y-auto transition-all duration-300 opacity-0 invisible"></div>
-                <div class="card-base create-post-card">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4">Create a New Post</h2>
-                    <div class="create-post-input-area">
-                        <div class="create-post-avatar" id="createPostAvatar">U</div>
-                        <textarea id="postContent" placeholder="Share your support message or request for help..." rows="3"></textarea>
-                    </div>
-                    <div id="mediaPreviewContainer" class="hidden mb-3">
-                        <img id="imagePreview" src="#" alt="Image Preview" class="w-full h-auto rounded-lg max-h-64 object-contain hidden">
-                        <video id="videoPreview" controls autoplay muted playsinline class="w-full h-auto rounded-lg max-h-64 hidden">
-                            <source src="#" type="video/mp4">
-                            Your browser does not support the video tag.
-                        </video>
-                        <button id="removeMediaBtn" class="text-red-500 text-sm mt-2">Remove Media</button>
-                    </div>
-                    <div class="post-actions">
-                        <div class="post-action-buttons flex space-x-2">
-                            <input type="file" id="postMediaUpload" accept="image/*,video/mp4,video/webm" class="hidden">
-                            <button id="uploadMediaBtn" class="flex items-center text-blue-600 hover:text-blue-800 transition-colors duration-200">
-                                <i class="fas fa-image mr-1"></i>Media
-                            </button>
-                        </div>
-                        <button id="submitPostBtn" class="btn-primary-action">
-                            <i class="fas fa-paper-plane"></i>Post
-                        </button>
-                    </div>
                 </div>
-                <div id="postFeed">
-                    <p class="text-gray-500 text-center py-4" id="loadingPostsMessage">Loading posts...</p>
-                </div>
+                <button id="submitPostBtn" class="btn-primary-action">
+                <i class="fas fa-paper-plane"></i>Publier
+                </button>
+            </div>
+            <div id="postFeed">
+                <p class="text-gray-500 text-center py-4" id="loadingPostsMessage">Chargement des publications...</p>
+            </div>
             </div>
             <div class="right-sidebar">
-                <div class="marketplace-card">
-                    <h3>Marketplace Highlights</h3>
-                    <div id="marketplaceHighlights">
-                        <p class="text-xs text-gray-500">Loading marketplace items...</p>
-                    </div>
+            <div class="marketplace-card">
+                <h3>Points forts du marché</h3>
+                <div id="marketplaceHighlights">
+                <p class="text-xs text-gray-500">Chargement des articles du marché...</p>
                 </div>
             </div>
+            </div>
         </div>
-        <button id="messageFab" class="message-fab relative">
+        <!-- Message Floating Action Button and Modal -->
+        <button id="""messageFab" class="""message-fab">
             <i class="fas fa-comment"></i>
-            <span id="unreadMessageCount" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center hidden">0</span>
         </button>
         <div id="messageModalOverlay" class="message-modal-overlay">
             <div class="message-modal-content">
-                <div class="message-modal-header">
-                    Messages
-                    <button id="closeMessageModalButton">&times;</button>
+            <div class="message-modal-header">
+                Messages
+                <button id="closeMessageModalButton">&times;</button>
+            </div>
+            <div class="message-modal-body">
+                <div class="message-sidebar">
+                <div class="message-search-bar">
+                    <input type="text" id="chatUserSearch" placeholder="Rechercher des utilisateurs ou des discussions...">
                 </div>
-                <div class="message-modal-body">
-                    <div class="message-sidebar">
-                        <div class="message-search-bar">
-                            <input type="text" id="chatUserSearch" placeholder="Search users or chats...">
-                        </div>
-                        <div id="chatUserList" class="message-list"></div>
-                    </div>
-                    <div class="chat-area">
-                        <div class="chat-area-header" id="activeChatHeader">Select a chat</div>
-                        <div id="chatWindow" class="chat-window"></div>
-                        <div class="chat-input-area">
-                            <input type="text" id="chatInput" placeholder="Write a message...">
-                            <button id="sendChatMessageButton" class="btn-primary-action">
-                                <i class="fas fa-paper-plane"></i>
-                            </button>
-                        </div>
-                    </div>
+                <div id="chatUserList" class="message-list"></div>
+                </div>
+                <div class="chat-area">
+                <div class="chat-area-header" id="activeChatHeader">Sélectionner une discussion</div>
+                <div id="chatWindow" class="chat-window"></div>
+                <div class="chat-input-area">
+                    <input type="text" id="chatInput" placeholder="Écrire un message...">
+                    <button id="sendChatMessageButton" class="btn-primary-action">
+                    <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
                 </div>
             </div>
+            </div>
         </div>
+        <button id="messageFab" class="message-fab">
+            <i class="fas fa-comment"></i>
+        </button>
     </main>
+</body>
 
-    <script>
-        // Supabase client initialization
-        const SUPABASE_URL = 'https://nvxqorudztbpwyanakdj.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52eHFvcnVkenRicHd5YW5ha2RqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIzOTk5NTQsImV4cCI6MjA2Nzk3NTk1NH0.XvITDAnpEkjQTh4SCVOfwGKsaANS6tp58Up37SXwYRw';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        const LOVE_AMOUNT = 1.00;
-        let currentUser = null;
-        let currentBalance = 0;
-        let activeChatSessionId = null;
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// Supabase client initialization
+const SUPABASE_URL = 'https://nvxqorudztbpwyanakdj.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52eHFvcnVkenRicHd5YW5ha2RqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIzOTk5NTQsImV4cCI6MjA2Nzk3NTk1NH0.XvITDAnpEkjQTh4SCVOfwGKsaANS6tp58Up37SXwYRw';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const LOVE_AMOUNT = 1.00; // $1 per love
+let currentUser = null;
+let currentBalance = 0;
+let activeChatSessionId = null; // Tracks the active chat ID
+let mediaRecorder = null;
+let audioChunks = [];
 
-        // Utility Functions
-        function timeDifference(current, previous) {
-            const msPerMinute = 60 * 1000;
-            const msPerHour = msPerMinute * 60;
-            const msPerDay = msPerHour * 24;
-            const msPerWeek = msPerDay * 7;
-            const elapsed = current - previous;
-            if (elapsed < msPerMinute) return Math.round(elapsed / 1000) + 's ago';
-            else if (elapsed < msPerHour) return Math.round(elapsed / msPerMinute) + 'm ago';
-            else if (elapsed < msPerDay) return Math.round(elapsed / msPerHour) + 'h ago';
-            else if (elapsed < msPerWeek) return Math.round(elapsed / msPerDay) + 'd ago';
-            else return new Date(previous).toLocaleDateString();
-        }
-
-        function showMessage(message, type = 'info') {
-            const messageBox = document.getElementById('messageBox');
-            messageBox.textContent = message;
-            messageBox.className = `message-box show ${type}`;
-            setTimeout(() => {
-                messageBox.classList.remove('show');
-            }, 3000);
-        }
-
-        async function handleLogout() {
-            try {
-                const { error } = await supabase.auth.signOut();
-                if (error) throw error;
-                window.location.href = 'index.html';
-            } catch (error) {
-                console.error('Logout error:', error.message);
-                showMessage('Failed to log out.', 'error');
-            }
-        }
-
-        // User and Authentication
-        async function initializeUser() {
-            try {
-                const { data: { user } } = await supabase.auth.getUser();
-                if (user) {
-                    currentUser = user;
-                    await fetchUserProfile();
-                    await fetchUserBalance();
-                    await updateUnreadMessageCount();
-                    await populateChatUserList();
-                    await fetchPosts();
-                    const avatarElement = document.getElementById('createPostAvatar');
-                    if (currentUser.avatar_url) {
-                        avatarElement.innerHTML = `<img src="${currentUser.avatar_url}" alt="Profile">`;
-                    } else {
-                        avatarElement.textContent = currentUser.full_name ? currentUser.full_name.charAt(0).toUpperCase() : 'U';
-                    }
-                    document.getElementById('desktopUserWelcome').textContent = `Welcome, ${currentUser.full_name || 'User'}!`;
-                } else {
-                    showMessage('Please log in to access the community.', 'error');
-                    setTimeout(() => window.location.href = 'index.html', 1000);
-                }
-            } catch (error) {
-                console.error('Error initializing user:', error.message);
-                showMessage('Failed to initialize user.', 'error');
-                window.location.href = 'index.html';
-            }
-        }
-
-        async function fetchUserProfile() {
-            if (!currentUser || !currentUser.id) return;
-            try {
-                const { data, error } = await supabase
-                    .from('users')
-                    .select('full_name, avatar_url, email')
-                    .eq('id', currentUser.id)
-                    .single();
-                if (error) throw error;
-                currentUser.full_name = data.full_name;
-                currentUser.avatar_url = data.avatar_url;
-                currentUser.email = data.email;
-            } catch (error) {
-                console.error('Error fetching user profile:', error.message);
-                showMessage('Failed to load user profile.', 'error');
-            }
-        }
-
-        async function fetchUserBalance() {
-            if (!currentUser || !currentUser.id) return;
-            try {
-                const { data: transactions, error } = await supabase
-                    .from('transactions')
-                    .select('amount, type, user_id, recipient_id, status')
-                    .or(`user_id.eq.${currentUser.id},recipient_id.eq.${currentUser.id}`)
-                    .eq('status', 'completed');
-                if (error) throw error;
-                let balance = 0;
-                transactions.forEach(tx => {
-                    const amount = parseFloat(tx.amount);
-                    if (tx.type === 'deposit' && tx.user_id === currentUser.id) {
-                        balance += amount;
-                    } else if (tx.type === 'transfer') {
-                        if (tx.recipient_id === currentUser.id) balance += amount * (1 - 0.001);
-                        else if (tx.user_id === currentUser.id) balance -= amount;
-                    } else if (tx.type === 'request' && tx.user_id === currentUser.id && tx.status === 'completed') {
-                        balance += amount;
-                    } else if (tx.user_id === currentUser.id && ['withdrawal', 'love'].includes(tx.type)) {
-                        balance -= amount;
-                    } else if (tx.recipient_id === currentUser.id && tx.type === 'love') {
-                        balance += amount;
-                    }
-                });
-                currentBalance = balance;
-            } catch (error) {
-                console.error('Error fetching user balance:', error.message);
-                showMessage('Failed to load balance.', 'error');
-            }
-        }
-
-        // Post Management
-        async function createPost() {
-            const postContent = document.getElementById('postContent').value;
-            const postMediaUpload = document.getElementById('postMediaUpload');
-            const mediaFile = postMediaUpload ? postMediaUpload.files[0] : null;
-            if (!postContent.trim() && !mediaFile) {
-                showMessage('Post content or media is required!', 'error');
-                return;
-            }
-            if (!currentUser || !currentUser.id) {
-                showMessage('You must be logged in to create a post.', 'error');
-                handleLogout();
-                return;
-            }
-            let imageUrl = null;
-            let mediaType = null;
-            if (mediaFile) {
-                try {
-                    const filePath = `${currentUser.id}/${Date.now()}_${mediaFile.name}`;
-                    const { error: uploadError } = await supabase.storage
-                        .from('post-images')
-                        .upload(filePath, mediaFile, {
-                            cacheControl: '3600',
-                            upsert: false
-                        });
-                    if (uploadError) throw uploadError;
-                    const { data: publicUrlData } = supabase.storage
-                        .from('post-images')
-                        .getPublicUrl(filePath);
-                    imageUrl = publicUrlData.publicUrl;
-                    mediaType = mediaFile.type.startsWith('image/') ? 'image' : 'video';
-                } catch (error) {
-                    console.error('Error uploading media:', error.message);
-                    showMessage(`Failed to upload media: ${error.message}`, 'error');
-                    return;
-                }
-            }
-            try {
-                const { data, error } = await supabase
-                    .from('posts')
-                    .insert([
-                        {
-                            user_id: currentUser.id,
-                            content: postContent,
-                            media_url: imageUrl,
-                            media_type: mediaType,
-                            created_at: new Date().toISOString(),
-                            likes_count: 0,
-                            loves_count: 0,
-                            comments_count: 0,
-                            views_count: 0
-                        }
-                    ])
-                    .select()
-                    .single();
-                if (error) throw error;
-                showMessage('Post created successfully!', 'success');
-                document.getElementById('postContent').value = '';
-                removeMedia();
-                await fetchPosts();
-            } catch (error) {
-                console.error('Error creating post:', error.message);
-                showMessage(`Failed to create post: ${error.message}`, 'error');
-            }
-        }
-
-        async function fetchPosts() {
-            const postFeedDiv = document.getElementById('postFeed');
-            postFeedDiv.innerHTML = '<p class="text-gray-500 text-center py-4" id="loadingPostsMessage">Loading posts...</p>';
-            try {
-                const { data: posts, error } = await supabase
-                    .from('posts')
-                    .select(`
-                        id,
-                        content,
-                        media_url,
-                        media_type,
-                        created_at,
-                        likes_count,
-                        loves_count,
-                        comments_count,
-                        views_count,
-                        user_id,
-                        users (
-                            id,
-                            full_name,
-                            email,
-                            avatar_url
-                        ),
-                        likes (user_id)
-                    `)
-                    .order('created_at', { ascending: false });
-                if (error) throw error;
-                postFeedDiv.innerHTML = '';
-                if (!posts || posts.length === 0) {
-                    postFeedDiv.innerHTML = '<p class="text-gray-500 text-center py-4">No posts yet. Be the first to share!</p>';
-                    return;
-                }
-                posts.forEach(post => {
-                    const isMyPost = currentUser && post.user_id && currentUser.id === post.user_id;
-                    const isLikedByMe = post.likes && post.likes.some(like => like.user_id === currentUser.id);
-                    const postElement = document.createElement('div');
-                    postElement.className = 'card-base post-card';
-                    const authorName = post.users
-                        ? post.users.full_name || (post.users.email ? post.users.email.split('@')[0] : 'Anonymous')
-                        : 'Anonymous';
-                    const authorAvatarUrl = post.users ? post.users.avatar_url : null;
-                    const avatarHtml = authorAvatarUrl
-                        ? `<img src="${authorAvatarUrl}" alt="Profile" class="w-full h-full rounded-full object-cover">`
-                        : `<span>${authorName.charAt(0).toUpperCase()}</span>`;
-                    const postDate = new Date(post.created_at);
-                    const formattedTime = timeDifference(new Date(), postDate);
-                    let mediaHtml = '';
-                    if (post.media_url) {
-                        if (post.media_type === 'image') {
-                            mediaHtml = `<div class="post-image"><img src="${post.media_url}" alt="Post image" loading="lazy"></div>`;
-                        } else if (post.media_type === 'video') {
-                            mediaHtml = `<div class="post-video"><video controls><source src="${post.media_url}" type="video/mp4">Your browser does not support the video tag.</video></div>`;
-                        }
-                    }
-                    postElement.innerHTML = `
-                        <div class="post-header">
-                            <div class="post-avatar">${avatarHtml}</div>
-                            <div class="post-author-info">
-                                <a href="profile.html?userId=${post.user_id}" class="hover:underline">${authorName}</a>
-                                <div class="post-timestamp">${formattedTime}</div>
-                            </div>
-                            ${isMyPost ? `
-                                <button class="post-options-btn" data-post-id="${post.id}">
-                                    <i class="fas fa-ellipsis-h"></i>
-                                </button>
-                                <div class="post-options-dropdown hidden" data-post-id="${post.id}">
-                                    <button class="delete-post-btn" data-post-id="${post.id}">Delete Post</button>
-                                </div>
-                            ` : ''}
-                        </div>
-                        <div class="post-content">${post.content || ''}</div>
-                        ${mediaHtml}
-                        <div class="post-stats">
-                            <span id="viewsCount-${post.id}">${post.views_count || 0} views</span>
-                            <span id="likesCount-${post.id}">${post.likes_count || 0} likes</span>
-                            <span id="lovesCount-${post.id}">${post.loves_count || 0} loves</span>
-                            <span id="commentsCount-${post.id}">${post.comments_count || 0} comments</span>
-                        </div>
-                        <div class="post-footer">
-                            <button class="like-btn ${isLikedByMe ? 'liked' : ''}" data-post-id="${post.id}" style="color: ${isLikedByMe ? '#0A66C2' : '#4B5563'}">
-                                <i class="fas fa-thumbs-up"></i>Like
-                            </button>
-                            <button class="love-btn" data-post-id="${post.id}" data-recipient-id="${post.user_id}">
-                                <i class="fas fa-heart"></i>Love
-                            </button>
-                            <button class="comment-btn" data-post-id="${post.id}">
-                                <i class="fas fa-comment"></i>Comment
-                            </button>
-                            <button class="share-btn" data-post-id="${post.id}">
-                                <i class="fas fa-share"></i>Share
-                            </button>
-                        </div>
-                        <div id="commentsSection-${post.id}" class="comments-section hidden"></div>
-                    `;
-                    postFeedDiv.appendChild(postElement);
-                    recordPostView(post.id);
-                });
-                setupPostEventListeners();
-            } catch (error) {
-                console.error('Error fetching posts:', error.message);
-                postFeedDiv.innerHTML = '<p class="text-red-500 text-center text-sm">Failed to load posts.</p>';
-            }
-        }
-
-        async function deletePost(postId) {
-            try {
-                const { error } = await supabase
-                    .from('posts')
-                    .delete()
-                    .eq('id', postId)
-                    .eq('user_id', currentUser.id);
-                if (error) throw error;
-                showMessage('Post deleted successfully!', 'success');
-                await fetchPosts();
-            } catch (error) {
-                console.error('Error deleting post:', error.message);
-                showMessage('Failed to delete post.', 'error');
-            }
-        }
-
-        async function likePost(postId, button) {
-            try {
-                const { data: existingLike } = await supabase
-                    .from('likes')
-                    .select('id')
-                    .eq('post_id', postId)
-                    .eq('user_id', currentUser.id)
-                    .maybeSingle();
-                if (existingLike) {
-                    await supabase.from('likes').delete().eq('id', existingLike.id);
-                    button.classList.remove('liked');
-                    button.style.color = '#4B5563';
-                } else {
-                    await supabase.from('likes').insert([{ post_id: postId, user_id: currentUser.id }]);
-                    button.classList.add('liked');
-                    button.style.color = '#0A66C2';
-                }
-                await updatePostStats(postId);
-            } catch (error) {
-                console.error('Error liking post:', error.message);
-                showMessage('Failed to like post.', 'error');
-            }
-        }
-
-        async function lovePost(postId, button, recipientId) {
-            if (currentBalance < LOVE_AMOUNT) {
-                showMessage('Insufficient balance to love post.', 'error');
-                return;
-            }
-            try {
-                await supabase.from('transactions').insert([{
-                    user_id: currentUser.id,
-                    recipient_id: recipientId,
-                    amount: -LOVE_AMOUNT,
-                    type: 'love',
-                    status: 'completed',
-                    description: postId,
-                    created_at: new Date().toISOString()
-                }]);
-                button.classList.add('loved');
-                button.style.color = '#0A66C2';
-                currentBalance -= LOVE_AMOUNT;
-                showMessage('Love sent successfully!', 'success');
-                await fetchUserBalance();
-                await updatePostStats(postId);
-            } catch (error) {
-                console.error('Error loving post:', error.message);
-                showMessage('Failed to love post.', 'error');
-            }
-        }
-
-        async function sharePost(postId) {
-            const postUrl = `${window.location.origin}/community.html?postId=${postId}`;
-            try {
-                await navigator.clipboard.writeText(postUrl);
-                showMessage('Post link copied to clipboard!', 'success');
-            } catch (error) {
-                console.error('Error copying post link:', error.message);
-                showMessage('Failed to copy post link.', 'error');
-            }
-        }
-
-        async function fetchComments(postId) {
-            const commentsSection = document.getElementById(`commentsSection-${postId}`);
-            commentsSection.innerHTML = '<p class="text-gray-500 text-center text-sm">Loading comments...</p>';
-            try {
-                const { data: comments, error } = await supabase
-                    .from('comments')
-                    .select(`
-                        id,
-                        content,
-                        created_at,
-                        user_id,
-                        users (
-                            full_name,
-                            avatar_url
-                        )
-                    `)
-                    .eq('post_id', postId)
-                    .order('created_at', { ascending: true });
-                if (error) throw error;
-                commentsSection.innerHTML = '';
-                if (!comments || comments.length === 0) {
-                    commentsSection.innerHTML = '<p class="text-gray-500 text-center text-sm">No comments yet.</p>';
-                } else {
-                    comments.forEach(comment => {
-                        const isMyComment = currentUser && comment.user_id && currentUser.id === comment.user_id;
-                        const commenterName = comment.users?.full_name || 'Anonymous';
-                        const avatarHtml = comment.users?.avatar_url
-                            ? `<img src="${comment.users.avatar_url}" alt="Profile">`
-                            : `<span>${commenterName.charAt(0).toUpperCase()}</span>`;
-                        const formattedTime = timeDifference(new Date(), new Date(comment.created_at));
-                        const commentElement = document.createElement('div');
-                        commentElement.className = 'comment';
-                        commentElement.innerHTML = `
-                            <div class="comment-avatar">${avatarHtml}</div>
-                            <div class="comment-content-wrapper">
-                                <span class="commenter-name">${commenterName}</span>
-                                <span class="comment-timestamp">${formattedTime}</span>
-                                <div class="comment-text">${comment.content}</div>
-                                ${isMyComment ? `
-                                    <button class="comment-options-btn" data-comment-id="${comment.id}">
-                                        <i class="fas fa-ellipsis-h"></i>
-                                    </button>
-                                    <div class="comment-options-dropdown hidden" data-comment-id="${comment.id}">
-                                        <button class="edit-comment-btn" data-comment-id="${comment.id}">Edit</button>
-                                        <button class="delete-comment-btn" data-comment-id="${comment.id}">Delete</button>
-                                    </div>
-                                ` : ''}
-                            </div>
-                        `;
-                        commentsSection.appendChild(commentElement);
-                    });
-                }
-                commentsSection.innerHTML += `
-                    <div class="add-comment-area">
-                        <textarea placeholder="Write a comment..." rows="1"></textarea>
-                        <button class="btn-primary-action add-comment-btn" data-post-id="${postId}">
-                            <i class="fas fa-comment"></i>Comment
-                        </button>
-                    </div>
-                `;
-                setupCommentEventListeners(postId);
-            } catch (error) {
-                console.error('Error fetching comments:', error.message);
-                commentsSection.innerHTML = '<p class="text-red-500 text-center text-sm">Failed to load comments.</p>';
-            }
-        }
-
-        async function addComment(postId, textarea) {
-            const content = textarea.value.trim();
-            if (!content) {
-                showMessage('Comment cannot be empty.', 'error');
-                return;
-            }
-            try {
-                await supabase.from('comments').insert([{
-                    post_id: postId,
-                    user_id: currentUser.id,
-                    content,
-                    created_at: new Date().toISOString()
-                }]);
-                textarea.value = '';
-                await fetchComments(postId);
-                await updatePostStats(postId);
-                showMessage('Comment added successfully!', 'success');
-            } catch (error) {
-                console.error('Error adding comment:', error.message);
-                showMessage('Failed to add comment.', 'error');
-            }
-        }
-
-        async function editComment(commentId, commentElement) {
-            const commentTextElement = commentElement.querySelector('.comment-text');
-            const currentContent = commentTextElement.textContent;
-            commentElement.innerHTML = `
-                <div class="comment-avatar">${commentElement.querySelector('.comment-avatar').innerHTML}</div>
-                <div class="comment-content-wrapper">
-                    <div class="edit-comment-area">
-                        <textarea rows="2">${currentContent}</textarea>
-                        <div class="edit-comment-actions">
-                            <button class="cancel-btn">Cancel</button>
-                            <button class="save-btn btn-primary-action">Save</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            const textarea = commentElement.querySelector('textarea');
-            const saveBtn = commentElement.querySelector('.save-btn');
-            const cancelBtn = commentElement.querySelector('.cancel-btn');
-            textarea.focus();
-            saveBtn.addEventListener('click', async () => {
-                const newContent = textarea.value.trim();
-                if (!newContent) {
-                    showMessage('Comment cannot be empty.', 'error');
-                    return;
-                }
-                try {
-                    const { error } = await supabase
-                        .from('comments')
-                        .update({ content: newContent })
-                        .eq('id', commentId)
-                        .eq('user_id', currentUser.id);
-                    if (error) throw error;
-                    await fetchComments(commentElement.closest('.comments-section').dataset.postId);
-                    showMessage('Comment updated successfully!', 'success');
-                } catch (error) {
-                    console.error('Error updating comment:', error.message);
-                    showMessage('Failed to update comment.', 'error');
-                }
-            });
-            cancelBtn.addEventListener('click', () => fetchComments(commentElement.closest('.comments-section').dataset.postId));
-        }
-
-        async function deleteComment(commentId, postId) {
-            try {
-                const { error } = await supabase
-                    .from('comments')
-                    .delete()
-                    .eq('id', commentId)
-                    .eq('user_id', currentUser.id);
-                if (error) throw error;
-                await fetchComments(postId);
-                await updatePostStats(postId);
-                showMessage('Comment deleted successfully!', 'success');
-            } catch (error) {
-                console.error('Error deleting comment:', error.message);
-                showMessage('Failed to delete comment.', 'error');
-            }
-        }
-
-        async function recordPostView(postId) {
-            if (!currentUser || !currentUser.id) return;
-            try {
-                const { data: existingView } = await supabase
-                    .from('views')
-                    .select('id')
-                    .eq('post_id', postId)
-                    .eq('user_id', currentUser.id)
-                    .maybeSingle();
-                if (!existingView) {
-                    await supabase.from('views').insert([{ post_id: postId, user_id: currentUser.id, created_at: new Date().toISOString() }]);
-                    await updatePostStats(postId);
-                }
-            } catch (error) {
-                console.error('Error recording post view:', error.message);
-            }
-        }
-
-        async function updatePostStats(postId) {
-            try {
-                const { data: likes } = await supabase.from('likes').select('id').eq('post_id', postId);
-                const { data: loves } = await supabase.from('transactions').select('id').eq('description', postId).eq('type', 'love').eq('status', 'completed');
-                const { data: comments } = await supabase.from('comments').select('id').eq('post_id', postId);
-                const { data: views } = await supabase.from('views').select('id').eq('post_id', postId);
-                const { error } = await supabase
-                    .from('posts')
-                    .update({
-                        likes_count: likes.length,
-                        loves_count: loves.length,
-                        comments_count: comments.length,
-                        views_count: views.length
-                    })
-                    .eq('id', postId);
-                if (error) throw error;
-                const likesCountElement = document.getElementById(`likesCount-${postId}`);
-                const lovesCountElement = document.getElementById(`lovesCount-${postId}`);
-                const commentsCountElement = document.getElementById(`commentsCount-${postId}`);
-                const viewsCountElement = document.getElementById(`viewsCount-${postId}`);
-                if (likesCountElement) likesCountElement.textContent = `${likes.length} likes`;
-                if (lovesCountElement) lovesCountElement.textContent = `${loves.length} loves`;
-                if (commentsCountElement) commentsCountElement.textContent = `${comments.length} comments`;
-                if (viewsCountElement) viewsCountElement.textContent = `${views.length} views`;
-            } catch (error) {
-                console.error('Error updating post stats:', error.message);
-            }
-        }
-
-        function setupPostEventListeners() {
-            document.querySelectorAll('.post-options-btn').forEach(button => {
-                button.addEventListener('click', () => {
-                    const postId = button.dataset.postId;
-                    const dropdown = document.querySelector(`.post-options-dropdown[data-post-id="${postId}"]`);
-                    dropdown.classList.toggle('hidden');
-                });
-            });
-            document.querySelectorAll('.delete-post-btn').forEach(button => {
-                button.addEventListener('click', () => deletePost(button.dataset.postId));
-            });
-            document.querySelectorAll('.like-btn').forEach(button => {
-                button.addEventListener('click', () => likePost(button.dataset.postId, button));
-            });
-            document.querySelectorAll('.love-btn').forEach(button => {
-                button.addEventListener('click', () => lovePost(button.dataset.postId, button, button.dataset.recipientId));
-            });
-            document.querySelectorAll('.comment-btn').forEach(button => {
-                button.addEventListener('click', () => {
-                    const postId = button.dataset.postId;
-                    const commentsSection = document.getElementById(`commentsSection-${postId}`);
-                    commentsSection.classList.toggle('hidden');
-                    if (!commentsSection.classList.contains('hidden')) {
-                        fetchComments(postId);
-                    }
-                });
-            });
-            document.querySelectorAll('.share-btn').forEach(button => {
-                button.addEventListener('click', () => sharePost(button.dataset.postId));
-            });
-        }
-
-        function setupCommentEventListeners(postId) {
-            const commentsSection = document.getElementById(`commentsSection-${postId}`);
-            commentsSection.querySelectorAll('.comment-options-btn').forEach(button => {
-                button.addEventListener('click', () => {
-                    const commentId = button.dataset.commentId;
-                    const dropdown = commentsSection.querySelector(`.comment-options-dropdown[data-comment-id="${commentId}"]`);
-                    dropdown.classList.toggle('hidden');
-                });
-            });
-            commentsSection.querySelectorAll('.edit-comment-btn').forEach(button => {
-                button.addEventListener('click', () => {
-                    const commentId = button.dataset.commentId;
-                    const commentElement = commentsSection.querySelector(`.comment:has([data-comment-id="${commentId}"])`);
-                    editComment(commentId, commentElement);
-                });
-            });
-            commentsSection.querySelectorAll('.delete-comment-btn').forEach(button => {
-                button.addEventListener('click', () => deleteComment(button.dataset.commentId, postId));
-            });
-            commentsSection.querySelectorAll('.add-comment-btn').forEach(button => {
-                button.addEventListener('click', () => {
-                    const textarea = commentsSection.querySelector('textarea');
-                    addComment(postId, textarea);
-                });
-            });
-        }
-
-        // Real-Time Subscriptions
-        function subscribeToPosts() {
-            supabase
-                .channel('posts-channel')
-                .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'posts' }, async (payload) => {
-                    const postId = payload.new.id;
-                    const { likes_count, loves_count, comments_count, views_count } = payload.new;
-                    const likesCountElement = document.getElementById(`likesCount-${postId}`);
-                    const lovesCountElement = document.getElementById(`lovesCount-${postId}`);
-                    const commentsCountElement = document.getElementById(`commentsCount-${postId}`);
-                    const viewsCountElement = document.getElementById(`viewsCount-${postId}`);
-                    if (likesCountElement) likesCountElement.textContent = `${likes_count || 0} likes`;
-                    if (lovesCountElement) lovesCountElement.textContent = `${loves_count || 0} loves`;
-                    if (commentsCountElement) commentsCountElement.textContent = `${comments_count || 0} comments`;
-                    if (viewsCountElement) viewsCountElement.textContent = `${views_count || 0} views`;
-                })
-                .subscribe();
-        }
-
-        function subscribeToLikes() {
-            supabase
-                .channel('likes-channel')
-                .on('postgres_changes', { event: '*', schema: 'public', table: 'likes' }, async (payload) => {
-                    if (payload.eventType === 'INSERT' || payload.eventType === 'DELETE') {
-                        const postId = payload.new.post_id || payload.old.post_id;
-                        if (payload.eventType === 'INSERT' && payload.new.user_id === currentUser.id) {
-                            const likeButton = document.querySelector(`.like-btn[data-post-id="${postId}"]`);
-                            if (likeButton) {
-                                likeButton.classList.add('liked');
-                                likeButton.style.color = '#0A66C2';
-                            }
-                        } else if (payload.eventType === 'DELETE' && payload.old.user_id === currentUser.id) {
-                            const likeButton = document.querySelector(`.like-btn[data-post-id="${postId}"]`);
-                            if (likeButton) {
-                                likeButton.classList.remove('liked');
-                                likeButton.style.color = '#4B5563';
-                            }
-                        }
-                        await updatePostStats(postId);
-                    }
-                })
-                .subscribe();
-        }
-
-        function subscribeToComments() {
-            supabase
-                .channel('comments-channel')
-                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'comments' }, async (payload) => {
-                    const postId = payload.new.post_id;
-                    const commentsSection = document.getElementById(`commentsSection-${postId}`);
-                    if (commentsSection && !commentsSection.classList.contains('hidden')) {
-                        await fetchComments(postId);
-                    }
-                    await updatePostStats(postId);
-                })
-                .subscribe();
-        }
-
-        function subscribeToMessages() {
-            supabase
-                .channel('messages-channel')
-                .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, async (payload) => {
-                    if (payload.eventType === 'INSERT') {
-                        if (payload.new.chat_id === activeChatSessionId) {
-                            await loadChatSession(payload.new.chat_id, document.getElementById('activeChatHeader').textContent);
-                        }
-                        await updateUnreadMessageCount();
-                        if (payload.new.sender_id !== currentUser.id) {
-                            const { data: chatUsers, error: chatUsersError } = await supabase
-                                .from('chats_users')
-                                .select('user_id, users!chats_users_user_id_fkey(email, full_name)')
-                                .eq('chat_id', payload.new.chat_id)
-                                .neq('user_id', payload.new.sender_id)
-                                .single();
-                            if (chatUsersError) {
-                                console.error('Error fetching recipient for notification:', chatUsersError.message);
-                                return;
-                            }
-                            const recipient = chatUsers.users;
-                            const sender = await supabase
-                                .from('users')
-                                .select('full_name')
-                                .eq('id', payload.new.sender_id)
-                                .single();
-                            if (sender.error) {
-                                console.error('Error fetching sender for notification:', sender.error.message);
-                                return;
-                            }
-                            await sendEmailNotification(recipient.email, recipient.full_name || 'User', sender.data.full_name || 'Someone', payload.new.content);
-                        }
-                    }
-                })
-                .subscribe();
-        }
-
-        async function updateUnreadMessageCount() {
-            try {
-                const { data: chatUsers, error: chatUsersError } = await supabase
-                    .from('chats_users')
-                    .select('chat_id')
-                    .eq('user_id', currentUser.id);
-                if (chatUsersError) throw chatUsersError;
-                const chatIds = chatUsers.map(cu => cu.chat_id);
-                const { data: unreadMessages, error: unreadError } = await supabase
-                    .from('messages')
-                    .select('chat_id')
-                    .in('chat_id', chatIds)
-                    .eq('read', false)
-                    .neq('sender_id', currentUser.id);
-                if (unreadError) throw unreadError;
-                const unreadCount = unreadMessages.length;
-                const unreadBadge = document.getElementById('unreadMessageCount');
-                if (unreadBadge) {
-                    unreadBadge.textContent = unreadCount;
-                    unreadBadge.classList.toggle('hidden', unreadCount === 0);
-                }
-            } catch (error) {
-                console.error('Error updating unread message count:', error.message);
-            }
-        }
-
-        async function sendEmailNotification(recipientEmail, recipientName, senderName, messageContent) {
-            try {
-                // Placeholder for Supabase Edge Function (to be implemented)
-                const { error } = await supabase.functions.invoke('send-email', {
-                    body: {
-                        to: recipientEmail,
-                        subject: `New Message from ${senderName}`,
-                        html: `
-                            <p>Dear ${recipientName},</p>
-                            <p>You have received a new message from ${senderName} on the nova7 Community:</p>
-                            <p><strong>Message:</strong> ${messageContent}</p>
-                            <p>Log in to <a href="https://your-app-url/community.html">nova7 Community</a> to reply.</p>
-                            <p>Best regards,<br>nova7 Team</p>
-                        `
-                    }
-                });
-                if (error) throw error;
-                console.log('Email notification sent to:', recipientEmail);
-            } catch (error) {
-                console.error('Error sending email notification:', error.message);
-                showMessage('Failed to send email notification.', 'error');
-            }
-        }
-
-        // Chat Functions
-        async function populateChatUserList() {
-    const chatUserList = document.getElementById('chatUserList');
-    if (chatUserList) chatUserList.innerHTML = '<p class="text-center text-gray-500">Loading conversations...</p>';
-    try {
-        const { data: chatUsers, error } = await supabase
-            .from('chats_users')
-            .select(`
-                chat_id,
-                chats!chats_users_chat_id_fkey (
-                    id,
-                    title,
-                    created_at
-                ),
-                users!chats_users_user_id_fkey (
-                    id,
-                    full_name,
-                    avatar_url
-                )
-            `)
-            .eq('user_id', currentUser.id)
-            .order('created_at', { referencedTable: 'chats', ascending: false });
-        if (error) throw error;
-        if (!chatUsers || chatUsers.length === 0) {
-            if (chatUserList) chatUserList.innerHTML = '<p class="text-center text-gray-500">No conversations found.</p>';
-            return;
-        }
-        const chatIds = chatUsers.map(cu => cu.chat_id);
-        const { data: lastMessages, error: messagesError } = await supabase
-            .from('messages')
-            .select('chat_id, content, created_at, read')
-            .in('chat_id', chatIds)
-            .order('created_at', { ascending: false });
-        if (messagesError) throw messagesError;
-        const { data: unreadCounts, error: unreadError } = await supabase
-            .from('messages')
-            .select('chat_id, read')
-            .in('chat_id', chatIds)
-            .eq('read', false)
-            .neq('sender_id', currentUser.id);
-        if (unreadError) throw unreadError;
-        const unreadByChat = {};
-        unreadCounts.forEach(msg => {
-            unreadByChat[msg.chat_id] = (unreadByChat[msg.chat_id] || 0) + 1;
-        });
-        chatUserList.innerHTML = '';
-        const users = await Promise.all(chatUsers.map(async cu => {
-            const chat = cu.chats;
-            const user = cu.users;
-            const lastMessage = lastMessages.find(msg => msg.chat_id === chat.id);
-            const unreadCount = unreadByChat[chat.id] || 0;
-            const formattedTime = lastMessage ? timeDifference(new Date(), new Date(lastMessage.created_at)) : '';
-            const avatarHtml = user.avatar_url
-                ? `<img src="${user.avatar_url}" alt="${user.full_name || 'User'}" class="w-12 h-12 rounded-full object-cover">`
-                : `<div class="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center text-white">${user.full_name ? user.full_name.charAt(0).toUpperCase() : 'U'}</div>`;
-            const chatItem = document.createElement('div');
-            chatItem.className = `message-list-item ${activeChatSessionId === chat.id ? 'active' : ''}`;
-            chatItem.dataset.chatId = chat.id;
-            chatItem.dataset.userName = user.full_name || 'User';
-            chatItem.innerHTML = `
-                ${avatarHtml}
-                <div class="message-list-item-info">
-                    <strong>${user.full_name || 'User'}</strong>
-                    <span>${lastMessage ? lastMessage.content.slice(0, 30) + (lastMessage.content.length > 30 ? '...' : '') : 'No messages yet'}</span>
-                    ${unreadCount > 0 ? `<span class="absolute right-2 top-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">${unreadCount}</span>` : ''}
-                    <span class="text-xs text-gray-500">${formattedTime}</span>
-                </div>
-            `;
-            chatItem.addEventListener('click', () => {
-                document.querySelectorAll('.message-list-item').forEach(item => item.classList.remove('active'));
-                chatItem.classList.add('active');
-                loadChatSession(chat.id, user.full_name || 'User');
-            });
-            chatUserList.appendChild(chatItem);
-            return { chat, user };
-        }));
-        if (activeChatSessionId) {
-            const activeChat = users.find(u => u.chat.id === activeChatSessionId);
-            if (activeChat) {
-                loadChatSession(activeChat.chat.id, activeChat.user.full_name || 'User');
-            }
-        }
-    } catch (error) {
-        console.error('Error populating chat user list:', error.message);
-        if (chatUserList) chatUserList.innerHTML = '<p class="text-center text-red-500">Failed to load conversations.</p>';
+// Like, Love, and Comment functions
+async function likePost(postId, button) {
+  try {
+    const { data: existingLike } = await supabase
+      .from('likes')
+      .select('id')
+      .eq('post_id', postId)
+      .eq('user_id', currentUser.id)
+      .maybeSingle();
+    
+    if (existingLike) {
+      // Unlike: Delete the like (trigger handles count)
+      await supabase.from('likes').delete().eq('id', existingLike.id);
+      button.classList.remove('liked');
+      button.style.color = '#4B5563'; // Inactive color
+    } else {
+      // Like: Add the like (trigger handles count)
+      await supabase.from('likes').insert([{ post_id: postId, user_id: currentUser.id }]);
+      button.classList.add('liked');
+      button.style.color = '#0A66C2'; // Blue when liked
     }
+  } catch (error) {
+    console.error('Error liking post:', error.message);
+    showMessage('Failed to like post.', 'error');
+  }
+}
+
+async function lovePost(postId, button, recipientId) {
+  if (currentBalance < LOVE_AMOUNT) {
+    showMessage('Insufficient balance to love post.', 'error');
+    return;
+  }
+  try {
+    // Insert love transaction (trigger handles loves_count and recipient transaction)
+    await supabase.from('transactions').insert([{
+      user_id: currentUser.id,
+      recipient_id: recipientId,
+      amount: -LOVE_AMOUNT,
+      type: 'love',
+      status: 'completed',
+      description: postId,
+      created_at: new Date().toISOString()
+    }]);
+    button.classList.add('loved');
+    button.style.color = '#0A66C2'; // Blue when loved
+    currentBalance -= LOVE_AMOUNT;
+    showMessage('Love sent successfully!', 'success');
+    await fetchUserBalance(); // Update balance
+  } catch (error) {
+    console.error('Error loving post:', error.message);
+    showMessage('Failed to love post.', 'error');
+  }
+}
+
+async function addComment(postId, textarea) {
+  const content = textarea.value.trim();
+  if (!content) {
+    showMessage('Comment cannot be empty.', 'error');
+    return;
+  }
+  try {
+    // Insert comment (trigger handles comments_count)
+    await supabase.from('comments').insert([{
+      post_id: postId,
+      user_id: currentUser.id,
+      content,
+      created_at: new Date().toISOString()
+    }]);
+    textarea.value = '';
+    await fetchComments(postId);
+    showMessage('Comment added successfully!', 'success');
+  } catch (error) {
+    console.error('Error adding comment:', error.message);
+    showMessage('Failed to add comment.', 'error');
+  }
+}
+
+// Real-time subscriptions
+function subscribeToPosts() {
+  supabase
+    .channel('posts-channel')
+    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'posts' }, async (payload) => {
+      const postId = payload.new.id;
+      const { likes_count, loves_count, comments_count } = payload.new;
+      const likesCountElement = document.getElementById(`likesCount-${postId}`);
+      const lovesCountElement = document.getElementById(`lovesCount-${postId}`);
+      const commentsCountElement = document.getElementById(`commentsCount-${postId}`);
+      if (likesCountElement) likesCountElement.textContent = likes_count || 0;
+      if (lovesCountElement) lovesCountElement.textContent = loves_count || 0;
+      if (commentsCountElement) commentsCountElement.textContent = comments_count || 0;
+    })
+    .subscribe();
+}
+
+function subscribeToLikes() {
+  supabase
+    .channel('likes-channel')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'likes' }, async (payload) => {
+      if (payload.eventType === 'INSERT' || payload.eventType === 'DELETE') {
+        const postId = payload.new.post_id || payload.old.post_id;
+        if (payload.eventType === 'INSERT' && payload.new.user_id === currentUser.id) {
+          const likeButton = document.querySelector(`.like-btn[data-post-id="${postId}"]`);
+          if (likeButton) {
+            likeButton.classList.add('liked');
+            likeButton.style.color = '#0A66C2';
+          }
+        } else if (payload.eventType === 'DELETE' && payload.old.user_id === currentUser.id) {
+          const likeButton = document.querySelector(`.like-btn[data-post-id="${postId}"]`);
+          if (likeButton) {
+            likeButton.classList.remove('liked');
+            likeButton.style.color = '#4B5563';
+          }
+        }
+      }
+    })
+    .subscribe();
+}
+
+function subscribeToComments() {
+  supabase
+    .channel('comments-channel')
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'comments' }, async (payload) => {
+      const postId = payload.new.post_id;
+      const commentsSection = document.getElementById(`commentsSection-${postId}`);
+      if (commentsSection && !commentsSection.classList.contains('hidden')) {
+        await fetchComments(postId);
+      }
+    })
+    .subscribe();
+}
+
+function subscribeToMessages() {
+  supabase
+    .channel('messages-channel')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, async (payload) => {
+      if (payload.eventType === 'INSERT' && payload.new.chat_id === activeChatSessionId) {
+        await loadChatSession(payload.new.chat_id, document.getElementById('activeChatHeader').textContent);
+      }
+    })
+    .subscribe();
+}
+
+// Chat functions
+async function populateChatUserList() {
+  const chatUserList = document.getElementById('chatUserList');
+  if (chatUserList) chatUserList.innerHTML = '<p class="text-center text-gray-500">Loading conversations...</p>';
+  try {
+    const { data: chatUsers, error } = await supabase
+      .from('chats_users')
+      .select(`
+        chat_id,
+        chats!chats_users_chat_id_fkey (
+          id,
+          title,
+          created_at
+        ),
+        users!chats_users_user_id_fkey (
+          id,
+          full_name,
+          avatar_url
+        )
+      `)
+      .eq('user_id', currentUser.id)
+      .order('created_at', { referencedTable: 'chats', ascending: false });
+    if (error) throw error;
+    if (!chatUsers || chatUsers.length === 0) {
+      if (chatUserList) chatUserList.innerHTML = '<p class="text-center text-gray-500">No conversations found.</p>';
+      return;
+    }
+    const chatIds = chatUsers.map(cu => cu.chat_id);
+    const { data: lastMessages, error: messagesError } = await supabase
+      .from('messages')
+      .select('chat_id, content, created_at, read')
+      .in('chat_id', chatIds)
+      .order('created_at', { ascending: false });
+    if (messagesError) throw messagesError;
+    const { data: unreadCounts, error: unreadError } = await supabase
+      .from('messages')
+      .select('chat_id, read')
+      .in('chat_id', chatIds)
+      .eq('read', false)
+      .neq('sender_id', currentUser.id);
+    if (unreadError) throw unreadError;
+    const unreadByChat = {};
+    unreadCounts.forEach(msg => {
+      unreadByChat[msg.chat_id] = (unreadByChat[msg.chat_id] || 0) + 1;
+    });
+    chatUserList.innerHTML = '';
+    const users = await Promise.all(chatUsers.map(async cu => {
+      const chat = cu.chats;
+      const otherUser = await getOtherChatUser(chat.id);
+      const lastMessage = lastMessages.find(lm => lm.chat_id === chat.id);
+      return {
+        id: chat.id,
+        name: otherUser?.full_name || chat.title || 'Chat',
+        avatar: otherUser?.avatar_url || 'https://placehold.co/50x50',
+        lastMessage: 'No messages yet',
+        created_at: chat.created_at,
+        unreadCount: unreadByChat[chat.id] || 0
+      };
+    }));
+    users.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    users.forEach(user => {
+      const userItem = document.createElement('div');
+      userItem.className = `message-list-item ${activeChatSessionId === user.id ? 'active' : ''}`;
+      userItem.dataset.chatId = user.id;
+      userItem.innerHTML = `
+        <img src="${user.avatar}" alt="${user.name}">
+        <div class="message-list-item-info">
+          <strong>${user.name}</strong>
+          <span>${user.lastMessage}</span>
+          ${user.unreadCount > 0 ? `<span class="unread-count">${user.unreadCount}</span>` : ''}
+        </div>
+      `;
+      userItem.addEventListener('click', async () => {
+        await supabase
+          .from('messages')
+          .update({ read: true })
+          .eq('chat_id', user.id)
+          .eq('read', false)
+          .neq('sender_id', currentUser.id);
+        loadChatSession(user.id, user.name);
+      });
+      chatUserList.appendChild(userItem);
+    });
+  } catch (error) {
+    console.error('Error fetching chat users:', error.message);
+    chatUserList.innerHTML = '<p class="text-red-500 text-center text-sm">Failed to load conversations.</p>';
+  }
+}
+
+async function getOtherChatUser(chatId) {
+  try {
+    const { data: chatUsers, error } = await supabase
+      .from('chats_users')
+      .select(`
+        user_id,
+        users!chats_users_user_id_fkey (
+          id,
+          full_name,
+          avatar_url
+        )
+      `)
+      .eq('chat_id', chatId)
+      .neq('user_id', currentUser.id)
+      .single();
+    if (error) throw error;
+    return chatUsers?.users || null;
+  } catch (error) {
+    console.error('Error fetching other chat user:', error.message);
+    return null;
+  }
+}
+
+async function searchUsersForChat(query) {
+  const chatUserList = document.getElementById('chatUserList');
+  chatUserList.innerHTML = '<p class="text-center text-gray-500">Searching users...</p>';
+  try {
+    if (!query.trim()) {
+      await populateChatUserList();
+      return;
+    }
+    const { data: users, error } = await supabase
+      .from('users')
+      .select('id, full_name, avatar_url')
+      .ilike('full_name', `%${query}%`)
+      .neq('id', currentUser.id)
+      .limit(10);
+    if (error) throw error;
+    if (!users || users.length === 0) {
+      chatUserList.innerHTML = '<p class="text-center text-gray-500">No users found.</p>';
+      return;
+    }
+    chatUserList.innerHTML = '';
+    users.forEach(user => {
+      const userItem = document.createElement('div');
+      userItem.className = 'message-list-item';
+      userItem.dataset.userId = user.id;
+      userItem.innerHTML = `
+        <img src="${user.avatar_url || 'https://placehold.co/50x50'}" alt="${user.full_name}">
+        <div class="message-list-item-info">
+          <strong>${user.full_name}</strong>
+          <span>Start a new chat</span>
+        </div>
+      `;
+      userItem.addEventListener('click', async () => {
+        const chatId = await startChatWithUser(user.id, user.full_name);
+        if (chatId) {
+          loadChatSession(chatId, user.full_name);
+          populateChatUserList();
+        }
+      });
+      chatUserList.appendChild(userItem);
+    });
+  } catch (error) {
+    console.error('Error searching users:', error.message);
+    chatUserList.innerHTML = '<p class="text-red-500 text-center text-sm">Failed to search users.</p>';
+  }
+}
+
+async function startChatWithUser(userId, userName) {
+  try {
+    const { data: userChats, error: userError } = await supabase
+      .from('chats_users')
+      .select('chat_id')
+      .eq('user_id', currentUser.id);
+    if (userError) throw userError;
+    const { data: targetChats, error: targetError } = await supabase
+      .from('chats_users')
+      .select('chat_id')
+      .eq('user_id', userId);
+    if (targetError) throw targetError;
+    const commonChat = userChats.find(uc => targetChats.some(tc => tc.chat_id === uc.chat_id));
+    if (commonChat) {
+      return commonChat.chat_id;
+    }
+    const { data: newChat, error: chatError } = await supabase
+      .from('chats')
+      .insert([{ chat_type: 'one-on-one', created_at: new Date().toISOString() }])
+      .select('id')
+      .single();
+    if (chatError) throw chatError;
+    const chatId = newChat.id;
+    const { error: usersError } = await supabase
+      .from('chats_users')
+      .insert([
+        { chat_id: chatId, user_id: currentUser.id, created_at: new Date().toISOString() },
+        { chat_id: chatId, user_id: userId, created_at: new Date().toISOString() }
+      ]);
+    if (usersError) throw usersError;
+    return chatId;
+  } catch (error) {
+    console.error('Error starting chat:', error.message);
+    showMessage('Failed to start chat.', 'error');
+    return null;
+  }
 }
 
 async function loadChatSession(chatId, userName) {
-    activeChatSessionId = chatId;
-    const chatWindow = document.getElementById('chatWindow');
-    const activeChatHeader = document.getElementById('activeChatHeader');
-    activeChatHeader.textContent = userName;
-    chatWindow.innerHTML = '<p class="text-center text-gray-500">Loading messages...</p>';
-    try {
-        const { data: messages, error } = await supabase
-            .from('messages')
-            .select('id, content, created_at, sender_id, read')
-            .eq('chat_id', chatId)
-            .order('created_at', { ascending: true });
-        if (error) throw error;
-        chatWindow.innerHTML = '';
-        if (!messages || messages.length === 0) {
-            chatWindow.innerHTML = '<p class="text-center text-gray-500">No messages yet.</p>';
-            return;
-        }
-        messages.forEach(msg => {
-            const isOwnMessage = msg.sender_id === currentUser.id;
-            const messageElement = document.createElement('div');
-            messageElement.className = `chat-message ${isOwnMessage ? 'self' : ''}`;
-            const formattedTime = timeDifference(new Date(), new Date(msg.created_at));
-            messageElement.innerHTML = `
-                <div class="chat-bubble" style="background-color: ${isOwnMessage ? '#0A66C2' : '#E2E8F0'}; color: ${isOwnMessage ? '#FFFFFF' : '#1F2937'};">
-                    ${msg.content}
-                    <div class="text-xs mt-1" style="color: ${isOwnMessage ? '#E0F2FE' : '#6B7280'}">${formattedTime}</div>
-                </div>
-            `;
-            chatWindow.appendChild(messageElement);
-        });
-        chatWindow.scrollTop = chatWindow.scrollHeight;
-        if (messages.some(msg => !msg.read && msg.sender_id !== currentUser.id)) {
-            await supabase
-                .from('messages')
-                .update({ read: true })
-                .eq('chat_id', chatId)
-                .eq('read', false)
-                .neq('sender_id', currentUser.id);
-            await updateUnreadMessageCount();
-        }
-    } catch (error) {
-        console.error('Error loading chat session:', error.message);
-        chatWindow.innerHTML = '<p class="text-center text-red-500">Failed to load messages.</p>';
+  activeChatSessionId = chatId;
+  const chatWindow = document.getElementById('chatWindow');
+  const activeChatHeader = document.getElementById('activeChatHeader');
+  activeChatHeader.textContent = userName || 'Chat';
+  try {
+    const { data: messages, error } = await supabase
+      .from('messages')
+      .select(`
+        id,
+        content,
+        media_content,
+        media_type,
+        created_at,
+        sender_id,
+        edited,
+        read,
+        users!messages_sender_id_fkey (
+          id,
+          full_name,
+          avatar_url
+        )
+      `)
+      .eq('chat_id', chatId)
+      .order('created_at', { ascending: true });
+    if (error) throw error;
+    chatWindow.innerHTML = '';
+    if (!messages || messages.length === 0) {
+      chatWindow.innerHTML = '<p class="text-center text-gray-500">No messages in this chat.</p>';
+      return;
     }
+    messages.forEach(message => {
+      const messageElement = document.createElement('div');
+      const isSelf = message.sender_id === currentUser.id;
+      const formattedTime = timeDifference(new Date(), new Date(message.created_at));
+      messageElement.className = `chat-message ${isSelf ? 'self' : 'other'} mb-2 p-3 rounded-lg shadow-sm max-w-[70%]`;
+      let contentHtml = '';
+      if (message.media_type === 'audio' && message.media_content) {
+        contentHtml = `
+          <audio controls class="w-full">
+            <source src="data:audio/wav;base64,${message.media_content}" type="audio/wav">
+            Your browser does not support the audio element.
+          </audio>
+          <div class="chat-timestamp text-xs text-gray-400 mt-1">
+            ${formattedTime}
+          </div>
+        `;
+      } else {
+        contentHtml = `
+          <div class="chat-bubble">
+            ${message.content || ''}
+            <div class="chat-timestamp text-xs text-gray-400 mt-1">
+              ${formattedTime}
+            </div>
+          </div>
+        `;
+      }
+      messageElement.innerHTML = contentHtml + (isSelf && (!message.media_type || message.media_type === 'text') ? `
+        <button class="edit-message-btn text-xs text-blue-500 mt-1" data-message-id="${message.id}" data-current-content="${message.content || ''}">
+          Edit
+        </button>` : '');
+      if (isSelf && (!message.media_type || message.media_type === 'text')) {
+        const editButton = messageElement.querySelector('.edit-message-btn');
+        editButton.addEventListener('click', () => editChatMessage(message.id, message.content || '', messageElement));
+      }
+      chatWindow.appendChild(messageElement);
+    });
+    await supabase
+      .from('messages')
+      .update({ read: true })
+      .eq('chat_id', chatId)
+      .eq('read', false)
+      .neq('sender_id', currentUser.id);
+    document.querySelectorAll('.message-list-item').forEach(item => {
+      item.classList.remove('active');
+      if (item.dataset.chatId === chatId) {
+        item.classList.add('active');
+      }
+    });
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+  } catch (error) {
+    console.error('Error loading chat session:', error.message);
+    chatWindow.innerHTML = '<p class="text-red-500 text-center text-sm">Failed to load messages.</p>';
+  }
 }
 
 async function sendChatMessage() {
-    const chatInput = document.getElementById('chatInput');
-    const messageContent = chatInput.value.trim();
-    if (!messageContent || !activeChatSessionId) {
-        showMessage('Please select a chat and enter a message.', 'error');
-        return;
-    }
-    try {
-        const { data: chatUsers, error: chatUsersError } = await supabase
-            .from('chats_users')
-            .select('user_id')
-            .eq('chat_id', activeChatSessionId)
-            .neq('user_id', currentUser.id)
-            .single();
-        if (chatUsersError) throw chatUsersError;
-        const recipientId = chatUsers.user_id;
-        const { error } = await supabase
-            .from('messages')
-            .insert([{
-                chat_id: activeChatSessionId,
-                sender_id: currentUser.id,
-                content: messageContent,
-                created_at: new Date().toISOString(),
-                read: false
-            }]);
-        if (error) throw error;
-        chatInput.value = '';
-        await loadChatSession(activeChatSessionId, document.getElementById('activeChatHeader').textContent);
-    } catch (error) {
-        console.error('Error sending message:', error.message);
-        showMessage('Failed to send message.', 'error');
-    }
+  if (!activeChatSessionId) {
+    showMessage('Please Sélectionner une discussion to send a message.', 'error');
+    return;
+  }
+  const chatInput = document.getElementById('chatInput');
+  const messageContent = chatInput.value.trim();
+  if (!messageContent) {
+    showMessage('Message cannot be empty.', 'error');
+    return;
+  }
+  try {
+    const newMessage = {
+      chat_id: activeChatSessionId,
+      sender_id: currentUser.id,
+      content: messageContent,
+      media_type: 'text',
+      created_at: new Date().toISOString(),
+      edited: false,
+      read: false
+    };
+    const chatWindow = document.getElementById('chatWindow');
+    const messageElement = document.createElement('div');
+    messageElement.className = 'chat-message self mb-2 p-3 rounded-lg bg-blue-100 shadow-sm max-w-[70%]';
+    const formattedTime = timeDifference(new Date(), new Date(newMessage.created_at));
+    messageElement.innerHTML = `
+      <div class="chat-bubble">
+        ${newMessage.content}
+        <div class="chat-timestamp text-xs text-gray-500 mt-1">${formattedTime}</div>
+      </div>
+      <button class="edit-message-btn text-xs text-blue-500 mt-1" data-message-id="temp-${Date.now()}" data-current-content="${newMessage.content}">
+        Edit
+      </button>
+    `;
+    chatWindow.appendChild(messageElement);
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+    const { data, error } = await supabase
+      .from('messages')
+      .insert([newMessage])
+      .select()
+      .single();
+    if (error) throw error;
+    messageElement.querySelector('.edit-message-btn').dataset.messageId = data.id;
+    messageElement.querySelector('.edit-message-btn').addEventListener('click', () => editChatMessage(data.id, data.content, messageElement));
+    chatInput.value = '';
+  } catch (error) {
+    console.error('Error sending message:', error.message);
+    showMessage(`Failed to send message: ${error.message}`, 'error');
+    chatWindow.removeChild(messageElement);
+  }
 }
 
-async function searchChatUsers() {
-    const searchInput = document.getElementById('chatUserSearch').value.trim().toLowerCase();
-    const chatUserList = document.getElementById('chatUserList');
-    if (!searchInput) {
-        await populateChatUserList();
-        return;
+async function editChatMessage(messageId, currentContent, messageElement) {
+  const chatBubble = messageElement.querySelector('.chat-bubble');
+  const originalHtml = chatBubble.innerHTML;
+  chatBubble.innerHTML = `
+    <textarea class="w-full border border-blue-500 rounded-md p-2 text-sm">${currentContent}</textarea>
+    <div class="flex justify-end gap-2 mt-2">
+      <button class="cancel-edit-btn text-xs text-gray-500">Cancel</button>
+      <button class="save-edit-btn text-xs text-blue-500">Save</button>
+    </div>
+  `;
+  const textarea = chatBubble.querySelector('textarea');
+  const saveBtn = chatBubble.querySelector('.save-edit-btn');
+  const cancelBtn = chatBubble.querySelector('.cancel-edit-btn');
+  textarea.focus();
+  saveBtn.addEventListener('click', async () => {
+    const newContent = textarea.value.trim();
+    if (!newContent) {
+      showMessage('Message cannot be empty.', 'error');
+      return;
     }
     try {
-        const { data: users, error } = await supabase
-            .from('users')
-            .select('id, full_name, avatar_url')
-            .ilike('full_name', `%${searchInput}%`)
-            .neq('id', currentUser.id);
-        if (error) throw error;
-        chatUserList.innerHTML = '';
-        if (!users || users.length === 0) {
-            chatUserList.innerHTML = '<p class="text-center text-gray-500">No users found.</p>';
-            return;
-        }
-        users.forEach(user => {
-            const userItem = document.createElement('div');
-            userItem.className = 'message-list-item';
-            const avatarHtml = user.avatar_url
-                ? `<img src="${user.avatar_url}" alt="${user.full_name || 'User'}" class="w-12 h-12 rounded-full object-cover">`
-                : `<div class="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center text-white">${user.full_name ? user.full_name.charAt(0).toUpperCase() : 'U'}</div>`;
-            userItem.innerHTML = `
-                ${avatarHtml}
-                <div class="message-list-item-info">
-                    <strong>${user.full_name || 'User'}</strong>
-                    <span>Start a new chat</span>
-                </div>
-            `;
-            userItem.addEventListener('click', async () => {
-                try {
-                    const { data: existingChat, error: chatError } = await supabase
-                        .from('chats_users')
-                        .select('chat_id, chats!inner(id)')
-                        .eq('user_id', currentUser.id)
-                        .in('chat_id', (await supabase
-                            .from('chats_users')
-                            .select('chat_id')
-                            .eq('user_id', user.id)
-                        ).data.map(cu => cu.chat_id));
-                    if (chatError) throw chatError;
-                    let chatId;
-                    if (existingChat && existingChat.length > 0) {
-                        chatId = existingChat[0].chat_id;
-                    } else {
-                        const { data: newChat, error: newChatError } = await supabase
-                            .from('chats')
-                            .insert([{ title: `${currentUser.full_name || 'User'} & ${user.full_name || 'User'}`, created_at: new Date().toISOString() }])
-                            .select()
-                            .single();
-                        if (newChatError) throw newChatError;
-                        chatId = newChat.id;
-                        await supabase.from('chats_users').insert([
-                            { chat_id: chatId, user_id: currentUser.id },
-                            { chat_id: chatId, user_id: user.id }
-                        ]);
-                    }
-                    document.querySelectorAll('.message-list-item').forEach(item => item.classList.remove('active'));
-                    userItem.classList.add('active');
-                    await loadChatSession(chatId, user.full_name || 'User');
-                    await populateChatUserList();
-                } catch (error) {
-                    console.error('Error starting chat:', error.message);
-                    showMessage('Failed to start chat.', 'error');
-                }
-            });
-            chatUserList.appendChild(userItem);
-        });
+      const { error } = await supabase
+        .from('messages')
+        .update({ content: newContent, edited: true })
+        .eq('id', messageId)
+        .eq('sender_id', currentUser.id);
+      if (error) throw error;
+      const formattedTime = timeDifference(new Date(), new Date());
+      chatBubble.innerHTML = `
+        ${newContent}
+        <div class="chat-timestamp text-xs text-gray-500 mt-1">${formattedTime} (edited)</div>
+      `;
     } catch (error) {
-        console.error('Error searching users:', error.message);
-        chatUserList.innerHTML = '<p class="text-center text-red-500">Failed to search users.</p>';
+      console.error(`Error updating message ${messageId}:`, error.message);
+      showMessage(`Failed to update message: ${error.message}`, 'error');
+      chatBubble.innerHTML = originalHtml;
     }
+  });
+  cancelBtn.addEventListener('click', () => {
+    chatBubble.innerHTML = originalHtml;
+  });
+}
+
+// DOMContentLoaded and event listeners
+document.addEventListener('DOMContentLoaded', async function() {
+  const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+  if (sessionError || !session) {
+    console.log("Community: No active session. Redirecting to login.");
+    showMessage('No active session. Please log in.', 'error');
+    window.location.href = 'login.html';
+    return;
+  }
+  currentUser = session.user;
+  console.log("Current user:", currentUser);
+  await fetchUserProfile();
+  const desktopUserWelcomeElement = document.getElementById('desktopUserWelcome');
+  if (desktopUserWelcomeElement && currentUser.full_name) {
+    desktopUserWelcomeElement.textContent = `Welcome, ${currentUser.full_name}!`;
+  } else if (desktopUserWelcomeElement && currentUser.email) {
+    desktopUserWelcomeElement.textContent = `Welcome, ${currentUser.email.split('@')[0]}!`;
+  }
+  const createPostAvatar = document.getElementById('createPostAvatar');
+  if (createPostAvatar) {
+    if (currentUser.full_name) {
+      createPostAvatar.textContent = currentUser.full_name.charAt(0).toUpperCase();
+    } else if (currentUser.email) {
+      createPostAvatar.textContent = currentUser.email.charAt(0).toUpperCase();
+    }
+    if (currentUser.avatar_url) {
+      createPostAvatar.innerHTML = `<img src="${currentUser.avatar_url}" alt="Profile" class="w-full h-full rounded-full object-cover">`;
+    } else {
+      createPostAvatar.innerHTML = `<span>${createPostAvatar.textContent}</span>`;
+    }
+  }
+  await fetchUserBalance();
+  await fetchPosts();
+  await fetchMarketplaceHighlights();
+  await populateChatUserList();
+  subscribeToPosts();
+  subscribeToLikes();
+  subscribeToComments();
+  subscribeToMessages();
+  document.getElementById('submitPostBtn').addEventListener('click', createPost);
+  document.getElementById('uploadMediaBtn').addEventListener('click', () => document.getElementById('postMediaUpload').click());
+  document.getElementById('postMediaUpload').addEventListener('change', previewMedia);
+  document.getElementById('removeMediaBtn').addEventListener('click', removeMedia);
+  const sidebarLogoutLink = document.getElementById('sidebarLogoutLink');
+  if (sidebarLogoutLink) sidebarLogoutLink.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); });
+  const mobileLogoutLink = document.getElementById('mobileLogoutLink');
+  if (mobileLogoutLink) mobileLogoutLink.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); });
+  const hamburgerBtnMobile = document.getElementById('hamburgerBtnMobile');
+  const sidebar = document.getElementById('sidebar');
+  if (hamburgerBtnMobile && sidebar) {
+    hamburgerBtnMobile.addEventListener('click', (e) => { e.stopPropagation(); sidebar.classList.toggle('open'); });
+  }
+  document.addEventListener('click', (e) => {
+    if (sidebar && sidebar.classList.contains('open') && !sidebar.contains(e.target) && (!hamburgerBtnMobile || !hamburgerBtnMobile.contains(e.target))) {
+      sidebar.classList.remove('open');
+    }
+    document.querySelectorAll('.post-options-dropdown:not(.hidden), .comment-options-dropdown:not(.hidden)').forEach(dropdown => {
+      if (!dropdown.contains(e.target) && !e.target.closest('.post-options-btn') && !e.target.closest('.comment-options-btn')) {
+        dropdown.classList.add('hidden');
+      }
+    });
+  });
+  document.getElementById('searchBar')?.addEventListener('input', (e) => searchContent(e.target.value));
+  document.getElementById('messageFab')?.addEventListener('click', () => {
+    document.getElementById('messageModalOverlay').classList.add('show');
+    document.getElementById('chatUserSearch').focus();
+  });
+  document.getElementById('closeMessageModalButton')?.addEventListener('click', () => {
+    document.getElementById('messageModalOverlay').classList.remove('show');
+  });
+  document.getElementById('chatUserSearch')?.addEventListener('input', (e) => searchUsersForChat(e.target.value));
+  document.getElementById('sendChatMessageButton')?.addEventListener('click', sendChatMessage);
+  document.getElementById('chatInput')?.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') sendChatMessage();
+  });
+});
+
+async function searchContent(query) {
+  const searchResultsDiv = document.getElementById('searchResults');
+  searchResultsDiv.innerHTML = '<p class="text-gray-500 text-center py-2">Searching...</p>';
+  try {
+    if (!query.trim()) {
+      searchResultsDiv.innerHTML = '';
+      await fetchPosts();
+      return;
+    }
+    const { data: posts, error: postError } = await supabase
+      .from('posts')
+      .select(`
+        id,
+        content,
+        media_url,
+        media_type,
+        created_at,
+        users (
+          id,
+          full_name,
+          avatar_url,
+          email
+        )
+      `)
+      .ilike('content', `%${query}%`)
+      .order('created_at', { ascending: false })
+      .limit(10);
+    if (postError) throw postError;
+    const { data: users, error: userError } = await supabase
+      .from('users')
+      .select('id, full_name, avatar_url, email')
+      .ilike('full_name', `%${query}%`)
+      .neq('id', currentUser.id)
+      .limit(10);
+    if (userError) throw userError;
+    searchResultsDiv.innerHTML = '';
+    if (posts.length === 0 && users.length === 0) {
+      searchResultsDiv.innerHTML = '<p class="text-gray-500 text-center py-2">No results found.</p>';
+      return;
+    }
+    if (posts.length > 0) {
+      const postFeedDiv = document.getElementById('postFeed');
+      postFeedDiv.innerHTML = '';
+      posts.forEach(post => {
+        const isMyPost = currentUser && post.users && currentUser.id === post.users.id;
+        const authorName = post.users
+          ? post.users.full_name || post.users.email?.split('@')[0] || 'Anonymous'
+          : 'Anonymous';
+        const authorAvatarUrl = post.users ? post.users.avatar_url : null;
+        const avatarHtml = authorAvatarUrl
+          ? `<img src="${authorAvatarUrl}" alt="Profile" class="w-full h-full rounded-full object-cover">`
+          : `<span>${authorName.charAt(0).toUpperCase()}</span>`;
+        const postDate = new Date(post.created_at);
+        const formattedTime = timeDifference(new Date(), postDate);
+        const mediaHtml = post.media_url
+          ? (post.media_type === 'image'
+            ? `<div class="post-image"><img src="${post.media_url}" alt="Post image" loading="lazy"></div>`
+            : `<div class="post-video">
+                <video controls>
+                  <source src="${post.media_url}" type="${post.media_type === 'video' ? 'video/mp4' : 'video/webm'}">
+                  Your browser does not support the video tag.
+                </video>
+              </div>`)
+          : '';
+        const postElement = document.createElement('div');
+        postElement.className = 'post-card';
+        postElement.innerHTML = `
+          <div class="post-header">
+            <div class="post-avatar">${avatarHtml}</div>
+            <div class="post-author-info">
+              <span>${authorName}</span>
+              <p class="post-timestamp">${formattedTime}</p>
+            </div>
+            ${!isMyPost ? `
+              <button class="follow-btn" data-post-id="${post.id}" style="display:none;">
+              <span><i class="fas fa-user-plus"></i> Follow</span></button>
+            ` : ''}
+            ${isMyPost ? `
+              <button class="post-options-btn" data-post-id="${post.id}">
+                <i class="fas fa-ellipsis-h"></i>
+              </button>
+              <div class="post-options-dropdown hidden" id="postOptions-${post.id}">
+                <button class="edit-post-btn" data-post-id="${post.id}">Edit Post</button>
+                <button class="delete-post-btn" data-post-id="${post.id}">Delete Post</button>
+                <button class="share-post-btn" data-post-id="${post.id}">Share</button>
+                <button class="share-post-btn" data-post-id="${post.id}">Share</button>
+              </div>` : ''}
+          </div>
+          <div class="post-content">
+            <p>${post.content}</p>
+          </div>
+          ${mediaHtml}
+          <div class="post-stats">
+            <span><span id="likesCount-${post.id}">0</span> Likes</span>
+            <span><span id="lovesCount-${post.id}">0</span> Loves</span>
+            <span><span id="commentsCount-${post.id}">0</span> Comments</span>
+          </div>
+          <div class="post-footer">
+             <button class="like-btn" data-post-id="${post.id}">
+                <i class="fas fa-thumbs-up"></i>J'aime
+            </button>
+            <button class="love-btn" data-post-id="${post.id}" ${isMyPost ? 'disabled' : ''}>
+                <i class="fas fa-heart"></i>Aimer (1 $)
+            </button>
+            <button class="comment-toggle-btn" data-post-id="${post.id}">
+                <i class="fas fa-comment"></i>Commenter
+            </button>
+            <button onclick="copyPostLink('${post.id}')">
+                <i class="fas fa-link"></i> Share
+            </button>
+        </div>
+          <div class="comments-section hidden" id="commentsSection-${post.id}">
+            <div class="comments-list" id="comments-${post.id}">
+              <p class="text-gray-500 text-center py-2 text-sm">No comments yet.</p>
+            </div>
+            <div class="add-comment-area">
+              <div class="comment-avatar" id="addComment-${post.id}">
+                ${currentUser && currentUser.avatar_url ? `<img src="${currentUser.avatar_url}" alt="Profile">` : (currentUser && currentUser.full_name ? currentUser.full_name.charAt(0).toUpperCase() : (currentUser && currentUser.email ? currentUser.email.charAt(0).toUpperCase() : 'U'))}
+              </div>
+              <textarea placeholder="Ajouter un commentaire..." rows="1" class="comment-input" data-post-id="${post.id}"></textarea>
+              <button class="btn-primary-action post-comment-btn" data-post-id="${post.id}">Post</button>
+            </div>
+          </div>
+        `;
+        postFeedDiv.appendChild(postElement);
+        const likeButton = postElement.querySelector(`.like-btn[data-post-id="${post.id}"]`);
+        if (likeButton) {
+          likeButton.addEventListener('click', (e) => {
+            const postId = e.target.dataset.post_id || e.target.closest('.like-btn').dataset.postId;
+            likePost(postId, likeButton);
+          });
+        }
+        const loveButton = postElement.querySelector(`.love-btn[data-post-id="${post.id}"]`);
+        if (loveButton) {
+          loveButton.addEventListener('click', (e) => {
+            const postId = e.target.dataset.post_id || e.target.closest('.love-btn').dataset.postId;
+            lovePost(postId, loveButton, post.users.id);
+          });
+        }
+        const commentToggleButton = postElement.querySelector(`.comment-toggle-btn[data-post-id="${post.id}"]`);
+        if (commentToggleButton) {
+          commentToggleButton.addEventListener('click', (e) => {
+            const postId = e.target.dataset.post_id || e.target.closest('.comment-toggle-btn').dataset.postId;
+            toggleCommentsSection(postId);
+          });
+        }
+        const postCommentButton = postElement.querySelector(`.post-comment-btn[data-post-id="${post.id}"]`);
+        if (postCommentButton) {
+          postCommentButton.addEventListener('click', (e) => {
+            const postId = e.target.dataset.post_id || e.target.closest('.post-comment-btn').dataset.postId;
+            addComment(postId, postElement.querySelector(`.comment-input[data-post-id="${post.id}"]`));
+          });
+        }
+        const postOptionsBtn = postElement.querySelector(`.post-options-btn[data-post-id="${post.id}"]`);
+        if (postOptionsBtn) {
+          postOptionsBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const postId = e.target.dataset.post_id || e.target.closest('.post-options-btn').dataset.postId;
+            togglePostOptionsDropdown(postId);
+          });
+        }
+        const editPostBtn = postElement.querySelector(`.edit-post-btn[data-post-id="${post.id}"]`);
+        if (editPostBtn) {
+          editPostBtn.addEventListener('click', (e) => {
+            const postId = e.target.dataset.post_id || e.target.closest('.edit-post-btn').dataset.postId;
+            editPost(postId, post.content);
+          });
+        }
+        const deletePostBtn = postElement.querySelector(`.delete-post-btn[data-post-id="${post.id}"]`);
+        if (deletePostBtn) {
+          deletePostBtn.addEventListener('click', (e) => {
+            const sharePostBtn = postElement.querySelector(`.share-post-btn[data-post-id="${post.id}"]`);
+            sharePostBtn.addEventListener('click', () => copyPostLink(post.id));
+            const postId = e.target.dataset.post_id || e.target.closest('.delete-post-btn').dataset.postId;
+            deletePost(postId, post.media_url);
+          });
+        }
+        const followButton = postElement.querySelector(`.follow-btn[data-user-id="${post.users.id}"]`);
+        if (followButton) {
+          checkFollowStatus(post.users.id, followButton);
+          followButton.addEventListener('click', () => toggleFollow(post.users.id, followButton));
+        }
+      });
+    }
+    users.forEach(user => {
+      const resultItem = document.createElement('div');
+      resultItem.className = 'search-result-item';
+      const avatarHtml = user.avatar_url
+        ? `<img src="${user.avatar_url}" alt="Profile" class="w-full h-full rounded-full object-cover">`
+        : `<span>${user.full_name.charAt(0).toUpperCase()}</span>`;
+      resultItem.innerHTML = `
+        <div class="search-result-avatar">${avatarHtml}</div>
+        <div class="search-result-info">
+          <p>${user.full_name || user.email.split('@')[0]}</p>
+          <span>User Profile</span>
+        </div>
+        <button class="follow-btn" data-user-id="${user.id}" data-following="false">
+          <i class="fas fa-user-plus"></i> Follow
+        </button>
+      `;
+      searchResultsDiv.appendChild(resultItem);
+      const followButton = resultItem.querySelector(`.follow-btn[data-user-id="${user.id}"]`);
+      checkFollowStatus(user.id, followButton);
+      followButton.addEventListener('click', () => toggleFollow(user.id, followButton));
+    });
+  } catch (error) {
+    console.error('Error searching content:', error.message);
+    searchResultsDiv.innerHTML = `<p class="text-red-500 text-center py-2">Failed to search: ${error.message}</p>`;
+  }
+}
+
+async function checkFollowStatus(userId, button) {
+  if (!currentUser || !currentUser.id) return;
+  try {
+    const { data, error } = await supabase
+      .from('follows')
+      .select('id')
+      .eq('follower_id', currentUser.id)
+      .eq('followed_id', userId)
+      .maybeSingle();
+    if (error && error.code !== 'PGRST116') throw error;
+    if (data) {
+      button.classList.add('following');
+      button.innerHTML = '<i class="fas fa-user-check"></i> Following';
+      button.dataset.following = 'true';
+    } else {
+      button.classList.remove('following');
+      button.innerHTML = '<i class="fas fa-user-plus"></i> Follow';
+      button.dataset.following = 'false';
+    }
+  } catch (error) {
+    console.error('Error checking follow status:', error.message);
+  }
+}
+
+async function toggleFollow(userId, button) {
+  if (!currentUser || !currentUser.id) {
+    showMessage('You must be logged in to follow users.', 'error');
+    return;
+  }
+  if (button.disabled) return;
+  button.disabled = true;
+  try {
+    const isFollowing = button.dataset.following === 'true';
+    if (isFollowing) {
+      const { error } = await supabase
+        .from('follows')
+        .delete()
+        .eq('follower_id', currentUser.id)
+        .eq('followed_id', userId);
+      if (error) throw error;
+      button.classList.remove('following');
+      button.innerHTML = '<i class="fas fa-user-plus"></i> Follow';
+      button.dataset.following = 'false';
+      showMessage('Unfollowed user.', 'success');
+    } else {
+      const { error } = await supabase
+        .from('follows')
+        .insert([{ follower_id: currentUser.id, followed_id: userId, created_at: new Date().toISOString() }]);
+      if (error) throw error;
+      button.classList.add('following');
+      button.innerHTML = '<i class="fas fa-user-check"></i> Following';
+      button.dataset.following = 'true';
+      showMessage('Followed user!', 'success');
+    }
+  } catch (error) {
+    console.error('Error toggling follow:', error.message);
+    showMessage(`Failed to ${button.dataset.following === 'true' ? 'unfollow' : 'follow'} user: ${error.message}`, 'error');
+  } finally {
+    button.disabled = false;
+  }
+}
+
+async function handleLogout() {
+  const { error } = await supabase.auth.signOut();
+  if (error) {
+    console.error("Supabase Logout Error:", error.message);
+    showMessage('Logout failed.', 'error');
+  } else {
+    showMessage('Logged out successfully!', 'success');
+    window.location.href = 'login.html';
+  }
+}
+
+async function fetchUserProfile() {
+  if (!currentUser || !currentUser.id) return;
+  try {
+    const { data, error } = await supabase
+      .from('users')
+      .select('full_name, avatar_url, email')
+      .eq('id', currentUser.id)
+      .single();
+    if (error) {
+      console.error("Error fetching user profile:", error.message);
+      if (error.code !== 'PGRST116') {
+        showMessage('Failed to load user profile.', 'error');
+      }
+    } else if (data) {
+      currentUser.full_name = data.full_name;
+      currentUser.avatar_url = data.avatar_url;
+      currentUser.email = data.email;
+    }
+  } catch (err) {
+    console.error("Unexpected error fetching user profile:", err);
+  }
+}
+
+async function fetchUserBalance() {
+  if (!currentUser || !currentUser.id) {
+    console.warn("No current user to fetch balance for.");
+    return;
+  }
+  try {
+    const { data: transactions, error } = await supabase
+      .from('transactions')
+      .select('amount, type, user_id, recipient_id, status')
+      .or(`user_id.eq.${currentUser.id},recipient_id.eq.${currentUser.id}`)
+      .eq('status', 'completed');
+    if (error) {
+      console.error("Supabase Error fetching transactions for balance:", error.message);
+      showMessage('Failed to load balance.', 'error');
+      return;
+    }
+    let balance = 0;
+    if (transactions) {
+      transactions.forEach(tx => {
+        const amount = parseFloat(tx.amount);
+        if (tx.type === 'deposit' && tx.user_id === currentUser.id) {
+          balance += amount;
+        } else if (tx.type === 'transfer') {
+          if (tx.recipient_id === currentUser.id) {
+            balance += amount * (1 - 0.001);
+          } else if (tx.user_id === currentUser.id) {
+            balance -= amount;
+          }
+        } else if (tx.type === 'request' && tx.user_id === currentUser.id && tx.status === 'completed') {
+          balance += amount;
+        } else if (tx.user_id === currentUser.id && ['withdrawal', 'love'].includes(tx.type)) {
+          balance -= amount;
+        } else if (tx.recipient_id === currentUser.id && tx.type === 'love') {
+          balance += amount;
+        }
+      });
+    }
+    currentBalance = balance;
+    console.log("User balance fetched:", currentBalance);
+  } catch (error) {
+    console.error("Error fetching user balance:", error.message);
+    showMessage('Network error while fetching balance.', 'error');
+  }
+}
+
+async function createPost() {
+  const postContent = document.getElementById('postContent').value;
+  const postMediaUpload = document.getElementById('postMediaUpload');
+  const mediaFile = postMediaUpload ? postMediaUpload.files[0] : null;
+  if (!postContent.trim() && !mediaFile) {
+    showMessage('Post content or an image/video is required!', 'error');
+    return;
+  }
+  if (!currentUser || !currentUser.id) {
+    showMessage('You must be logged in to create a post.', 'error');
+    handleLogout();
+    return;
+  }
+  let imageUrl = null;
+  let mediaType = null;
+  if (mediaFile) {
+    try {
+      const filePath = `${currentUser.id}/${Date.now()}_${mediaFile.name}`;
+      const { error: uploadError } = await supabase.storage
+        .from('post-images')
+        .upload(filePath, mediaFile, {
+          cacheControl: '3600',
+          upsert: false
+        });
+      if (uploadError) {
+        throw uploadError;
+      }
+      const { data: publicUrlData } = supabase.storage
+        .from('post-images')
+        .getPublicUrl(filePath);
+      imageUrl = publicUrlData.publicUrl;
+      mediaType = mediaFile.type.startsWith('image/') ? 'image' : 'video';
+      console.log("Uploaded media public URL:", imageUrl, "Type:", mediaType);
+    } catch (error) {
+      console.error('Error uploading media to Supabase Storage:', error.message);
+      showMessage(`Failed to upload media: ${error.message}`, 'error');
+      return;
+    }
+  }
+  try {
+    const { data, error } = await supabase
+      .from('posts')
+      .insert([
+        {
+          user_id: currentUser.id,
+          content: postContent,
+          media_url: imageUrl,
+          media_type: mediaType,
+          created_at: new Date().toISOString(),
+          likes_count: 0,
+          loves_count: 0,
+          comments_count: 0
+        }
+      ])
+      .select()
+      .single();
+    if (error) {
+      throw error;
+    }
+    showMessage('Post created successfully!', 'success');
+    document.getElementById('postContent').value = '';
+    removeMedia();
+    await fetchPosts();
+  } catch (error) {
+    console.error('Error creating post in Supabase:', error.message);
+    showMessage(`Failed to create post: ${error.message}`, 'error');
+  }
+}
+
+async function fetchPosts() {
+  const postFeedDiv = document.getElementById('postFeed');
+  postFeedDiv.innerHTML = '<p class="text-gray-500 text-center py-4" id="loadingPostsMessage">Loading posts...</p>';
+  try {
+    const { data: posts, error: postsError } = await supabase
+      .from('posts')
+      .select(`
+        id,
+        content,
+        media_url,
+        media_type,
+        created_at,
+        likes_count,
+        loves_count,
+        comments_count,
+        user_id,
+        users (
+          id,
+          full_name,
+          email,
+          avatar_url
+        ),
+        likes (user_id)
+      `)
+      .order('created_at', { ascending: true });
+    if (postsError) throw postsError;
+    console.log('Posts data:', posts);
+    postFeedDiv.innerHTML = '';
+    if (!posts || posts.length === 0) {
+      postFeedDiv.innerHTML = '<p class="text-gray-500 text-center py-4">Aucune publication pour le moment. Soyez le premier à partager !</p>';
+      return;
+    }
+    posts.forEach(post => {
+      const isMyPost = currentUser && post.user_id && currentUser.id === post.user_id;
+      const isLikedByMe = post.likes && post.likes.some(like => like.user_id === currentUser.id);
+      const postElement = document.createElement('div');
+      postElement.className = 'card-base post-card';
+      const authorName = post.users
+        ? post.users.full_name || (post.users.email ? post.users.email.split('@')[0] : 'Anonymous')
+        : 'Anonymous';
+      const authorAvatarUrl = post.users ? post.users.avatar_url : null;
+      const avatarHtml = authorAvatarUrl
+        ? `<img src="${authorAvatarUrl}" alt="Profile" class="w-full h-full rounded-full object-cover">`
+        : `<span>${authorName.charAt(0).toUpperCase()}</span>`;
+      const postDate = new Date(post.created_at);
+      const formattedTime = timeDifference(new Date(), postDate);
+      let mediaHtml = '';
+      if (post.media_url) {
+        if (post.media_type === 'image') {
+          mediaHtml = `<div class="post-image">
+            <img src="${post.media_url}" alt="Post image" loading="lazy">
+          </div>`;
+        } else if (post.media_type === 'video') {
+          mediaHtml = `<div class="post-video">
+            <video controls>
+              <source src="${post.media_url}" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+          </div>`;
+        }
+      }
+      postElement.innerHTML = `
+        <div class="post-header">
+          <div class="post-avatar">${avatarHtml}</div>
+          <div class="post-author-info">
+            <a href="#">${authorName}</a>
+            <p class="post-timestamp">${formattedTime}</p>
+          </div>
+          ${!isMyPost ? `
+            <button class="follow-btn" data-user-id="${post.user_id}" data-following="false">
+              <i class="fas fa-user-plus"></i> Follow
+            </button>` : ''}
+          ${isMyPost ? `
+            <button class="post-options-btn" data-post-id="${post.id}">
+              <i class="fas fa-ellipsis-h"></i>
+            </button>
+            <div class="post-options-dropdown hidden" id="postOptions-${post.id}">
+              <button class="edit-post-btn" data-post-id="${post.id}">Edit</button>
+              <button class="delete-post-btn" data-post-id="${post.id}">Delete</button>
+            </div>` : ''}
+        </div>
+        <div class="post-content">
+          <p>${post.content}</p>
+        </div>
+        ${mediaHtml}
+        <div class="post-stats">
+          <span><span id="likesCount-${post.id}">${post.likes_count || 0}</span> Likes</span>
+          <span><span id="lovesCount-${post.id}">${post.loves_count || 0}</span> Loves</span>
+          <span><span id="commentsCount-${post.id}">${post.comments_count || 0}</span> Comments</span>
+        </div>
+        <div class="post-footer">
+          <button class="like-btn${isLikedByMe ? ' liked' : ''}" data-post-id="${post.id}" style="color: ${isLikedByMe ? '#0A66C2' : '#4B5563'}">
+            <i class="fas fa-thumbs-up"></i>J'aime
+          </button>
+          <button class="love-btn" data-post-id="${post.id}" ${isMyPost ? 'disabled' : ''}>
+            <i class="fas fa-heart"></i>Aimer (1 €)
+          </button>
+          <button class="comment-toggle-btn" data-post-id="${post.id}">
+            <i class="fas fa-comment"></i>Commenter
+          </button>
+        </div>
+        <div class="comments-section hidden" id="commentsSection-${post.id}">
+          <div class="comments-list" id="comments-${post.id}">
+            <p class="text-gray-500 text-center py-2 text-sm">No comments yet.</p>
+          </div>
+          <div class="add-comment-area">
+            <div class="comment-avatar" id="addComment-${post.id}">
+              ${currentUser && currentUser.avatar_url ? `<img src="${currentUser.avatar_url}" alt="Profile">` : (currentUser && currentUser.full_name ? currentUser.full_name.charAt(0).toUpperCase() : (currentUser && currentUser.email ? currentUser.email.charAt(0).toUpperCase() : 'U'))}
+            </div>
+            <textarea placeholder="Ajouter un commentaire..." rows="1" class="comment-input" data-post-id="${post.id}"></textarea>
+            <button class="btn-primary-action post-comment-btn" data-post-id="${post.id}">Post</button>
+          </div>
+        </div>
+      `;
+      postFeedDiv.appendChild(postElement);
+      const likeButton = postElement.querySelector(`.like-btn[data-post-id="${post.id}"]`);
+      if (likeButton) {
+        likeButton.addEventListener('click', (e) => {
+          const postId = e.target.dataset.post_id || e.target.closest('.like-btn').dataset.postId;
+          likePost(postId, likeButton);
+        });
+      }
+      const loveButton = postElement.querySelector(`.love-btn[data-post-id="${post.id}"]`);
+      if (loveButton) {
+        loveButton.addEventListener('click', (e) => {
+          const postId = e.target.dataset.post_id || e.target.closest('.love-btn').dataset.postId;
+          lovePost(postId, loveButton, post.user_id);
+        });
+      }
+      const commentToggleButton = postElement.querySelector(`.comment-toggle-btn[data-post-id="${post.id}"]`);
+      if (commentToggleButton) {
+        commentToggleButton.addEventListener('click', (e) => {
+          const postId = e.target.dataset.post_id || e.target.closest('.comment-toggle-btn').dataset.postId;
+          toggleCommentsSection(postId);
+        });
+      }
+      const postCommentButton = postElement.querySelector(`.post-comment-btn[data-post-id="${post.id}"]`);
+      if (postCommentButton) {
+        postCommentButton.addEventListener('click', (e) => {
+          const postId = e.target.dataset.post_id || e.target.closest('.post-comment-btn').dataset.postId;
+          addComment(postId, postElement.querySelector(`.comment-input[data-post-id="${post.id}"]`));
+        });
+      }
+      const postOptionsBtn = postElement.querySelector(`.post-options-btn[data-post-id="${post.id}"]`);
+      if (postOptionsBtn) {
+        postOptionsBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const postId = e.target.dataset.post_id || e.target.closest('.post-options-btn').dataset.postId;
+          togglePostOptionsDropdown(postId);
+        });
+      }
+      const editPostBtn = postElement.querySelector(`.edit-post-btn[data-post-id="${post.id}"]`);
+      if (editPostBtn) {
+        editPostBtn.addEventListener('click', (e) => {
+          const postId = e.target.dataset.post_id || e.target.closest('.edit-post-btn').dataset.postId;
+          editPost(postId, post.content);
+        });
+      }
+      const deletePostBtn = postElement.querySelector(`.delete-post-btn[data-post-id="${post.id}"]`);
+      if (deletePostBtn) {
+        deletePostBtn.addEventListener('click', (e) => {
+          const postId = e.target.dataset.post_id || e.target.closest('.delete-post-btn').dataset.postId;
+          deletePost(postId, post.media_url);
+        });
+      }
+      const followButton = postElement.querySelector(`.follow-btn[data-user-id="${post.user_id}"]`);
+      if (followButton) {
+        checkFollowStatus(post.user_id, followButton);
+        followButton.addEventListener('click', () => toggleFollow(post.user_id, followButton));
+      }
+    });
+  } catch (error) {
+    console.error("Error fetching posts from Supabase:", error.message);
+    postFeedDiv.innerHTML = `<p class="text-red-500 text-center py-4">Failed to load posts: ${error.message}.</p>`;
+    showMessage('Failed to load posts.', 'error');
+  }
+}
+
+async function deletePost(postId, mediaUrl) {
+  if (!confirm('Are you sure you want to delete this post?')) {
+    return;
+  }
+  try {
+    const { error } = await supabase
+      .from('posts')
+      .delete()
+      .eq('id', postId)
+      .eq('user_id', currentUser.id);
+    if (error) throw error;
+    showMessage('Post deleted successfully!', 'success');
+    document.getElementById('postFeed').querySelector(`.post-card .post-options-btn[data-post-id="${postId}"]`).closest('.post-card').remove();
+  } catch (error) {
+    console.error(`Error deleting post ${postId}:`, error.message);
+    showMessage(`Failed to delete post: ${error.message}`, 'error');
+  }
+}
+
+async function editComment(commentId, content, commentElement) {
+  const commentTextDiv = document.querySelector('.comment-content');
+  const originalCommentHtml = commentTextDiv.innerHTML;
+  document.getElementById(`commentOptions-${commentId}`).classList.add('hidden');
+  commentTextDiv.innerHTML = `
+    <div class="edit-comment-area">
+      <textarea rows="2">${content}</textarea>
+      <div class="edit-comment-actions">
+        <button class="cancel-btn">Cancel</button>
+        <button class="save-btn">Save</button>
+      </div>
+    </div>
+  `;
+  const textarea = commentTextDiv.querySelector('textarea');
+  const saveBtn = commentTextDiv.querySelector('.save-btn');
+  const cancelBtn = commentTextDiv.querySelector('.cancel-btn');
+  textarea.focus();
+  saveBtn.addEventListener('click', async () => {
+    const newContent = textarea.value.trim();
+    if (!newContent) {
+      showMessage('Comment content cannot be empty.', 'error');
+      return;
+    }
+    try {
+      const { error } = await supabase
+        .from('comments')
+        .update({ content: newContent, edited: true })
+        .eq('id', commentId)
+        .eq('user_id', currentUser.id);
+      if (error) throw error;
+      showMessage('Comment updated successfully!', 'success');
+      commentTextDiv.innerHTML = newContent;
+    } catch (error) {
+      console.error(`Error updating comment ${commentId}:`, error.message);
+      showMessage(`Failed to update comment: ${error.message}`, 'error');
+    }
+  });
+  cancelBtn.addEventListener('click', () => {
+    commentTextDiv.innerHTML = originalCommentHtml;
+  });
+}
+
+async function deleteComment(commentId, postId) {
+  if (!confirm('Are you sure you want to delete this comment?')) {
+    return;
+  }
+  try {
+    const { error } = await supabase
+      .from('comments')
+      .delete()
+      .eq('id', commentId)
+      .eq('user_id', currentUser.id);
+    if (error) throw error;
+    showMessage('Comment deleted successfully!', 'success');
+    fetchComments(postId);
+  } catch (error) {
+    console.error(`Error deleting comment ${commentId}:`, error.message);
+    showMessage(`Failed to delete comment: ${error.message}`, 'error');
+  }
+}
+
+function previewMedia(event) {
+  const [file] = event.target.files;
+  console.log("Selected file type:", file?.type);
+  const imagePreview = document.getElementById('imagePreview');
+  const videoPreview = document.getElementById('videoPreview');
+  const mediaPreviewContainer = document.getElementById('mediaPreview-img');
+  if (file && file.type) {
+    const fileType = file.type.toLowerCase();
+    if (fileType.startsWith('image/')) {
+      imagePreview.src = URL.createObjectURL(file);
+      imagePreview.classList.remove('hidden');
+      videoPreview.classList.add('hidden');
+      videoPreview.src = '';
+    } else if (fileType.startsWith('video/') || fileType === 'video/mp4' || fileType === 'video/webm') {
+      videoPreview.src = URL.createObjectURL(file);
+      videoPreview.load();
+      videoPreview.classList.remove('hidden');
+      imagePreview.classList.add('hidden');
+      imagePreview.src = '';
+    } else {
+      showMessage('Unsupported file type. Please upload an image or video (mp4/webm).', 'error');
+      removeMedia();
+    }
+    mediaPreviewContainer.classList.remove('hidden');
+  } else {
+    removeMedia();
+  }
 }
 
 function removeMedia() {
-    const mediaPreviewContainer = document.getElementById('mediaPreviewContainer');
-    const imagePreview = document.getElementById('imagePreview');
-    const videoPreview = document.getElementById('videoPreview');
-    const postMediaUpload = document.getElementById('postMediaUpload');
-    mediaPreviewContainer.classList.add('hidden');
-    imagePreview.classList.add('hidden');
-    videoPreview.classList.add('hidden');
-    postMediaUpload.value = '';
+  const imagePreview = document.getElementById('imagePreview');
+  const videoPreview = document.getElementById('videoPreview');
+  const mediaPreviewContainer = document.getElementById('mediaPreview-img');
+  const postMediaUpload = document.getElementById('post-options');
+  imagePreview.src = '#';
+  videoPreview.src = '';
+  imagePreview.classList.add('hidden');
+  videoPreview.classList.add('hidden');
+  mediaPreviewContainer.classList.add('hidden');
+  postMediaUpload.value = '';
 }
 
-// Event Listeners
-document.addEventListener('DOMContentLoaded', async () => {
-    await initializeUser();
-    subscribeToPosts();
-    subscribeToLikes();
-    subscribeToComments();
-    subscribeToMessages();
+function toggleCommentsSection(postId) {
+  const commentsSection = document.getElementById(`commentsSection-${postId}`);
+  commentsSection.classList.toggle('hidden');
+  if (!commentsSection.classList.contains('hidden')) {
+    fetchComments(postId);
+  }
+}
 
-    document.getElementById('hamburgerBtnMobile').addEventListener('click', () => {
-        document.getElementById('sidebar').classList.toggle('open');
-    });
+function togglePostOptionsDropdown(postId) {
+  document.querySelectorAll('.post-options-dropdown:not(.hidden)').forEach(dropdown => {
+    if (dropdown.id !== `postOptions-${postId}`) {
+      dropdown.classList.add('hidden');
+    }
+  });
+  document.getElementById(`postOptions-${postId}`).classList.toggle('hidden');
+}
 
-    document.getElementById('sidebarLogoutLink').addEventListener('click', handleLogout);
-    document.getElementById('mobileLogoutLink').addEventListener('click', handleLogout);
+function toggleCommentOptionsDropdown(commentId) {
+  document.querySelectorAll('.comment-options-dropdown:not(.hidden)').forEach(dropdown => {
+    if (dropdown.id !== `commentOptions-${commentId}`) {
+      dropdown.classList.add('hidden');
+    }
+  });
+  document.getElementById(`commentOptions-${commentId}`).classList.toggle('hidden');
+}
 
-    document.getElementById('submitPostBtn').addEventListener('click', createPost);
+function timeDifference(current, previous) {
+  const msPerMinute = 60 * 1000;
+  const msPerHour = msPerMinute * 60;
+  const msPerDay = msPerHour * 24;
+  const msPerMonth = msPerDay * 30;
+  const msPerYear = msPerDay * 365;
+  const elapsed = current - previous;
+  if (elapsed < msPerMinute) {
+    return Math.round(elapsed / 1000) + ' seconds ago';
+  } else if (elapsed < msPerHour) {
+    return Math.round(elapsed / msPerMinute) + ' minutes ago';
+  } else if (elapsed < msPerDay) {
+    return Math.round(elapsed / msPerHour) + ' hours ago';
+  } else if (elapsed < msPerMonth) {
+    return 'approximately ' + Math.round(elapsed / msPerDay) + ' days ago';
+  } else if (elapsed < msPerYear) {
+    return 'approximately ' + Math.round(elapsed / msPerMonth) + ' months ago';
+  } else {
+    return 'approximately ' + Math.round(elapsed / msPerYear) + ' years ago';
+  }
+}
 
-    const postMediaUpload = document.getElementById('postMediaUpload');
-    const uploadMediaBtn = document.getElementById('uploadMediaBtn');
-    const removeMediaBtn = document.getElementById('removeMediaBtn');
-    const mediaPreviewContainer = document.getElementById('mediaPreviewContainer');
-    const imagePreview = document.getElementById('imagePreview');
-    const videoPreview = document.getElementById('videoPreview');
+let messageTimeout;
+function showMessage(message, type = 'success', duration = 3000) {
+  const messageBox = document.getElementById('messageBox');
+  messageBox.textContent = message;
+  messageBox.className = `message-box show ${type}`;
+  clearTimeout(messageTimeout);
+  messageTimeout = setTimeout(() => {
+    messageBox.classList.remove('show');
+  }, duration);
+}
 
-    uploadMediaBtn.addEventListener('click', () => {
-        if (postMediaUpload) {
-            postMediaUpload.click();
+async function fetchComments(postId) {
+  const commentsList = document.getElementById(`comments-${postId}`);
+  try {
+    const { data: comments, error } = await supabase
+      .from('comments')
+      .select(`
+        id,
+        content,
+        created_at,
+        user_id,
+        users (
+          full_name,
+          avatar_url,
+          email
+        )
+      `)
+      .eq('post_id', postId)
+      .order('created_at', { ascending: true });
+    if (error) throw error;
+    commentsList.innerHTML = comments.length === 0 ? '<p class="text-gray-500 text-center py-2 text-sm">No comments yet.</p>' : '';
+    comments.forEach(comment => {
+      const isMyComment = currentUser && comment.user_id === currentUser.id;
+      const commenterName = comment.users?.full_name || comment.users?.email?.split('@')[0] || 'Anonymous';
+      const commenterAvatar = comment.users?.avatar_url ? `<img src="${comment.users.avatar_url}" alt="Profile">` : commenterName.charAt(0).toUpperCase();
+      const commentDate = new Date(comment.created_at);
+      const formattedTime = timeDifference(new Date(), commentDate);
+      const commentElement = document.createElement('div');
+      commentElement.className = 'comment';
+      commentElement.innerHTML = `
+        <div class="comment-avatar">${commenterAvatar}</div>
+        <div class="comment-content-wrapper">
+          <span class="commenter-name">${commenterName}</span>
+          <span class="comment-timestamp">${formattedTime}</span>
+          <p class="comment-text">${comment.content}</p>
+          ${isMyComment ? `
+            <button class="comment-options-btn" data-comment-id="${comment.id}">
+              <i class="fas fa-ellipsis-h"></i>
+            </button>
+            <div class="comment-options-dropdown hidden" id="commentOptions-${comment.id}">
+              <button class="edit-comment-btn" data-comment-id="${comment.id}">Edit</button>
+              <button class="delete-comment-btn" data-comment-id="${comment.id}">Delete</button>
+            </div>` : ''}
+        </div>
+      `;
+      commentsList.appendChild(commentElement);
+      if (isMyComment) {
+        const commentOptionsBtn = commentElement.querySelector(`.comment-options-btn[data-comment-id="${comment.id}"]`);
+        if (commentOptionsBtn) {
+          commentOptionsBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleCommentOptionsDropdown(comment.id);
+          });
         }
-    });
-
-    if (postMediaUpload) {
-        postMediaUpload.addEventListener('change', () => {
-            const file = postMediaUpload.files[0];
-            if (file) {
-                mediaPreviewContainer.classList.remove('hidden');
-                if (file.type.startsWith('image/')) {
-                    imagePreview.src = URL.createObjectURL(file);
-                    imagePreview.classList.remove('hidden');
-                    videoPreview.classList.add('hidden');
-                } else if (file.type.startsWith('video/')) {
-                    videoPreview.src = URL.createObjectURL(file);
-                    videoPreview.classList.remove('hidden');
-                    imagePreview.classList.add('hidden');
-                }
-            }
-        });
-    } // Added missing closing brace here
-
-    removeMediaBtn.addEventListener('click', removeMedia);
-
-    const messageFab = document.getElementById('messageFab');
-    const messageModalOverlay = document.getElementById('messageModalOverlay');
-    const closeMessageModalButton = document.getElementById('closeMessageModalButton');
-    messageFab.addEventListener('click', () => {
-        messageModalOverlay.classList.toggle('show');
-        if (messageModalOverlay.classList.contains('show')) {
-            populateChatUserList();
+        const editCommentBtn = commentElement.querySelector(`.edit-comment-btn[data-comment-id="${comment.id}"]`);
+        if (editCommentBtn) {
+          editCommentBtn.addEventListener('click', () => editComment(comment.id, comment.content, commentElement));
         }
-    });
-    closeMessageModalButton.addEventListener('click', () => {
-        messageModalOverlay.classList.remove('show');
-        activeChatSessionId = null;
-        document.getElementById('chatWindow').innerHTML = '<p class="text-center text-gray-500">Select a chat</p>';
-        document.getElementById('activeChatHeader').textContent = 'Select a chat';
-    });
-
-    document.getElementById('sendChatMessageButton').addEventListener('click', sendChatMessage);
-    document.getElementById('chatInput').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            sendChatMessage();
+        const deleteCommentBtn = commentElement.querySelector(`.delete-comment-btn[data-comment-id="${comment.id}"]`);
+        if (deleteCommentBtn) {
+          deleteCommentBtn.addEventListener('click', () => deleteComment(comment.id, postId));
         }
+      }
     });
+  } catch (error) {
+    console.error(`Error fetching comments for post ${postId}:`, error.message);
+    commentsList.innerHTML = `<p class="text-red-500 text-center py-2 text-sm">Failed to load comments: ${error.message}</p>`;
+  }
+}
 
-    document.getElementById('chatUserSearch').addEventListener('input', debounce(searchChatUsers, 300));
-
-    const searchBar = document.getElementById('searchBar');
-    const clearSearchBtn = document.getElementById('clearSearchBtn');
-    searchBar.addEventListener('input', debounce(async () => {
-        const query = searchBar.value.trim().toLowerCase();
-        clearSearchBtn.classList.toggle('hidden', !query);
-        const searchResults = document.getElementById('searchResults');
-        searchResults.classList.toggle('opacity-0', !query);
-        searchResults.classList.toggle('invisible', !query);
-        if (!query) {
-            searchResults.innerHTML = '';
-            await fetchPosts();
-            return;
-        }
-        try {
-            const { data: posts, error: postError } = await supabase
-                .from('posts')
-                .select(`
-                    id,
-                    content,
-                    user_id,
-                    users (
-                        full_name,
-                        avatar_url
-                    )
-                `)
-                .ilike('content', `%${query}%`);
-            if (postError) throw postError;
-            const { data: users, error: userError } = await supabase
-                .from('users')
-                .select('id, full_name, avatar_url')
-                .ilike('full_name', `%${query}%`);
-            if (userError) throw userError;
-            searchResults.innerHTML = '';
-            if ((!posts || posts.length === 0) && (!users || users.length === 0)) {
-                searchResults.innerHTML = '<p class="text-center text-gray-500 p-4">No results found.</p>';
-                return;
-            }
-            users.forEach(user => {
-                const resultItem = document.createElement('div');
-                resultItem.className = 'search-result-item';
-                const avatarHtml = user.avatar_url
-                    ? `<img src="${user.avatar_url}" alt="Profile">`
-                    : `<span>${user.full_name ? user.full_name.charAt(0).toUpperCase() : 'U'}</span>`;
-                resultItem.innerHTML = `
-                    <div class="search-result-avatar">${avatarHtml}</div>
-                    <div class="search-result-info">
-                        <p>${user.full_name || 'User'}</p>
-                        <span>User</span>
-                    </div>
-                    <button class="follow-btn" data-user-id="${user.id}">Follow</button>
-                `;
-                resultItem.querySelector('.follow-btn').addEventListener('click', () => followUser(user.id, resultItem.querySelector('.follow-btn')));
-                searchResults.appendChild(resultItem);
-            });
-            posts.forEach(post => {
-                const resultItem = document.createElement('div');
-                resultItem.className = 'search-result-item';
-                const avatarHtml = post.users.avatar_url
-                    ? `<img src="${post.users.avatar_url}" alt="Profile">`
-                    : `<span>${post.users.full_name ? post.users.full_name.charAt(0).toUpperCase() : 'U'}</span>`;
-                resultItem.innerHTML = `
-                    <div class="search-result-avatar">${avatarHtml}</div>
-                    <div class="search-result-info">
-                        <p>${post.users.full_name || 'User'}</p>
-                        <span>${post.content.slice(0, 50)}${post.content.length > 50 ? '...' : ''}</span>
-                    </div>
-                `;
-                resultItem.addEventListener('click', () => {
-                    const postElement = document.getElementById(`post-${post.id}`);
-                    if (postElement) {
-                        postElement.scrollIntoView({ behavior: 'smooth' });
-                    }
-                });
-                searchResults.appendChild(resultItem);
-            });
-        } catch (error) {
-            console.error('Error searching:', error.message);
-            searchResults.innerHTML = '<p class="text-center text-red-500 p-4">Failed to search.</p>';
-        }
-    }, 300));
-    clearSearchBtn.addEventListener('click', async () => {
-        searchBar.value = '';
-        clearSearchBtn.classList.add('hidden');
-        document.getElementById('searchResults').classList.add('opacity-0', 'invisible');
-        await fetchPosts();
+async function fetchMarketplaceHighlights() {
+  const marketplaceHighlights = document.getElementById('marketplaceHighlights');
+  marketplaceHighlights.innerHTML = '<div class="grid grid-cols-1 gap-4"><p class="text-xs text-gray-500 text-center animate-pulse" id="loadingMarketplace">Loading latest products...</p></div>';
+  try {
+    const { data: items, error } = await supabase
+      .from('products')
+      .select('id, name, price, image_url')
+      .limit(3)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    if (items.length === 0) {
+      marketplaceHighlights.innerHTML = '<div class="grid grid-cols-1 gap-4"><p class="text-xs text-gray-500 text-center">No marketplace items available yet.</p></div>';
+      return;
+    }
+    let itemsHtml = '<div class="grid grid-cols-1 gap-4">';
+    items.forEach(item => {
+      itemsHtml += `
+        <a href="marketplace.html" class="marketplace-item block bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 transform hover:-translate-y-1 cursor-pointer">
+          <div class="relative">
+            <img src="${item.image_url || 'https://placehold.co/50x50'}" alt="${item.title}" class="w-full h-32 object-cover">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+          </div>
+          <div class="p-3">
+            <p class="marketplace-item-name text-sm font-semibold text-gray-800 line-clamp-2">${item.title}</p>
+            <p class="marketplace-item-price text-green-600 font-bold mt-1">$${parseFloat(item.price).toFixed(2)}</p>
+          </div>
+        </a>
+      `;
     });
+    itemsHtml += '</div>';
+    marketplaceHighlights.innerHTML = itemsHtml;
+  } catch (error) {
+    console.error("Error fetching marketplace highlights:", error.message);
+    marketplaceHighlights.innerHTML = '<div class="grid grid-cols-1 gap-4"><p class="text-red-500 text-xs text-center">Failed to load marketplace items.</p></div>';
+  }
+}
+
+document.getElementById('searchBar').addEventListener('input', function(e) {
+  const query = e.target.value.trim();
+  const searchResults = document.getElementById('searchResults');
+  const clearSearchBtn = document.getElementById('clearSearchBtn');
+  if (query) {
+    searchContent(query);
+    searchResults.classList.remove('opacity-0', 'invisible');
+    searchResults.classList.add('opacity-100', 'visible');
+    clearSearchBtn.classList.remove('hidden');
+  } else {
+    searchResults.classList.add('opacity-0', 'invisible');
+    searchResults.classList.remove('opacity-100', '');
+    clearSearchBtn.classList.add('hidden');
+    searchResults.innerHTML = '';
+  }
 });
 
-async function followUser(userId, button) {
-    try {
-        const { data: existingFollow } = await supabase
-            .from('follows')
-            .select('id')
-            .eq('follower_id', currentUser.id)
-            .eq('followed_id', userId)
-            .maybeSingle();
-        if (existingFollow) {
-            await supabase.from('follows').delete().eq('id', existingFollow.id);
-            button.textContent = 'Follow';
-            button.classList.remove('following');
-        } else {
-            await supabase.from('follows').insert([{ follower_id: currentUser.id, followed_id: userId }]);
-            button.textContent = 'Following';
-            button.classList.add('following');
-        }
-        showMessage(`Successfully ${existingFollow ? 'unfollowed' : 'followed'} user!`, 'success');
-    } catch (error) {
-        console.error('Error following/unfollowing user:', error.message);
-        showMessage('Failed to follow/unfollow user.', 'error');
+document.getElementById('clearSearchBtn').addEventListener('click', function() {
+  const searchBar = document.getElementById('searchBar');
+  const searchResults = document.getElementById('searchResults');
+  searchBar.value = '';
+  searchResults.classList.add('opacity-0', 'invisible');
+  searchResults.classList.remove('opacity-100', '');
+  this.classList.add('hidden');
+  fetchPosts();
+});
+
+document.querySelectorAll('.search-result-item').forEach(item => {
+  item.addEventListener('click', function() {
+    const userId = this.querySelector('.follow-btn')?.dataset.userId;
+    if (userId) {
+      searchResults.innerHTML = `
+        <div class="p-4 bg-white rounded-lg shadow">
+          <div class="flex items-center space-x-4">
+            <div class="search-result-avatar">${this.querySelector('.search-result-avatar').innerHTML}</div>
+            <div>
+              <p class="font-semibold">${this.querySelector('.search-result-info p').textContent}</p>
+              <span class="text-gray-500">User Profile</span>
+            </div>
+          </div>
+          <div id="userPosts" class="mt-4">
+            <p class="text-gray-500">Loading posts...</p>
+          </div>
+        </div>
+      `;
     }
+  });
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      const video = entry.target;
+      if (entry.isIntersecting) {
+        video.play().catch(() => {});
+      } else {
+        video.pause();
+      }
+    });
+  }, { threshold: 0.6 });
+  document.querySelectorAll('video').forEach(video => {
+    observer.observe(video);
+  });
+});
+
+document.querySelectorAll('.post-video').forEach(videoContainer => {
+  const video = videoContainer.querySelector('video');
+  const overlay = videoContainer.querySelector('::before');
+  video.addEventListener('play', () => overlay.style.display = 'none');
+  video.addEventListener('pause', () => overlay.style.display = 'flex');
+  videoContainer.addEventListener('mouseenter', () => {
+    observer.observe(video);
+  });
+});
+
+document.querySelectorAll('.post-video').forEach(videoContainer => {
+  const video = videoContainer.querySelector('video');
+  const overlay = videoContainer.querySelector('::before');
+  video.addEventListener('play', () => overlay.style.display = 'none');
+  video.addEventListener('pause', () => overlay.style.display = 'flex');
+  videoContainer.addEventListener('mouseenter', () => {
+    if (video.paused) overlay.style.display = 'flex';
+  });
+  videoContainer.addEventListener('mouseleave', () => {
+    if (video.paused) overlay.style.display = 'none';
+  });
+  overlay.style.content = video.paused ? '\f04b' : '\f04c';
+});
+function copyPostLink(postId) {
+  const url = `${window.location.origin}/post.html?id=${postId}`;
+  navigator.clipboard.writeText(url)
+    .then(() => showMessage('Post link copied!', 'success'))
+    .catch(() => showMessage('Failed to copy link.', 'error'));
 }
-    </script>
+</script>
 </body>
 </html>
