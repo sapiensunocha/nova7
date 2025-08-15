@@ -260,7 +260,7 @@
             opacity: 0;
             transition: opacity 0.5s ease-in-out;
             text-align: center;
-            min-width: 250px;
+            min-width: 240px;
             font-size: 0.969rem;
         }
         .message-box.error {
@@ -692,7 +692,7 @@
             try {
                 const { data: profile, error: profileError } = await supabase
                     .from('users')
-                    .select('full_name')
+                    .select('full_name, email')
                     .eq('id', userId)
                     .maybeSingle();
 
@@ -1181,34 +1181,30 @@
                         throw new Error(stripeError.message);
                     }
 
-                    if (paymentIntent.status === 'succeeded') {
-                        const { error: txError } = await supabase
-                            .from('transactions')
-                            .insert({
-                                user_id: userId,
-                                amount: amount,
-                                transaction_type: 'deposit',
-                                status: 'completed',
-                                description: `Dépôt via Stripe (Intention de paiement : ${paymentIntent.id})`,
-                                created_at: new Date().toISOString()
-                            });
+                    const { error: txError } = await supabase
+                        .from('transactions')
+                        .insert({
+                            user_id: userId,
+                            amount: amount,
+                            transaction_type: 'deposit',
+                            status: 'pending',
+                            description: `Dépôt via Stripe (Intention de paiement : ${paymentIntent.id})`,
+                            created_at: new Date().toISOString()
+                        });
 
-                        if (txError) {
-                            console.error('Erreur lors de l\'enregistrement du dépôt :', txError.message);
-                            showMessage('Dépôt traité, mais échec de l\'enregistrement dans le portefeuille.', 'error');
-                            messageDiv.textContent = 'Échec de l\'enregistrement de la transaction.';
-                            return;
-                        }
-
-                        showMessage('Dépôt réussi !', 'success');
-                        messageDiv.textContent = 'Fonds ajoutés avec succès !';
-                        amountInput.value = '';
-                        cardElement.clear();
-                        await fetchWalletBalance();
-                        await fetchTransactionHistory();
-                    } else {
-                        throw new Error(`Statut de paiement : ${paymentIntent.status}. Veuillez réessayer.`);
+                    if (txError) {
+                        console.error('Erreur lors de l\'enregistrement du dépôt :', txError.message);
+                        showMessage('Dépôt initié, mais échec de l\'enregistrement.', 'error');
+                        messageDiv.textContent = 'Échec de l\'enregistrement de la transaction.';
+                        return;
                     }
+
+                    showMessage('Dépôt initié, en attente de confirmation. Vous recevrez une notification par email.', 'success');
+                    messageDiv.textContent = 'Dépôt initié ! En attente de confirmation.';
+                    amountInput.value = '';
+                    cardElement.clear();
+                    await fetchWalletBalance();
+                    await fetchTransactionHistory();
                 } catch (error) {
                     console.error('Erreur de dépôt :', error);
                     showMessage(`Échec du dépôt : ${error.message}`, 'error');
@@ -1252,6 +1248,7 @@
                         return;
                     }
 
+                    const description = `Retrait via ${method}: ${account}`;
                     const { error: txError } = await supabase
                         .from('transactions')
                         .insert({
@@ -1259,7 +1256,7 @@
                             amount: -amount,
                             transaction_type: 'withdrawal',
                             status: 'pending',
-                            description: `Retrait via ${method}: ${account}`,
+                            description,
                             created_at: new Date().toISOString()
                         });
 
@@ -1270,7 +1267,18 @@
                         return;
                     }
 
-                    showMessage('Demande de retrait soumise avec succès !', 'success');
+                    // Trigger email notification
+                    await supabase.functions.invoke('send-transaction-email', {
+                        body: {
+                            user_id: userId,
+                            transaction_type: 'withdrawal',
+                            amount: amount,
+                            status: 'pending',
+                            description
+                        }
+                    });
+
+                    showMessage('Demande de retrait soumise avec succès ! Une notification a été envoyée par email.', 'success');
                     messageDiv.textContent = 'Demande de retrait soumise !';
                     document.getElementById('withdrawalForm').reset();
                     await fetchWalletBalance();
@@ -1342,6 +1350,9 @@
                         return;
                     }
 
+                    const senderDescription = `Transfert à ${recipientName} (ID : ${recipientId})`;
+                    const recipientDescription = `Transfert de ${userName} (ID : ${userId})`;
+                    const netAmount = amount * (1 - TRANSACTION_FEE_RATE);
                     const { error: txError } = await supabase
                         .from('transactions')
                         .insert([
@@ -1350,16 +1361,16 @@
                                 amount: -amount,
                                 transaction_type: 'transfer',
                                 status: 'completed',
-                                description: `Transfert à ${recipientName} (ID : ${recipientId})`,
+                                description: senderDescription,
                                 recipient_id: recipientId,
                                 created_at: new Date().toISOString()
                             },
                             {
                                 user_id: recipientId,
-                                amount: amount * (1 - TRANSACTION_FEE_RATE),
+                                amount: netAmount,
                                 transaction_type: 'transfer',
                                 status: 'completed',
-                                description: `Transfert de ${userName} (ID : ${userId})`,
+                                description: recipientDescription,
                                 recipient_id: userId,
                                 created_at: new Date().toISOString()
                             }
@@ -1372,7 +1383,29 @@
                         return;
                     }
 
-                    showMessage('Transfert réussi !', 'success');
+                    // Trigger email notifications for both sender and recipient
+                    await Promise.all([
+                        supabase.functions.invoke('send-transaction-email', {
+                            body: {
+                                user_id: userId,
+                                transaction_type: 'transfer',
+                                amount: amount,
+                                status: 'completed',
+                                description: senderDescription
+                            }
+                        }),
+                        supabase.functions.invoke('send-transaction-email', {
+                            body: {
+                                user_id: recipientId,
+                                transaction_type: 'transfer',
+                                amount: netAmount,
+                                status: 'completed',
+                                description: recipientDescription
+                            }
+                        })
+                    ]);
+
+                    showMessage('Transfert réussi ! Une notification a été envoyée par email.', 'success');
                     messageDiv.textContent = 'Fonds transférés avec succès !';
                     document.getElementById('transferForm').reset();
                     await fetchWalletBalance();
@@ -1432,6 +1465,7 @@
                         return;
                     }
 
+                    const description = `Demande d'argent à ${senderName} (ID : ${senderId})`;
                     const { error: txError } = await supabase
                         .from('transactions')
                         .insert({
@@ -1439,7 +1473,7 @@
                             amount: amount,
                             transaction_type: 'money_request',
                             status: 'pending',
-                            description: `Demande d'argent à ${senderName} (ID : ${senderId})`,
+                            description,
                             recipient_id: senderId,
                             created_at: new Date().toISOString()
                         });
@@ -1451,7 +1485,18 @@
                         return;
                     }
 
-                    showMessage('Demande envoyée avec succès !', 'success');
+                    // Trigger email notification for the requester
+                    await supabase.functions.invoke('send-transaction-email', {
+                        body: {
+                            user_id: userId,
+                            transaction_type: 'money_request',
+                            amount: amount,
+                            status: 'pending',
+                            description
+                        }
+                    });
+
+                    showMessage('Demande envoyée avec succès ! Une notification a été envoyée par email.', 'success');
                     messageDiv.textContent = 'Demande envoyée avec succès !';
                     document.getElementById('requestForm').reset();
                     await fetchPendingRequests();
@@ -1473,7 +1518,7 @@
                 try {
                     const { data: request, error: fetchError } = await supabase
                         .from('transactions')
-                        .select('amount, user_id')
+                        .select('amount, user_id, description')
                         .eq('id', requestId)
                         .eq('status', 'pending')
                         .eq('transaction_type', 'money_request')
@@ -1506,7 +1551,9 @@
                     }
 
                     const requesterName = requesterData?.full_name || 'Inconnu';
-
+                    const senderDescription = `Demande d'argent acceptée ${requestId} à ${requesterName} (ID : ${requesterId})`;
+                    const recipientDescription = `Reçu de la demande acceptée ${requestId} de ${userName} (ID : ${userId})`;
+                    const netAmount = amount * (1 - TRANSACTION_FEE_RATE);
                     const { error: updateError } = await supabase
                         .from('transactions')
                         .insert([
@@ -1515,16 +1562,16 @@
                                 amount: -amount,
                                 transaction_type: 'transfer',
                                 status: 'completed',
-                                description: `Demande d'argent acceptée ${requestId} à ${requesterName} (ID : ${requesterId})`,
+                                description: senderDescription,
                                 recipient_id: requesterId,
                                 created_at: new Date().toISOString()
                             },
                             {
                                 user_id: requesterId,
-                                amount: amount * (1 - TRANSACTION_FEE_RATE),
+                                amount: netAmount,
                                 transaction_type: 'transfer',
                                 status: 'completed',
-                                description: `Reçu de la demande acceptée ${requestId} de ${userName} (ID : ${userId})`,
+                                description: recipientDescription,
                                 recipient_id: userId,
                                 created_at: new Date().toISOString()
                             }
@@ -1548,7 +1595,29 @@
                         return;
                     }
 
-                    showMessage('Demande acceptée avec succès !', 'success');
+                    // Trigger email notifications for both accepter and requester
+                    await Promise.all([
+                        supabase.functions.invoke('send-transaction-email', {
+                            body: {
+                                user_id: userId,
+                                transaction_type: 'transfer',
+                                amount: amount,
+                                status: 'completed',
+                                description: senderDescription
+                            }
+                        }),
+                        supabase.functions.invoke('send-transaction-email', {
+                            body: {
+                                user_id: requesterId,
+                                transaction_type: 'transfer',
+                                amount: netAmount,
+                                status: 'completed',
+                                description: recipientDescription
+                            }
+                        })
+                    ]);
+
+                    showMessage('Demande acceptée avec succès ! Une notification a été envoyée par email.', 'success');
                     await fetchWalletBalance();
                     await fetchPendingRequests();
                     await fetchTransactionHistory();
@@ -1563,6 +1632,21 @@
                 if (!confirm('Êtes-vous sûr de vouloir refuser cette demande d\'argent ?')) return;
 
                 try {
+                    const { data: request, error: fetchError } = await supabase
+                        .from('transactions')
+                        .select('amount, user_id, description')
+                        .eq('id', requestId)
+                        .eq('status', 'pending')
+                        .eq('transaction_type', 'money_request')
+                        .eq('recipient_id', userId)
+                        .single();
+
+                    if (fetchError || !request) {
+                        console.error('Erreur lors de la récupération de la demande :', fetchError?.message);
+                        showMessage('Demande non trouvée ou déjà traitée.', 'error');
+                        return;
+                    }
+
                     const { error } = await supabase
                         .from('transactions')
                         .update({ status: 'failed' })
@@ -1577,7 +1661,18 @@
                         return;
                     }
 
-                    showMessage('Demande refusée avec succès.', 'success');
+                    // Trigger email notification for the requester
+                    await supabase.functions.invoke('send-transaction-email', {
+                        body: {
+                            user_id: request.user_id,
+                            transaction_type: 'money_request',
+                            amount: parseFloat(request.amount),
+                            status: 'failed',
+                            description: request.description
+                        }
+                    });
+
+                    showMessage('Demande refusée avec succès. Une notification a été envoyée par email.', 'success');
                     await fetchPendingRequests();
                     await fetchTransactionHistory();
                 } catch (error) {
@@ -1594,16 +1689,20 @@
             document.getElementById('transferRecipient').addEventListener('input', debounce(handleRecipientSearch, 300));
             document.getElementById('requestSender').addEventListener('input', debounce(handleSenderSearch, 300));
             document.getElementById('viewPendingRequestsBtn').addEventListener('click', () => {
-                const pendingContent = document.getElementById('pendingRequestsContent');
-                pendingContent.classList.add('open');
-                pendingContent.parentElement.querySelector('.fa-chevron-down').classList.replace('fa-chevron-down', 'fa-chevron-up');
-                pendingContent.scrollIntoView({ behavior: 'smooth' });
+                const pendingRequestsCard = document.getElementById('pendingRequestsContainer');
+                const content = document.getElementById('pendingRequestsContent');
+                const icon = pendingRequestsCard.querySelector('i');
+                content.classList.toggle('open');
+                icon.classList.toggle('fa-chevron-down');
+                icon.classList.toggle('fa-chevron-up');
             });
 
-            // Initial Data Fetches
-            await fetchWalletBalance();
-            await fetchPendingRequests();
-            await fetchTransactionHistory();
+            // Initialize Data
+            await Promise.all([
+                fetchWalletBalance(),
+                fetchPendingRequests(),
+                fetchTransactionHistory()
+            ]);
         });
     </script>
 </body>
