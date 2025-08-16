@@ -780,10 +780,10 @@
                             } else if (tx.transaction_type === 'loan_received' && tx.user_id === userId) {
                                 balance += amount;
                             } else if (tx.transaction_type === 'transfer') {
-                                if (tx.recipient_id === userId) {
-                                    balance += amount * (1 - TRANSACTION_FEE_RATE);
-                                } else if (tx.user_id === userId) {
-                                    balance -= amount;
+                                if (tx.user_id === userId) {
+                                    balance -= Math.abs(amount); // Sender's outflow
+                                } else if (tx.recipient_id === null && tx.user_id !== userId) {
+                                    balance += amount * (1 - TRANSACTION_FEE_RATE); // Recipient's inflow
                                 }
                             } else if (tx.transaction_type === 'money_request' && tx.user_id === userId && tx.status === 'completed') {
                                 balance += amount;
@@ -1371,7 +1371,7 @@
                                 transaction_type: 'transfer',
                                 status: 'completed',
                                 description: recipientDescription,
-                                recipient_id: userId,
+                                recipient_id: null, // Changed from userId to null
                                 created_at: new Date().toISOString()
                             }
                         ]);
