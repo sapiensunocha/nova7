@@ -759,42 +759,16 @@
             async function getCalculatedBalance() {
                 try {
                     const { data, error } = await supabase
-                        .from('transactions')
-                        .select('amount, transaction_type, user_id, recipient_id, status')
-                        .or(`user_id.eq.${userId},recipient_id.eq.${userId}`)
-                        .eq('status', 'completed');
-
-                    if (error) {
-                        console.error('Erreur lors de la récupération des transactions pour le calcul du solde :', error.message);
-                        return 0;
-                    }
-
-                    let balance = 0;
-                    if (data) {
-                        data.forEach(tx => {
-                            const amount = parseFloat(tx.amount);
-                            if (tx.transaction_type === 'deposit' && tx.user_id === userId) {
-                                balance += amount;
-                            } else if (tx.transaction_type === 'product_sell' && tx.user_id === userId) {
-                                balance += amount;
-                            } else if (tx.transaction_type === 'loan_received' && tx.user_id === userId) {
-                                balance += amount;
-                            } else if (tx.transaction_type === 'transfer') {
-                                if (tx.user_id === userId) {
-                                    balance -= Math.abs(amount); // Sender's outflow
-                                } else if (tx.recipient_id === null && tx.user_id !== userId) {
-                                    balance += amount * (1 - TRANSACTION_FEE_RATE); // Recipient's inflow
-                                }
-                            } else if (tx.transaction_type === 'money_request' && tx.user_id === userId && tx.status === 'completed') {
-                                balance += amount;
-                            } else if (tx.user_id === userId && ['withdrawal', 'bill_payment', 'loan_payment', 'insurance_payment', 'product_buy'].includes(tx.transaction_type)) {
-                                balance -= amount;
-                            }
-                        });
-                    }
-                    return balance;
+                    .from('user_balances')
+                    .select('balance')
+                    .eq('user_id', userId)
+                    .single();
+                    if (error) throw error;
+                    console.log('Balance fetched from user_balances:', data?.balance || 0);
+                    return data ? parseFloat(data.balance) : 0;
                 } catch (error) {
-                    console.error('Erreur réseau lors du calcul du solde :', error);
+                    console.error('Error fetching balance from user_balances view:', error.message);
+                    showMessage('Erreur lors de la récupération du solde.', 'error');
                     return 0;
                 }
             }
@@ -1343,7 +1317,7 @@
                         return;
                     }
 
-                    const balance = await getCalculatedBalance();
+                    const { data: balanceData, error: balanceError } = await supabase.from('user_balances').select('balance').eq('user_id', userId).single(); const balance = balanceError ? 0 : balanceData.balance;
                     if (balance < amount) {
                         showMessage('Solde insuffisant pour le transfert. Veuillez recharger votre compte.', 'error');
                         messageDiv.textContent = 'Solde insuffisant.';
@@ -1371,7 +1345,7 @@
                                 transaction_type: 'transfer',
                                 status: 'completed',
                                 description: recipientDescription,
-                                recipient_id: null, // Changed from userId to null
+                                recipient_id: userId, // Set to sender's userId to satisfy RLS policy
                                 created_at: new Date().toISOString()
                             }
                         ]);
