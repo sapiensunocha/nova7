@@ -178,6 +178,8 @@
                 <a href="#" id="viewPrivacy" class="link-linkedin">Politique de confidentialité</a>
                 <span class="text-gray-600 mx-2">|</span>
                 <a href="#" id="viewTerms" class="link-linkedin">Conditions d'utilisation</a>
+                <span class="text-gray-600 mx-2">|</span>
+                <a href="#" id="viewTutorial" class="link-linkedin">Tutoriel de l'application</a>
             </div>
         </div>
 
@@ -206,6 +208,16 @@
         </div>
     </div>
 
+    <div id="tutorial-modal" class="policy-modal-overlay hidden">
+        <div class="policy-modal">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-4">Tutoriel de l'application</h2>
+            <div id="tutorial-content" class="text-gray-700 text-sm leading-relaxed">
+                <iframe src="https://gamma.app/embed/2tywy06r7fqindq" style="width: 700px; max-width: 100%; height: 450px" allow="fullscreen" title="Guide Utilisateur"></iframe>
+            </div>
+            <button class="policy-modal-close-button" onclick="document.getElementById('tutorial-modal').classList.add('hidden');">&times;</button>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script>
@@ -215,7 +227,7 @@
                 currentYearSpan.textContent = new Date().getFullYear();
             }
 
-            // Supabase client initialization - Ensure these match your .env setup
+            // Supabase client initialization
             const SUPABASE_URL = 'https://nvxqorudztbpwyanakdj.supabase.co';
             const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52eHFvcnVkenRicHd5YW5ha2RqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIzOTk5NTQsImV4cCI6MjA2Nzk3NTk1NH0.XvITDAnpEkjQTh4SCVOfwGKsaANS6tp58Up37SXwYRw';
             const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -227,13 +239,10 @@
             
             if (!loginForm || !messageDiv) {
                 console.error("Login form or message div not found.");
-                // Fallback message for debugging if core elements are missing
-                if (document.body) {
-                    const errorMsg = document.createElement('p');
-                    errorMsg.textContent = "Error: Page components missing. Please contact support.";
-                    errorMsg.style.color = "red"; errorMsg.style.textAlign = "center"; errorMsg.style.padding = "1rem";
-                    document.body.prepend(errorMsg);
-                }
+                const errorMsg = document.createElement('p');
+                errorMsg.textContent = "Error: Page components missing. Please contact support.";
+                errorMsg.style.color = "red"; errorMsg.style.textAlign = "center"; errorMsg.style.padding = "1rem";
+                document.body.prepend(errorMsg);
                 return;
             }
 
@@ -243,8 +252,8 @@
                 const password = document.getElementById("password").value;
                 
                 messageDiv.textContent = "";
-                messageDiv.className = 'text-sm text-center font-medium pt-1'; // Reset classes
-                if(loginButton) {
+                messageDiv.className = 'text-sm text-center font-medium pt-1';
+                if (loginButton) {
                     loginButton.disabled = true;
                     loginButton.textContent = "Connexion en cours...";
                 }
@@ -252,7 +261,7 @@
                 if (!email || !password) {
                     messageDiv.textContent = "L'adresse e-mail et le mot de passe sont requis.";
                     messageDiv.classList.add("message-error");
-                    if(loginButton) {
+                    if (loginButton) {
                         loginButton.disabled = false;
                         loginButton.textContent = "Se connecter";
                     }
@@ -275,12 +284,8 @@
                         messageDiv.textContent = 'Connexion réussie ! Redirection vers votre tableau de bord...';
                         messageDiv.classList.remove("message-error");
                         messageDiv.classList.add("message-success");
-                        
-                        // Supabase handles session storage automatically (e.g., in localStorage)
-                        // You can confirm the session is active via supabase.auth.getSession()
-                        
                         setTimeout(() => {
-                            window.location.href = "dashboard.html"; // Redirect to dashboard.html
+                            window.location.href = "dashboard.html";
                         }, 1500);
                     }
                 } catch (error) {
@@ -289,70 +294,109 @@
                     messageDiv.classList.remove("message-success");
                     messageDiv.classList.add("message-error");
                 } finally {
-                    if(loginButton) {
+                    if (loginButton) {
                         loginButton.disabled = false;
                         loginButton.textContent = "Se connecter";
                     }
                 }
             });
 
-            // Modal logic for Privacy Policy and Terms of Service
+            // Modal logic for Privacy Policy, Terms of Service, and Tutorial
             const viewTermsLink = document.getElementById('viewTerms');
             const viewPrivacyLink = document.getElementById('viewPrivacy');
+            const viewTutorialLink = document.getElementById('viewTutorial');
 
-            async function showPolicyModal(policyType, policyUrl) {
-                const modalId = `${policyType}-modal`;
+            if (!viewTermsLink || !viewPrivacyLink || !viewTutorialLink) {
+                console.error("One or more modal links not found.");
+                return;
+            }
+
+            function showPolicyModal(modalId) {
+                console.log(`Attempting to show modal: ${modalId}`);
                 const modal = document.getElementById(modalId);
-                const contentDiv = document.getElementById(`${policyType}-content`);
-
-                // Show the modal
-                modal.classList.remove('hidden');
-                contentDiv.innerHTML = 'Chargement...'; // Reset content and show loading
-
-                try {
-                    const response = await fetch(policyUrl);
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    const htmlContent = await response.text();
-
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(htmlContent, 'text/html');
-                    const mainContent = doc.querySelector('.container'); 
-                    if (mainContent) {
-                        // Remove elements that are not suitable for a modal view
-                        mainContent.querySelector('header')?.remove();
-                        mainContent.querySelector('footer')?.remove();
-                        mainContent.querySelector('script')?.remove();
-                        mainContent.querySelector('.table-of-contents')?.remove(); 
-                        
-                        // Set the extracted content
-                        contentDiv.innerHTML = mainContent.innerHTML;
-                        // Ensure images load correctly if paths are relative
-                        contentDiv.querySelectorAll('img').forEach(img => {
-                            if (img.src.startsWith('nova-logo.png')) { // Replace with actual path logic if needed
-                                img.src = 'nova-logo.png'; // Ensure correct path for modal view
-                            }
-                        });
-                    } else {
-                        contentDiv.innerHTML = "Erreur : Impossible de charger le contenu de la politique.";
-                        console.error("Could not find .container in policy HTML for modal.");
-                    }
-
-                } catch (error) {
-                    console.error('Error loading policy content:', error);
-                    contentDiv.innerHTML = 'Échec du chargement du contenu. Veuillez réessayer plus tard.';
+                if (modal) {
+                    modal.classList.remove('hidden');
+                    console.log(`Modal ${modalId} displayed.`);
+                } else {
+                    console.error(`Modal ${modalId} not found in DOM.`);
                 }
             }
 
             viewTermsLink.addEventListener('click', (e) => {
                 e.preventDefault();
-                showPolicyModal('terms', 'terms-of-service.html');
+                showPolicyModal('terms-modal');
+                const contentDiv = document.getElementById('terms-content');
+                contentDiv.innerHTML = 'Chargement...';
+                fetch('terms-of-service.html')
+                    .then(response => {
+                        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                        return response.text();
+                    })
+                    .then(htmlContent => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(htmlContent, 'text/html');
+                        const mainContent = doc.querySelector('.container');
+                        if (mainContent) {
+                            mainContent.querySelector('header')?.remove();
+                            mainContent.querySelector('footer')?.remove();
+                            mainContent.querySelector('script')?.remove();
+                            mainContent.querySelector('.table-of-contents')?.remove();
+                            contentDiv.innerHTML = mainContent.innerHTML;
+                            contentDiv.querySelectorAll('img').forEach(img => {
+                                if (img.src.includes('nova-logo.png')) {
+                                    img.src = 'nova-logo.png';
+                                }
+                            });
+                        } else {
+                            contentDiv.innerHTML = "Erreur : Impossible de charger le contenu.";
+                            console.error("Could not find .container in terms HTML.");
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading terms content:', error);
+                        contentDiv.innerHTML = 'Échec du chargement du contenu. Veuillez réessayer.';
+                    });
             });
 
             viewPrivacyLink.addEventListener('click', (e) => {
                 e.preventDefault();
-                showPolicyModal('privacy', 'privacy-policy.html');
+                showPolicyModal('privacy-modal');
+                const contentDiv = document.getElementById('privacy-content');
+                contentDiv.innerHTML = 'Chargement...';
+                fetch('privacy-policy.html')
+                    .then(response => {
+                        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                        return response.text();
+                    })
+                    .then(htmlContent => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(htmlContent, 'text/html');
+                        const mainContent = doc.querySelector('.container');
+                        if (mainContent) {
+                            mainContent.querySelector('header')?.remove();
+                            mainContent.querySelector('footer')?.remove();
+                            mainContent.querySelector('script')?.remove();
+                            mainContent.querySelector('.table-of-contents')?.remove();
+                            contentDiv.innerHTML = mainContent.innerHTML;
+                            contentDiv.querySelectorAll('img').forEach(img => {
+                                if (img.src.includes('nova-logo.png')) {
+                                    img.src = 'nova-logo.png';
+                                }
+                            });
+                        } else {
+                            contentDiv.innerHTML = "Erreur : Impossible de charger le contenu.";
+                            console.error("Could not find .container in privacy HTML.");
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading privacy content:', error);
+                        contentDiv.innerHTML = 'Échec du chargement du contenu. Veuillez réessayer.';
+                    });
+            });
+
+            viewTutorialLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                showPolicyModal('tutorial-modal');
             });
         });
     </script>
