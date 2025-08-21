@@ -1162,6 +1162,13 @@
                     return;
                 }
 
+                // Update Open Graph meta tags for sharing
+                document.querySelector('meta[property="og:title"]').setAttribute('content', product.name);
+                document.querySelector('meta[property="og:description"]').setAttribute('content', product.description);
+                document.querySelector('meta[property="og:image"]').setAttribute('content', product.image_url || 'https://placehold.co/600x400/0A66C2/FFFFFF/jpg?text=nova7+Product');
+                document.querySelector('meta[property="og:url"]').setAttribute('content', `${window.location.origin}${window.location.pathname}?productId=${product.id}`);
+
+                // Update modal content
                 document.getElementById('previewImage').src = product.image_url || 'https://placehold.co/280x200/E2E8F0/4A5568?text=No+Image';
                 document.getElementById('previewTitle').textContent = product.name;
                 document.getElementById('previewDescription').textContent = product.description;
