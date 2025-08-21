@@ -6,6 +6,7 @@
     <title>Connexion - nova7</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -74,15 +75,14 @@
         .message-error {
             color: #EF4444;
         }
-        /* Modal specific styles */
         .policy-modal {
             background-color: #FFFFFF;
             border-radius: 8px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
             padding: 2.5rem;
-            max-width: 880px; /* Increased by 10% from 800px */
-            max-height: 90vh; /* Max height for scrollability */
-            overflow-y: auto; /* Enable vertical scrolling */
+            max-width: 880px;
+            max-height: 90vh;
+            overflow-y: auto;
             position: relative;
         }
         .policy-modal-overlay {
@@ -91,11 +91,11 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+            background-color: rgba(0, 0, 0, 0.5);
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 1000; /* Ensure it's on top of everything */
+            z-index: 1000;
         }
         .policy-modal-close-button {
             position: absolute;
@@ -105,9 +105,26 @@
             border: none;
             font-size: 2rem;
             cursor: pointer;
-            color: #718096; /* Gray close button */
+            color: #718096;
         }
         .policy-modal-close-button:hover {
+            color: #4A5568;
+        }
+        .password-container {
+            position: relative;
+        }
+        .toggle-password {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #718096;
+            font-size: 1.25rem;
+        }
+        .toggle-password:hover {
             color: #4A5568;
         }
     </style>
@@ -134,7 +151,7 @@
                         placeholder="vous@exemple.com">
                 </div>
 
-                <div>
+                <div class="password-container">
                     <div class="flex items-center justify-between mb-1">
                         <label for="password" class="block text-sm font-medium text-gray-700">Mot de passe</label>
                         <a href="forgot-password.html" class="text-xs link-linkedin">
@@ -142,8 +159,11 @@
                         </a>
                     </div>
                     <input type="password" name="password" id="password" required
-                        class="form-input-linkedin w-full"
+                        class="form-input-linkedin w-full pr-10"
                         placeholder="Entrez votre mot de passe">
+                    <button type="button" class="toggle-password" aria-label="Toggle password visibility">
+                        <i class="fas fa-eye"></i>
+                    </button>
                 </div>
 
                 <div id="messageDiv" class="text-sm text-center font-medium pt-1 message-error"></div>
@@ -236,20 +256,33 @@
             const loginForm = document.getElementById("loginForm");
             const messageDiv = document.getElementById("messageDiv");
             const loginButton = document.getElementById("loginButton");
-            
-            if (!loginForm || !messageDiv) {
-                console.error("Login form or message div not found.");
+            const passwordInput = document.getElementById("password");
+            const togglePasswordButton = document.querySelector(".toggle-password");
+
+            if (!loginForm || !messageDiv || !passwordInput || !togglePasswordButton) {
+                console.error("Login form, message div, password input, or toggle button not found.");
                 const errorMsg = document.createElement('p');
                 errorMsg.textContent = "Error: Page components missing. Please contact support.";
-                errorMsg.style.color = "red"; errorMsg.style.textAlign = "center"; errorMsg.style.padding = "1rem";
+                errorMsg.style.color = "red";
+                errorMsg.style.textAlign = "center";
+                errorMsg.style.padding = "1rem";
                 document.body.prepend(errorMsg);
                 return;
             }
 
+            // Password visibility toggle
+            togglePasswordButton.addEventListener("click", () => {
+                const isPasswordVisible = passwordInput.type === "text";
+                passwordInput.type = isPasswordVisible ? "password" : "text";
+                const icon = togglePasswordButton.querySelector("i");
+                icon.classList.toggle("fa-eye", isPasswordVisible);
+                icon.classList.toggle("fa-eye-slash", !isPasswordVisible);
+            });
+
             loginForm.addEventListener("submit", async function(event) {
                 event.preventDefault();
                 const email = document.getElementById("email").value;
-                const password = document.getElementById("password").value;
+                const password = passwordInput.value;
                 
                 messageDiv.textContent = "";
                 messageDiv.className = 'text-sm text-center font-medium pt-1';
