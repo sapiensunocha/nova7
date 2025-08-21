@@ -152,6 +152,23 @@
             background-color: #A0AEC0;
             cursor: not-allowed;
         }
+        .btn-share {
+            background-color: #6B7280;
+            color: white;
+            border-radius: 8px;
+            padding: 0.6rem 1rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 0.5rem;
+        }
+        .btn-share:hover {
+            background-color: #4B5563;
+        }
         .product-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -297,6 +314,85 @@
             color: #004182;
             font-weight: 600;
         }
+        .product-preview-modal, .basket-modal, .timeline-modal {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+        }
+        .product-preview-modal.show, .basket-modal.show, .timeline-modal.show {
+            display: flex;
+        }
+        .product-preview-content, .basket-content, .timeline-content {
+            background-color: #FFFFFF;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .basket-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid #E2E8F0;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .basket-item:hover {
+            background-color: #F7FAFC;
+        }
+        .basket-item img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-right: 1rem;
+        }
+        .basket-item-info {
+            flex-grow: 1;
+        }
+        .timeline-step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+        .timeline-step.completed .timeline-icon {
+            background-color: #10B981;
+        }
+        .timeline-step .timeline-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: #CBD5E0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.75rem;
+            margin-right: 1rem;
+            z-index: 1;
+        }
+        .timeline-step .timeline-line {
+            position: absolute;
+            width: 2px;
+            background-color: #CBD5E0;
+            top: 24px;
+            left: 11px;
+            height: calc(100% - 24px);
+        }
+        .timeline-step.completed .timeline-line {
+            background-color: #10B981;
+        }
+        .timeline-step:last-child .timeline-line {
+            display: none;
+        }
         @media (max-width: 768px) {
             .sidebar-nova7 {
                 transform: translateX(-100%);
@@ -339,6 +435,40 @@
 </head>
 <body class="flex flex-col min-h-screen">
     <div id="messageBox" class="message-box"></div>
+    <div id="productPreviewModal" class="product-preview-modal">
+        <div class="product-preview-content">
+            <h2 class="text-xl font-semibold text-gray-700 mb-4">Product Preview</h2>
+            <div id="previewImageContainer" class="product-image-container mb-4">
+                <img id="previewImage" src="" alt="Product Preview" class="product-image">
+            </div>
+            <h3 id="previewTitle" class="product-title"></h3>
+            <p id="previewDescription" class="product-description"></p>
+            <p id="previewPrice" class="product-price"></p>
+            <p id="previewCategory" class="text-sm text-gray-500 mb-4"></p>
+            <div class="flex justify-end gap-2">
+                <button id="closePreviewBtn" class="btn-primary-action bg-red-500 hover:bg-red-600">Close</button>
+                <a id="viewProductLink" href="#" class="btn-primary-action">View Product</a>
+            </div>
+        </div>
+    </div>
+    <div id="basketModal" class="basket-modal">
+        <div class="basket-content">
+            <h2 class="text-xl font-semibold text-gray-700 mb-4">Your Basket</h2>
+            <div id="basketItems" class="mb-4"></div>
+            <div class="flex justify-end">
+                <button id="closeBasketBtn" class="btn-primary-action bg-red-500 hover:bg-red-600">Close</button>
+            </div>
+        </div>
+    </div>
+    <div id="timelineModal" class="timeline-modal">
+        <div class="timeline-content">
+            <h2 class="text-xl font-semibold text-gray-700 mb-4">Delivery Timeline</h2>
+            <div id="timelineContent" class="mb-4"></div>
+            <div class="flex justify-end">
+                <button id="closeTimelineBtn" class="btn-primary-action bg-red-500 hover:bg-red-600">Close</button>
+            </div>
+        </div>
+    </div>
 
     <header class="mobile-header md:hidden">
         <button id="hamburgerBtnMobile" class="p-2 text-gray-700 hover:text-blue-600">
@@ -401,6 +531,9 @@
         <header class="desktop-header hidden md:flex items-center justify-between mb-4">
             <h1 class="text-3xl font-bold text-gray-800">Marché</h1>
             <div class="flex items-center space-x-3">
+                <button id="openBasketBtn" class="btn-primary-action">
+                    <i class="fas fa-shopping-basket mr-2"></i>Panier
+                </button>
                 <span id="desktopUserWelcome" class="text-sm text-gray-700"></span>
             </div>
         </header>
@@ -513,17 +646,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const openBtn = document.getElementById('openProductFormBtn');
-        const closeBtn = document.getElementById('closeProductFormBtn');
-        const modal = document.getElementById('productFormModal');
-        const form = document.getElementById('postProductForm');
-
-        openBtn.addEventListener('click', () => modal.classList.remove('hidden'));
-        closeBtn.addEventListener('click', () => modal.classList.add('hidden'));
-        form.addEventListener('submit', handlePostProduct);
-    });
-
     document.addEventListener('DOMContentLoaded', async function() {
         // Supabase client initialization
         const SUPABASE_URL = 'https://nvxqorudztbpwyanakdj.supabase.co';
@@ -551,6 +673,16 @@
         const verificationMessage = document.getElementById('verificationMessage');
         const marketplaceContent = document.getElementById('marketplaceContent');
         const resendButton = document.getElementById('resendVerification');
+        const productPreviewModal = document.getElementById('productPreviewModal');
+        const closePreviewBtn = document.getElementById('closePreviewBtn');
+        const viewProductLink = document.getElementById('viewProductLink');
+        const basketModal = document.getElementById('basketModal');
+        const closeBasketBtn = document.getElementById('closeBasketBtn');
+        const openBasketBtn = document.getElementById('openBasketBtn');
+        const basketItemsDiv = document.getElementById('basketItems');
+        const timelineModal = document.getElementById('timelineModal');
+        const closeTimelineBtn = document.getElementById('closeTimelineBtn');
+        const timelineContent = document.getElementById('timelineContent');
 
         // Function to show messages
         function showMessage(message, type = 'success', duration = 3000) {
@@ -639,6 +771,38 @@
                 sidebar.classList.remove('open');
             }
         });
+
+        // Basket and Timeline modal handling
+        if (openBasketBtn) {
+            openBasketBtn.addEventListener('click', () => {
+                fetchBasketItems();
+                basketModal.classList.add('show');
+            });
+        }
+        if (closeBasketBtn) {
+            closeBasketBtn.addEventListener('click', () => {
+                basketModal.classList.remove('show');
+            });
+        }
+        if (closeTimelineBtn) {
+            closeTimelineBtn.addEventListener('click', () => {
+                timelineModal.classList.remove('show');
+            });
+        }
+
+        // Product preview modal handling
+        if (closePreviewBtn) {
+            closePreviewBtn.addEventListener('click', () => {
+                productPreviewModal.classList.remove('show');
+            });
+        }
+
+        // Check for product preview in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const productIdParam = urlParams.get('productId');
+        if (productIdParam) {
+            await showProductPreview(productIdParam);
+        }
 
         // Fetch user session
         try {
@@ -865,6 +1029,7 @@
                     products.forEach(product => {
                         const productCard = document.createElement('div');
                         productCard.className = 'product-card';
+                        const shareUrl = `${window.location.origin}${window.location.pathname}?productId=${product.id}`;
                         productCard.innerHTML = `
                             <div class="product-image-container">
                                 <img src="${product.image_url || 'https://placehold.co/280x200/E2E8F0/4A5568?text=No+Image'}" alt="${product.name}" class="product-image" onerror="this.src='https://placehold.co/280x200/E2E8F0/4A5568?text=No+Image';">
@@ -876,6 +1041,9 @@
                                 <button class="buy-button" data-product-id="${product.id}" data-product-price="${product.price}" data-seller-id="${product.seller_id}" ${product.seller_id === userId ? 'disabled' : ''}>
                                     <i class="fas fa-shopping-cart mr-2"></i>${product.seller_id === userId ? 'Your Product' : 'Buy Now'}
                                 </button>
+                                <button class="btn-share" data-product-id="${product.id}" data-share-url="${shareUrl}">
+                                    <i class="fas fa-share-alt mr-2"></i>Share
+                                </button>
                                 <div id="buyMessage-${product.id}" class="text-sm text-center mt-2"></div>
                             </div>
                         `;
@@ -885,6 +1053,9 @@
                         if (buyButton && !buyButton.disabled) {
                             buyButton.addEventListener('click', (event) => handleBuyProduct(event, product.id, product.price, product.seller_id));
                         }
+
+                        const shareButton = productCard.querySelector('.btn-share');
+                        shareButton.addEventListener('click', () => handleShareProduct(product.id, shareUrl));
                     });
 
                     const totalPages = Math.ceil(count / limit);
@@ -943,6 +1114,12 @@
                     return;
                 }
 
+                // Update the transaction with initial delivery_status
+                await supabase
+                    .from('transactions')
+                    .update({ delivery_status: 'ordered' })
+                    .eq('id', data.transaction_id);
+
                 showMessage('Purchase completed successfully!', 'success');
                 if (messageDiv) messageDiv.textContent = 'Purchase completed successfully!';
                 fetchMarketplaceItems(currentPage, currentFilters);
@@ -955,6 +1132,144 @@
                 buyButton.disabled = false;
                 buyButton.innerHTML = '<i class="fas fa-shopping-cart mr-2"></i>Buy Now';
             }
+        }
+
+        async function handleShareProduct(productId, shareUrl) {
+            try {
+                await navigator.clipboard.writeText(shareUrl);
+                showMessage('Product link copied to clipboard!', 'success');
+            } catch (error) {
+                console.error('Error copying share link:', error);
+                showMessage('Failed to copy link.', 'error');
+            }
+        }
+
+        async function showProductPreview(productId) {
+            try {
+                const { data: product, error } = await supabase
+                    .from('products')
+                    .select('id, name, description, price, category, image_url, status')
+                    .eq('id', productId)
+                    .single();
+
+                if (error || !product || product.status !== 'available') {
+                    console.error('Error fetching product for preview:', error?.message || 'Product not found');
+                    showMessage('Product not found or unavailable.', 'error');
+                    return;
+                }
+
+                document.getElementById('previewImage').src = product.image_url || 'https://placehold.co/280x200/E2E8F0/4A5568?text=No+Image';
+                document.getElementById('previewTitle').textContent = product.name;
+                document.getElementById('previewDescription').textContent = product.description;
+                document.getElementById('previewPrice').textContent = `$${parseFloat(product.price).toFixed(2)}`;
+                document.getElementById('previewCategory').textContent = `Category: ${product.category.charAt(0).toUpperCase() + product.category.slice(1)}`;
+                viewProductLink.href = `#product-${product.id}`;
+                viewProductLink.onclick = () => {
+                    productPreviewModal.classList.remove('show');
+                    const productElement = document.querySelector(`[data-product-id="${product.id}"]`);
+                    if (productElement) {
+                        productElement.scrollIntoView({ behavior: 'smooth' });
+                    }
+                };
+
+                productPreviewModal.classList.add('show');
+            } catch (error) {
+                console.error('Error showing product preview:', error);
+                showMessage('Failed to load product preview.', 'error');
+            }
+        }
+
+        async function fetchBasketItems() {
+            basketItemsDiv.innerHTML = '<p class="text-center text-gray-500 py-4">Loading basket...</p>';
+            try {
+                const { data: transactions, error } = await supabase
+                    .from('transactions')
+                    .select('id, product_id, amount, created_at, delivery_status, products(name, image_url)')
+                    .eq('transaction_type', 'product_buy')
+                    .eq('user_id', userId)
+                    .eq('status', 'completed');
+
+                if (error) {
+                    console.error('Error fetching basket items:', error.message);
+                    basketItemsDiv.innerHTML = `<p class="text-center text-red-500 py-4">Failed to load basket: ${error.message}</p>`;
+                    showMessage('Failed to load basket.', 'error');
+                    return;
+                }
+
+                basketItemsDiv.innerHTML = '';
+                if (!transactions || transactions.length === 0) {
+                    basketItemsDiv.innerHTML = '<p class="text-center text-gray-500 py-4">Your basket is empty.</p>';
+                } else {
+                    transactions.forEach(tx => {
+                        const product = tx.products;
+                        const basketItem = document.createElement('div');
+                        basketItem.className = 'basket-item';
+                        basketItem.innerHTML = `
+                            <img src="${product.image_url || 'https://placehold.co/60x60/E2E8F0/4A5568?text=No+Image'}" alt="${product.name}">
+                            <div class="basket-item-info">
+                                <h3 class="font-semibold text-gray-700">${product.name}</h3>
+                                <p class="text-sm text-gray-500">Purchased on ${new Date(tx.created_at).toLocaleDateString()}</p>
+                                <p class="text-sm text-gray-500">Price: $${parseFloat(tx.amount).toFixed(2)}</p>
+                                <p class="text-sm text-gray-500">Status: ${tx.delivery_status.charAt(0).toUpperCase() + tx.delivery_status.slice(1)}</p>
+                            </div>
+                        `;
+                        basketItem.addEventListener('click', () => showDeliveryTimeline(tx.id, product.name, tx.delivery_status));
+                        basketItemsDiv.appendChild(basketItem);
+                    });
+                }
+            } catch (error) {
+                console.error('Error fetching basket items:', error);
+                basketItemsDiv.innerHTML = '<p class="text-center text-red-500 py-4">Network error while loading basket.</p>';
+                showMessage('Network error while loading basket.', 'error');
+            }
+        }
+
+        async function showDeliveryTimeline(transactionId, productName, deliveryStatus) {
+            const timelineSteps = [
+                { step: 'Ordered', status: 'ordered', date: null, completed: false },
+                { step: 'Processing', status: 'processing', date: null, completed: false },
+                { step: 'Shipped', status: 'shipped', date: null, completed: false },
+                { step: 'Delivered', status: 'delivered', date: null, completed: false }
+            ];
+
+            // Fetch transaction to get created_at and delivery_status
+            const { data: transaction, error } = await supabase
+                .from('transactions')
+                .select('created_at, delivery_status')
+                .eq('id', transactionId)
+                .single();
+
+            if (error) {
+                console.error('Error fetching transaction for timeline:', error.message);
+                showMessage('Failed to load delivery timeline.', 'error');
+                return;
+            }
+
+            // Set dates and completion status based on delivery_status
+            const createdAt = new Date(transaction.created_at);
+            const statusIndex = timelineSteps.findIndex(step => step.status === deliveryStatus);
+            timelineSteps.forEach((step, index) => {
+                // Estimate dates for each step (e.g., +1 day, +2 days, etc.)
+                step.date = new Date(createdAt.getTime() + index * 24 * 60 * 60 * 1000).toISOString();
+                step.completed = index <= statusIndex;
+            });
+
+            timelineContent.innerHTML = `<h3 class="font-semibold text-gray-700 mb-2">${productName}</h3>`;
+            timelineSteps.forEach(step => {
+                const stepDiv = document.createElement('div');
+                stepDiv.className = `timeline-step ${step.completed ? 'completed' : ''}`;
+                stepDiv.innerHTML = `
+                    <div class="timeline-icon">${step.completed ? '<i class="fas fa-check"></i>' : ''}</div>
+                    <div class="timeline-line"></div>
+                    <div>
+                        <p class="font-medium text-gray-700">${step.step}</p>
+                        <p class="text-sm text-gray-500">${new Date(step.date).toLocaleDateString()}</p>
+                    </div>
+                `;
+                timelineContent.appendChild(stepDiv);
+            });
+
+            timelineModal.classList.add('show');
         }
 
         function renderPagination(totalPages, currentPageNum) {
