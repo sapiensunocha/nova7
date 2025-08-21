@@ -702,6 +702,24 @@
             }, duration);
         }
 
+        // Function to update Open Graph meta tags
+        async function updateOGTags(productId) {
+            try {
+                const response = await fetch(`https://nvxqorudztbpwyanakdj.supabase.co/functions/v1/get-product-og-tags?productId=${productId}`);
+                const data = await response.json();
+                if (response.ok && data.title) {
+                    document.querySelector('meta[property="og:title"]').setAttribute('content', data.title);
+                    document.querySelector('meta[property="og:description"]').setAttribute('content', data.description);
+                    document.querySelector('meta[property="og:image"]').setAttribute('content', data.image);
+                    document.querySelector('meta[property="og:url"]').setAttribute('content', data.url);
+                } else {
+                    console.error('Error fetching OG tags:', data.error || 'No product data');
+                }
+            } catch (error) {
+                console.error('Error updating OG tags:', error);
+            }
+        }
+
         // Function to calculate balance
         async function getCalculatedBalance(userId) {
             try {
@@ -805,6 +823,7 @@
         const urlParams = new URLSearchParams(window.location.search);
         const productIdParam = urlParams.get('productId');
         if (productIdParam) {
+            await updateOGTags(productIdParam);
             await showProductPreview(productIdParam);
         }
 
@@ -1162,13 +1181,6 @@
                     return;
                 }
 
-                // Update Open Graph meta tags for sharing
-                document.querySelector('meta[property="og:title"]').setAttribute('content', product.name);
-                document.querySelector('meta[property="og:description"]').setAttribute('content', product.description);
-                document.querySelector('meta[property="og:image"]').setAttribute('content', product.image_url || 'https://placehold.co/600x400/0A66C2/FFFFFF/jpg?text=nova7+Product');
-                document.querySelector('meta[property="og:url"]').setAttribute('content', `${window.location.origin}${window.location.pathname}?productId=${product.id}`);
-
-                // Update modal content
                 document.getElementById('previewImage').src = product.image_url || 'https://placehold.co/280x200/E2E8F0/4A5568?text=No+Image';
                 document.getElementById('previewTitle').textContent = product.name;
                 document.getElementById('previewDescription').textContent = product.description;
