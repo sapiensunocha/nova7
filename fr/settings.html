@@ -203,7 +203,7 @@
                 padding: 1rem;
             }
             .mobile-header { display: flex; }
-            .card-settings { padding: 1.5rem; }
+            .card-styled { padding: 1.5rem; }
         }
     </style>
 </head>
@@ -261,18 +261,22 @@
 
             <div id="personalInfoCard" class="card-styled hidden">
                 <div class="setting-section">
-                    <h3 class="text-xl font-semibold text-gray-700">Informations du profil</h3>
+                    <h3 class="text-xl font-semibold text-gray-700" id="profileInfoTitle">Informations du profil</h3>
                     <div class="space-y-4 mt-4">
-                        <div>
-                            <label for="settingFullName" class="form-label">Nom complet</label>
-                            <input type="text" id="settingFullName" class="form-input-styled" placeholder="Votre nom complet" required>
+                        <div id="nameField">
+                            <label for="settingName" class="form-label" id="nameLabel">Nom complet</label>
+                            <input type="text" id="settingName" class="form-input-styled" placeholder="Votre nom complet" required>
+                        </div>
+                        <div id="extraField" class="hidden">
+                            <label for="settingExtra" class="form-label" id="extraLabel"></label>
+                            <input type="text" id="settingExtra" class="form-input-styled" placeholder="">
                         </div>
                         <div>
-                            <label class="form-label">Photo de profil</label>
+                            <label id="imageLabel" class="form-label">Photo de profil</label>
                             <div class="flex items-center gap-4 mt-2">
-                                <img id="image-preview" class="image-preview" src="" alt="Photo de profil">
+                                <img id="image-preview" class="image-preview" src="" alt="Photo/Logo">
                                 <label for="profilePictureInput" class="cursor-pointer bg-white py-2 px-4 border border-gray-300 rounded-md">
-                                    <span>Changer de photo</span>
+                                    <span id="imageUploadText">Changer de photo</span>
                                     <input id="profilePictureInput" type="file" class="sr-only" accept="image/*">
                                 </label>
                             </div>
@@ -288,7 +292,7 @@
                             </div>
                         </div>
                         <div>
-                            <label for="settingSignature" class="form-label">Signature</label>
+                            <label for="settingSignature" class="form-label" id="signatureLabel">Signature</label>
                             <div class="flex items-center gap-4 mt-2">
                                 <img id="signature-preview" class="signature-preview" src="" alt="Aperçu de la signature">
                                 <label for="signatureInput" class="cursor-pointer bg-white py-2 px-4 border border-gray-300 rounded-md">
@@ -301,9 +305,9 @@
                             <label for="settingAddress" class="form-label">Adresse (Facultatif)</label>
                             <input type="text" id="settingAddress" class="form-input-styled" placeholder="123 Rue Principale, Anytown, France">
                         </div>
-                        <div>
-                            <label for="settingDateOfBirth" class="form-label">Date de naissance (Facultatif)</label>
-                            <input type="date" id="settingDateOfBirth" class="form-input-styled">
+                        <div id="dateField">
+                            <label for="settingDate" class="form-label" id="dateLabel">Date de naissance (Facultatif)</label>
+                            <input type="date" id="settingDate" class="form-input-styled">
                         </div>
                         <div class="pt-4">
                             <button type="button" id="updateProfileBtn" class="btn-primary-action"><i class="fas fa-save mr-2"></i>Enregistrer le profil</button>
@@ -367,6 +371,19 @@
             const imagePreview = document.getElementById('image-preview');
             const fingerprintPreview = document.getElementById('fingerprint-preview');
             const signaturePreview = document.getElementById('signature-preview');
+            const profileInfoTitle = document.getElementById('profileInfoTitle');
+            const nameField = document.getElementById('nameField');
+            const nameLabel = document.getElementById('nameLabel');
+            const settingName = document.getElementById('settingName');
+            const extraField = document.getElementById('extraField');
+            const extraLabel = document.getElementById('extraLabel');
+            const settingExtra = document.getElementById('settingExtra');
+            const imageLabel = document.getElementById('imageLabel');
+            const imageUploadText = document.getElementById('imageUploadText');
+            const signatureLabel = document.getElementById('signatureLabel');
+            const dateField = document.getElementById('dateField');
+            const dateLabel = document.getElementById('dateLabel');
+            const settingDate = document.getElementById('settingDate');
 
             function showMessage(message, type = 'success', duration = 3000) {
                 messageBox.textContent = message;
@@ -444,7 +461,7 @@
             try {
                 const { data: profile, error: profileError } = await supabase
                     .from('users')
-                    .select('*')
+                    .select('*, unique_code, stripe_payment_link')
                     .eq('id', currentUserId)
                     .maybeSingle();
 
@@ -454,15 +471,55 @@
                     return;
                 }
 
-                document.getElementById('currentEmail').value = session.user.email || 'N/A';
-                document.getElementById('settingFullName').value = profile?.full_name || '';
-                document.getElementById('settingAddress').value = profile?.address || '';
-                document.getElementById('settingDateOfBirth').value = profile?.date_of_birth || '';
+                const accountType = profile?.account_type || 'individual';
 
-                if (profile?.avatar_url) {
-                    imagePreview.src = profile.avatar_url;
+                if (accountType === 'business_partner') {
+                    profileInfoTitle.textContent = 'Informations de l’entreprise';
+                    nameLabel.textContent = 'Nom de l’entreprise';
+                    settingName.placeholder = 'Nom de votre entreprise';
+                    settingName.value = profile?.business_name || '';
+                    extraLabel.textContent = 'Numéro d’enregistrement';
+                    settingExtra.placeholder = 'Numéro d’enregistrement de l’entreprise';
+                    settingExtra.value = profile?.business_reg_number || '';
+                    extraField.classList.remove('hidden');
+                    imageLabel.textContent = 'Logo de l’entreprise';
+                    imageUploadText.textContent = 'Changer de logo';
+                    imagePreview.alt = 'Logo de l’entreprise';
+                    signatureLabel.textContent = 'Signature du contact';
+                    dateLabel.textContent = 'Date de création';
+                    settingDate.value = profile?.date_of_incorporation || '';
                 } else {
-                    imagePreview.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(profile?.full_name || '')}&size=80&background=e2e8f0&color=64748b`;
+                    profileInfoTitle.textContent = 'Informations du profil';
+                    nameLabel.textContent = accountType === 'retail_agent' ? 'Nom de l’agent' : 'Nom complet';
+                    settingName.placeholder = accountType === 'retail_agent' ? 'Nom de l’agent' : 'Votre nom complet';
+                    settingName.value = accountType === 'retail_agent' ? (profile?.agent_name || '') : (profile?.full_name || '');
+                    extraLabel.textContent = accountType === 'retail_agent' ? 'ID de l’agent' : 'ID gouvernemental';
+                    settingExtra.placeholder = accountType === 'retail_agent' ? 'ID de l’agent' : 'Numéro d’identification gouvernemental';
+                    settingExtra.value = accountType === 'retail_agent' ? (profile?.agent_id || '') : (profile?.id_number || '');
+                    extraField.classList.remove('hidden');
+                    imageLabel.textContent = accountType === 'retail_agent' ? 'Photo de l’agent' : 'Photo de profil';
+                    imageUploadText.textContent = 'Changer de photo';
+                    imagePreview.alt = accountType === 'retail_agent' ? 'Photo de l’agent' : 'Photo de profil';
+                    signatureLabel.textContent = accountType === 'retail_agent' ? 'Signature de l’agent' : 'Signature';
+                    dateLabel.textContent = 'Date de naissance';
+                    settingDate.value = profile?.date_of_birth || '';
+                }
+
+                document.getElementById('currentEmail').value = session.user.email || 'N/A';
+
+                if (accountType === 'business_partner') {
+                    if (profile?.logo_url) {
+                        imagePreview.src = profile.logo_url;
+                    } else {
+                        imagePreview.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(profile?.business_name || 'Entreprise')}&size=80&background=e2e8f0&color=64748b`;
+                    }
+                } else {
+                    if (profile?.avatar_url) {
+                        imagePreview.src = profile.avatar_url;
+                    } else {
+                        const name = accountType === 'retail_agent' ? (profile?.agent_name || '') : (profile?.full_name || '');
+                        imagePreview.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&size=80&background=e2e8f0&color=64748b`;
+                    }
                 }
 
                 if (profile?.fingerprint_url) {
@@ -528,29 +585,30 @@
                 }
 
                 imagePreview.src = URL.createObjectURL(file);
-                showMessage('Téléchargement de la photo de profil...', 'success', 5000);
+                showMessage('Téléchargement de l’image...', 'success', 5000);
 
                 const fileExtension = file.name.split('.').pop();
-                const filePath = `${currentUserId}/avatar.${fileExtension}`;
-                const newAvatarUrl = await uploadFile(file, SUPABASE_PROFILE_BUCKET, filePath);
+                const filePath = `${currentUserId}/${accountType === 'business_partner' ? 'logo' : 'avatar'}.${fileExtension}`;
+                const newImageUrl = await uploadFile(file, SUPABASE_PROFILE_BUCKET, filePath);
 
-                if (newAvatarUrl) {
+                if (newImageUrl) {
                     try {
+                        const updateField = accountType === 'business_partner' ? 'logo_url' : 'avatar_url';
                         const { error: updateError } = await supabase
                             .from('users')
-                            .update({ avatar_url: newAvatarUrl })
+                            .update({ [updateField]: newImageUrl })
                             .eq('id', currentUserId);
 
                         if (updateError) {
-                            console.error('Error updating profile avatar_url:', updateError.message);
-                            showMessage(`Échec de la mise à jour de la photo de profil dans la base de données : ${updateError.message}`, 'error');
+                            console.error(`Error updating ${updateField}:`, updateError.message);
+                            showMessage(`Échec de la mise à jour de l’image dans la base de données : ${updateError.message}`, 'error');
                         } else {
-                            imagePreview.src = newAvatarUrl;
-                            showMessage('Photo de profil mise à jour avec succès !');
+                            imagePreview.src = newImageUrl;
+                            showMessage('Image mise à jour avec succès !');
                         }
                     } catch (error) {
-                        console.error('Unexpected error during profile picture update:', error);
-                        showMessage('Une erreur s\'est produite lors de la mise à jour de la photo de profil.', 'error');
+                        console.error('Unexpected error during image update:', error);
+                        showMessage('Une erreur s\'est produite lors de la mise à jour de l’image.', 'error');
                     }
                 }
                 event.target.value = '';
@@ -633,12 +691,13 @@
                 updateBtn.disabled = true;
                 updateBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Enregistrement...';
 
-                const fullName = document.getElementById('settingFullName').value.trim();
+                const name = settingName.value.trim();
+                const extra = settingExtra.value.trim();
                 const address = document.getElementById('settingAddress').value.trim();
-                const dateOfBirth = document.getElementById('settingDateOfBirth').value;
+                const date = settingDate.value;
 
-                if (!fullName) {
-                    showMessage('Le nom complet est requis.', 'error');
+                if (!name) {
+                    showMessage(accountType === 'business_partner' ? 'Le nom de l’entreprise est requis.' : 'Le nom est requis.', 'error');
                     updateBtn.disabled = false;
                     updateBtn.innerHTML = '<i class="fas fa-save mr-2"></i>Enregistrer le profil';
                     return;
@@ -646,11 +705,23 @@
 
                 try {
                     const updatedData = {
-                        full_name: fullName,
                         address: address,
-                        date_of_birth: dateOfBirth,
                         updated_at: new Date().toISOString()
                     };
+
+                    if (accountType === 'business_partner') {
+                        updatedData.business_name = name;
+                        updatedData.business_reg_number = extra;
+                        updatedData.date_of_incorporation = date;
+                    } else if (accountType === 'retail_agent') {
+                        updatedData.agent_name = name;
+                        updatedData.agent_id = extra;
+                        updatedData.date_of_birth = date;
+                    } else {
+                        updatedData.full_name = name;
+                        updatedData.id_number = extra;
+                        updatedData.date_of_birth = date;
+                    }
 
                     const { data, error } = await supabase
                         .from('users')

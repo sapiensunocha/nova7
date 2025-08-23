@@ -408,7 +408,10 @@ border-top: 1px dashed #A0AEC0;
 margin-top: auto;
 padding-top: 4mm;
 }
-#id-card-signature .label, .info-field .label {
+#id-card-signature .label {
+font-size: 7.5px;
+}
+.info-field .label {
 font-size: 7.5px;
 }
 .info-field .value {
@@ -513,25 +516,26 @@ onerror="this.style.display='none';">
 <div id="profileContent" class="hidden">
 <div id="id-card-container">
 <div id="id-card-header">
-<h2>CARTE D'IDENTITÉ NOVA7</h2>
+<h2 id="id-card-title">CARTE D'IDENTITÉ NOVA7</h2>
 <img src="nova-logo.png" alt="Logo nova7">
 </div>
 <div id="id-card-body">
 <div id="id-card-left">
 <div id="id-card-photo">
-<img id="profile-photo-val" src="https://picsum.photos/150/220?random=1" alt="Photo de l'utilisateur">
+<img id="profile-photo-val" src="https://picsum.photos/150/220?random=1" alt="Photo/Logo">
 </div>
 <div id="id-card-signature">
-<span class="label">SIGNATURE DU TITULAIRE</span>
+<span class="label" id="signature-label">SIGNATURE DU TITULAIRE</span>
 </div>
 </div>
 <div id="id-card-right">
 <div id="id-card-info">
-<div class="info-field"><span class="label">NOM DE FAMILLE</span><span class="value" id="surname-val"></span></div>
-<div class="info-field"><span class="label">PRÉNOMS</span><span class="value" id="givennames-val"></span></div>
+<div class="info-field" id="name-field"><span class="label" id="name-label">NOM DE FAMILLE</span><span class="value" id="name-val"></span></div>
+<div class="info-field" id="givennames-field"><span class="label" id="givennames-label">PRÉNOMS</span><span class="value" id="givennames-val"></span></div>
+<div class="info-field" id="extra-field"><span class="label" id="extra-label"></span><span class="value" id="extra-val"></span></div>
 <div class="info-field"><span class="label">NUMÉRO DE COMPTE</span><span class="value" id="account-val"></span></div>
-<div class="info-field"><span class="label">DATE DE NAISSANCE</span><span class="value" id="dob-val"></span></div>
-<div class="info-field"><span class="label">ÂGE</span><span class="value" id="age-val"></span></div>
+<div class="info-field"><span class="label" id="dob-label">DATE DE NAISSANCE</span><span class="value" id="dob-val"></span></div>
+<div class="info-field"><span class="label" id="age-label">ÂGE</span><span class="value" id="age-val"></span></div>
 <div class="info-field"><span class="label">MEMBRE DEPUIS</span><span class="value" id="member-since-val"></span></div>
 <div class="info-field full-width"><span class="label">ADRESSE</span><span class="value" id="address-val"></span></div>
 <div class="info-field"><span class="label">EMAIL</span><span class="value" id="email-val"></span></div>
@@ -609,19 +613,17 @@ function formatDate(dateStr) {
 }
 
 try {
-    // 1. Fetch user's profile, including the unique_code
     let { data: profile, error: profileError } = await supabase
         .from('users')
-        .select('*, unique_code, stripe_payment_link') // Explicitly select unique_code
+        .select('*, unique_code, stripe_payment_link')
         .eq('id', currentUserId)
         .single();
 
-    if (profileError && profileError.code !== 'PGRST116') { // PGRST116 is "no rows found" (new user)
+    if (profileError && profileError.code !== 'PGRST116') {
         console.error('Erreur lors de la récupération du profil utilisateur :', profileError.message);
         profile = {};
     }
 
-    // 2. Generate unique_code if it doesn't exist and save it
     let finalUniqueCode = profile.unique_code;
     if (!finalUniqueCode) {
         finalUniqueCode = 'NOVA7-' + Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -651,14 +653,70 @@ try {
 function populateIdCard(profileData, userAuthData, balance) {
     const user = userAuthData || {};
     const profile = profileData || {};
+    const accountType = profile.account_type || 'individual';
 
-    const fullName = profile.full_name || user.email?.split('@')[0] || 'Jeanne Dupont';
-    const nameParts = fullName.split(" ");
-    const givenNames = nameParts.length > 1 ? nameParts.slice(0, -1).join(" ") : nameParts[0] || "Jeanne";
-    const surname = nameParts.length > 1 ? nameParts[nameParts.length - 1] : "Dupont";
+    const profilePhotoVal = document.getElementById('profile-photo-val');
+    const idCardTitle = document.getElementById('id-card-title');
+    const signatureLabel = document.getElementById('signature-label');
+    const nameField = document.getElementById('name-field');
+    const nameLabel = document.getElementById('name-label');
+    const nameVal = document.getElementById('name-val');
+    const givennamesField = document.getElementById('givennames-field');
+    const givennamesLabel = document.getElementById('givennames-label');
+    const givennamesVal = document.getElementById('givennames-val');
+    const extraField = document.getElementById('extra-field');
+    const extraLabel = document.getElementById('extra-label');
+    const extraVal = document.getElementById('extra-val');
+    const dobLabel = document.getElementById('dob-label');
+    const ageLabel = document.getElementById('age-label');
+
+    if (accountType === 'business_partner') {
+        idCardTitle.textContent = 'CARTE D’IDENTITÉ ENTREPRISE NOVA7';
+        profilePhotoVal.alt = 'Logo de l’entreprise';
+        signatureLabel.textContent = 'SIGNATURE DU CONTACT';
+        nameLabel.textContent = 'NOM DE L’ENTREPRISE';
+        nameVal.textContent = profile.business_name || 'Entreprise Non Spécifiée';
+        givennamesField.style.display = 'none';
+        extraLabel.textContent = 'NUMÉRO D’ENREGISTREMENT';
+        extraVal.textContent = profile.business_reg_number || 'N/A';
+        dobLabel.textContent = 'DATE DE CRÉATION';
+        ageLabel.textContent = 'ÂGE DE L’ENTREPRISE';
+        profilePhotoVal.src = profile.logo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.business_name || 'Entreprise')}&size=220&background=004182&color=fff`;
+    } else {
+        idCardTitle.textContent = 'CARTE D’IDENTITÉ NOVA7';
+        profilePhotoVal.alt = accountType === 'retail_agent' ? 'Photo de l’agent' : 'Photo de l’utilisateur';
+        signatureLabel.textContent = accountType === 'retail_agent' ? 'SIGNATURE DE L’AGENT' : 'SIGNATURE DU TITULAIRE';
+        nameLabel.textContent = 'NOM DE FAMILLE';
+        givennamesLabel.textContent = 'PRÉNOMS';
+        const fullName = profile.account_type === 'retail_agent' ? (profile.agent_name || user.email?.split('@')[0] || 'Jeanne Dupont') :
+                         profile.full_name || user.email?.split('@')[0] || 'Jeanne Dupont';
+        const nameParts = fullName.split(" ");
+        const givenNames = nameParts.length > 1 ? nameParts.slice(0, -1).join(" ") : nameParts[0] || 'Jeanne';
+        const surname = nameParts.length > 1 ? nameParts[nameParts.length - 1] : 'Dupont';
+        nameVal.textContent = surname;
+        givennamesVal.textContent = givenNames;
+        extraLabel.textContent = accountType === 'retail_agent' ? 'ID DE L’AGENT' : 'ID GOUVERNEMENTAL';
+        extraVal.textContent = accountType === 'retail_agent' ? (profile.agent_id || 'N/A') : (profile.id_number || 'N/A');
+        dobLabel.textContent = 'DATE DE NAISSANCE';
+        ageLabel.textContent = 'ÂGE';
+        profilePhotoVal.src = profile.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&size=220&background=004182&color=fff`;
+    }
 
     let age = 'N/A';
-    if (profile.date_of_birth) {
+    if (accountType === 'business_partner' && profile.date_of_incorporation) {
+        try {
+            const startDate = new Date(profile.date_of_incorporation);
+            const today = new Date();
+            let calculatedAge = today.getFullYear() - startDate.getFullYear();
+            const monthDifference = today.getMonth() - startDate.getMonth();
+            if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < startDate.getDate())) {
+                calculatedAge--;
+            }
+            age = calculatedAge;
+        } catch (e) {
+            console.error("Impossible de calculer l’âge de l’entreprise :", profile.date_of_incorporation);
+        }
+    } else if (profile.date_of_birth) {
         try {
             const birthDate = new Date(profile.date_of_birth);
             const today = new Date();
@@ -669,29 +727,20 @@ function populateIdCard(profileData, userAuthData, balance) {
             }
             age = calculatedAge;
         } catch (e) {
-            console.error("Impossible de calculer l'âge à partir de la date :", profile.date_of_birth);
+            console.error("Impossible de calculer l’âge à partir de la date :", profile.date_of_birth);
         }
     }
 
-    const profilePhotoVal = document.getElementById('profile-photo-val');
-    if (profile.avatar_url) {
-        profilePhotoVal.src = profile.avatar_url;
-    } else {
-        profilePhotoVal.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&size=220&background=004182&color=fff`;
-    }
-
-    document.getElementById('surname-val').textContent = surname;
-    document.getElementById('givennames-val').textContent = givenNames;
     document.getElementById('account-val').textContent = profile.account_number || user.id?.substring(0, 8).toUpperCase() || '00000000';
-    document.getElementById('dob-val').textContent = formatDate(profile.date_of_birth);
+    document.getElementById('dob-val').textContent = formatDate(accountType === 'business_partner' ? profile.date_of_incorporation : profile.date_of_birth);
     document.getElementById('age-val').textContent = age;
     document.getElementById('member-since-val').textContent = formatDate(profile.member_since || user.created_at);
     document.getElementById('address-val').textContent = profile.address || 'Non fournie';
     document.getElementById('email-val').textContent = user.email || 'N/A';
     document.getElementById('phone-val').textContent = profile.phone_number || 'N/A';
-    document.getElementById('account-status-val').textContent = (profile.account_status || "ACTIVE").toUpperCase() === "ACTIVE" ? "ACTIF" : "INACTIF";
+    document.getElementById('account-status-val').textContent = (profile.account_status || 'ACTIVE').toUpperCase() === 'ACTIVE' ? 'ACTIF' : 'INACTIF';
     document.getElementById('membership-val').textContent = profile.membership_level || 'Standard';
-    document.getElementById('kyc-status-val').textContent = (profile.kyc_status || 'PENDING').toUpperCase() === "PENDING" ? "EN ATTENTE" : "APPROUVÉ";
+    document.getElementById('kyc-status-val').textContent = (profile.kyc_status || 'PENDING').toUpperCase() === 'PENDING' ? 'EN ATTENTE' : 'APPROUVÉ';
     document.getElementById('balance-val').textContent = formatCurrency(balance);
 
     const finalUniqueCodeToDisplay = profile.unique_code || (user.id ? 'NOVA7-' + user.id.substring(0,6).toUpperCase() : 'N/A');
@@ -699,7 +748,6 @@ function populateIdCard(profileData, userAuthData, balance) {
 
     const QR_BASE_URL = 'https://lifeline-wdc.com/pay';
     const qrDataForPayment = `${QR_BASE_URL}?user_code=${encodeURIComponent(finalUniqueCodeToDisplay)}`;
-
     document.getElementById('qr-code-val').src = `https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(qrDataForPayment)}`;
     document.getElementById('currency-val').textContent = profile.currency_type || 'EUR';
     document.getElementById('limit-val').textContent = profile.payment_limit || '5 000 €';
