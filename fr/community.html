@@ -1051,7 +1051,7 @@
             </div>
         </div>
         <!-- Message Floating Action Button and Modal -->
-        <button id="""messageFab" class="""message-fab">
+        <button id="messageFab" class="message-fab">
             <i class="fas fa-comment"></i>
         </button>
         <div id="messageModalOverlay" class="message-modal-overlay">
@@ -1101,28 +1101,57 @@ let audioChunks = [];
 
 // Like, Love, and Comment functions
 async function likePost(postId, button) {
+  if (!currentUser?.id) {
+    showMessage('You must be logged in to like.', 'error');
+    return;
+  }
+  if (button.dataset.loading === '1') return;
+  button.dataset.loading = '1';
+
+  const wasLiked = button.classList.contains('liked');
+
+  const bump = (delta) => {
+    const el = document.getElementById(`likesCount-${postId}`);
+    if (!el) return;
+    const n = parseInt(el.textContent || '0', 10) || 0;
+    el.textContent = String(Math.max(0, n + delta));
+  };
+  const setLiked = (v) => button.classList.toggle('liked', v);
+
+  // optimistic UI
+  setLiked(!wasLiked);
+  bump(wasLiked ? -1 : +1);
+
   try {
-    const { data: existingLike } = await supabase
-      .from('likes')
-      .select('id')
-      .eq('post_id', postId)
-      .eq('user_id', currentUser.id)
-      .maybeSingle();
-    
-    if (existingLike) {
-      // Unlike: Delete the like (trigger handles count)
-      await supabase.from('likes').delete().eq('id', existingLike.id);
-      button.classList.remove('liked');
-      button.style.color = '#4B5563'; // Inactive color
+    if (wasLiked) {
+      // UNLIKE
+      const { error } = await supabase
+        .from('likes')
+        .delete()
+        .eq('post_id', postId)
+        .eq('user_id', currentUser.id);
+
+      // If nothing was deleted (e.g., already deleted elsewhere), just keep UI as-is.
+      if (error) throw error;
     } else {
-      // Like: Add the like (trigger handles count)
-      await supabase.from('likes').insert([{ post_id: postId, user_id: currentUser.id }]);
-      button.classList.add('liked');
-      button.style.color = '#0A66C2'; // Blue when liked
+      // LIKE with UPSERT semantics: ignore duplicates if the row already exists.
+      const { error } = await supabase
+        .from('likes')
+        .insert(
+          [{ post_id: postId, user_id: currentUser.id }],
+          { onConflict: 'post_id,user_id', ignoreDuplicates: true }
+        );
+
+      if (error && error.code !== '23505') throw error;
     }
-  } catch (error) {
-    console.error('Error liking post:', error.message);
-    showMessage('Failed to like post.', 'error');
+  } catch (err) {
+    // rollback optimistic UI
+    setLiked(wasLiked);
+    bump(wasLiked ? +1 : -1);
+    console.error('Like toggle failed:', err?.message || err);
+    showMessage(`Failed to update like: ${err?.message || err}`, 'error');
+  } finally {
+    delete button.dataset.loading;
   }
 }
 
@@ -1704,24 +1733,24 @@ async function searchContent(query) {
       await fetchPosts();
       return;
     }
-    const { data: posts, error: postError } = await supabase
-      .from('posts')
-      .select(`
-        id,
-        content,
-        media_url,
-        media_type,
-        created_at,
-        users (
-          id,
-          full_name,
-          avatar_url,
-          email
-        )
-      `)
-      .ilike('content', `%${query}%`)
-      .order('created_at', { ascending: false })
-      .limit(10);
+   const { data: posts, error: postError } = await supabase
+  .from('posts')
+  .select(`
+    id,
+    content,
+    media_url,
+    media_type,
+    created_at,
+    users (
+      id,
+      full_name,
+      avatar_url,
+      email
+    )
+  `)
+  .ilike('content', `%${query}%`)
+  .order('created_at', { ascending: false })
+  .limit(10);
     if (postError) throw postError;
     const { data: users, error: userError } = await supabase
       .from('users')
@@ -1791,11 +1820,11 @@ async function searchContent(query) {
             <span><span id="likesCount-${post.id}">0</span> Likes</span>
             <span><span id="lovesCount-${post.id}">0</span> Loves</span>
             <span><span id="commentsCount-${post.id}">0</span> Comments</span>
-          </div>
-          <div class="post-footer">
-             <button class="like-btn" data-post-id="${post.id}">
-                <i class="fas fa-thumbs-up"></i>J'aime
-            </button>
+            </div>
+            <div class="post-footer">
+             <button class="like-btn" data-post-id="${post.id}"> 
+              <i class="fas fa-thumbs-up"></i>J'aime
+             </button>
             <button class="love-btn" data-post-id="${post.id}" ${isMyPost ? 'disabled' : ''}>
                 <i class="fas fa-heart"></i>Aimer (1 $)
             </button>
@@ -1822,31 +1851,31 @@ async function searchContent(query) {
         postFeedDiv.appendChild(postElement);
         const likeButton = postElement.querySelector(`.like-btn[data-post-id="${post.id}"]`);
         if (likeButton) {
-          likeButton.addEventListener('click', (e) => {
-            const postId = e.target.dataset.post_id || e.target.closest('.like-btn').dataset.postId;
+        likeButton.addEventListener('click', (e) => {
+         const postId = e.target.dataset.post_id || e.target.closest('.like-btn').dataset.postId;
             likePost(postId, likeButton);
-          });
+});
         }
         const loveButton = postElement.querySelector(`.love-btn[data-post-id="${post.id}"]`);
         if (loveButton) {
-          loveButton.addEventListener('click', (e) => {
-            const postId = e.target.dataset.post_id || e.target.closest('.love-btn').dataset.postId;
-            lovePost(postId, loveButton, post.users.id);
-          });
+         loveButton.addEventListener('click', (e) => {
+         const postId = e.target.dataset.post_id || e.target.closest('.love-btn').dataset.postId;
+         lovePost(postId, loveButton, post.users.id);
+});
         }
         const commentToggleButton = postElement.querySelector(`.comment-toggle-btn[data-post-id="${post.id}"]`);
         if (commentToggleButton) {
           commentToggleButton.addEventListener('click', (e) => {
             const postId = e.target.dataset.post_id || e.target.closest('.comment-toggle-btn').dataset.postId;
             toggleCommentsSection(postId);
-          });
+});
         }
         const postCommentButton = postElement.querySelector(`.post-comment-btn[data-post-id="${post.id}"]`);
         if (postCommentButton) {
-          postCommentButton.addEventListener('click', (e) => {
-            const postId = e.target.dataset.post_id || e.target.closest('.post-comment-btn').dataset.postId;
-            addComment(postId, postElement.querySelector(`.comment-input[data-post-id="${post.id}"]`));
-          });
+         postCommentButton.addEventListener('click', (e) => {
+           const postId = e.target.dataset.post_id || e.target.closest('.post-comment-btn').dataset.postId;
+  addComment(postId, postElement.querySelector(`.comment-input[data-post-id="${post.id}"]`));
+});
         }
         const postOptionsBtn = postElement.querySelector(`.post-options-btn[data-post-id="${post.id}"]`);
         if (postOptionsBtn) {
@@ -2202,12 +2231,12 @@ async function fetchPosts() {
         </div>
         ${mediaHtml}
         <div class="post-stats">
-          <span><span id="likesCount-${post.id}">${post.likes_count || 0}</span> Likes</span>
+                    <span><span id="likesCount-${post.id}">${post.likes_count || 0}</span> Likes</span>
           <span><span id="lovesCount-${post.id}">${post.loves_count || 0}</span> Loves</span>
           <span><span id="commentsCount-${post.id}">${post.comments_count || 0}</span> Comments</span>
         </div>
         <div class="post-footer">
-          <button class="like-btn${isLikedByMe ? ' liked' : ''}" data-post-id="${post.id}" style="color: ${isLikedByMe ? '#0A66C2' : '#4B5563'}">
+          <button class="like-btn${isLikedByMe ? ' liked' : ''}" data-post-id="${post.id}" data-liked="${isLikedByMe ? 'true' : 'false'}"aria-pressed="${isLikedByMe ? 'true' : 'false'}">
             <i class="fas fa-thumbs-up"></i>J'aime
           </button>
           <button class="love-btn" data-post-id="${post.id}" ${isMyPost ? 'disabled' : ''}>
@@ -2231,34 +2260,34 @@ async function fetchPosts() {
         </div>
       `;
       postFeedDiv.appendChild(postElement);
-      const likeButton = postElement.querySelector(`.like-btn[data-post-id="${post.id}"]`);
-      if (likeButton) {
+     const likeButton = postElement.querySelector(`.like-btn[data-post-id="${post.id}"]`);
+     if (likeButton) {
         likeButton.addEventListener('click', (e) => {
           const postId = e.target.dataset.post_id || e.target.closest('.like-btn').dataset.postId;
           likePost(postId, likeButton);
-        });
-      }
-      const loveButton = postElement.querySelector(`.love-btn[data-post-id="${post.id}"]`);
-      if (loveButton) {
-        loveButton.addEventListener('click', (e) => {
-          const postId = e.target.dataset.post_id || e.target.closest('.love-btn').dataset.postId;
+  });
+}
+     const loveButton = postElement.querySelector(`.love-btn[data-post-id="${post.id}"]`);
+     if (loveButton) {
+      loveButton.addEventListener('click', (e) => {
+       const postId = e.target.dataset.post_id || e.target.closest('.love-btn').dataset.postId;
           lovePost(postId, loveButton, post.user_id);
-        });
-      }
+      });
+    }
       const commentToggleButton = postElement.querySelector(`.comment-toggle-btn[data-post-id="${post.id}"]`);
-      if (commentToggleButton) {
-        commentToggleButton.addEventListener('click', (e) => {
-          const postId = e.target.dataset.post_id || e.target.closest('.comment-toggle-btn').dataset.postId;
+     if (commentToggleButton) {
+       commentToggleButton.addEventListener('click', (e) => {
+        const postId = e.target.dataset.post_id || e.target.closest('.comment-toggle-btn').dataset.postId;
           toggleCommentsSection(postId);
-        });
-      }
-      const postCommentButton = postElement.querySelector(`.post-comment-btn[data-post-id="${post.id}"]`);
-      if (postCommentButton) {
-        postCommentButton.addEventListener('click', (e) => {
-          const postId = e.target.dataset.post_id || e.target.closest('.post-comment-btn').dataset.postId;
+      });
+    }
+   const postCommentButton = postElement.querySelector(`.post-comment-btn[data-post-id="${post.id}"]`);
+    if (postCommentButton) {
+      postCommentButton.addEventListener('click', (e) => {
+       const postId = e.target.dataset.post_id || e.target.closest('.post-comment-btn').dataset.postId;
           addComment(postId, postElement.querySelector(`.comment-input[data-post-id="${post.id}"]`));
-        });
-      }
+    });
+  }
       const postOptionsBtn = postElement.querySelector(`.post-options-btn[data-post-id="${post.id}"]`);
       if (postOptionsBtn) {
         postOptionsBtn.addEventListener('click', (e) => {
