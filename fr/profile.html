@@ -624,14 +624,49 @@ try {
         profile = {};
     }
 
-    let finalUniqueCode = profile.unique_code;
+    let finalUniqueCode = profile?.unique_code;
     if (!finalUniqueCode) {
         finalUniqueCode = 'NOVA7-' + Math.random().toString(36).substring(2, 8).toUpperCase();
         console.log("Nouveau code unique généré :", finalUniqueCode);
 
+        // Prepare updated data with required fields based on account_type
+        const updatedData = {
+            id: currentUserId,
+            unique_code: finalUniqueCode,
+            account_type: profile?.account_type || 'individual',
+            updated_at: new Date().toISOString(),
+            contact_person: profile?.contact_person || 'Default Contact'
+        };
+        // Include required fields based on account_type to satisfy check constraint
+        if (updatedData.account_type === 'business_partner') {
+            updatedData.business_name = profile?.business_name || 'Default Business';
+            updatedData.business_reg_number = profile?.business_reg_number || null;
+            updatedData.date_of_incorporation = profile?.date_of_incorporation || null;
+            updatedData.full_name = null;
+            updatedData.agent_name = null;
+            updatedData.date_of_birth = null;
+            updatedData.id_number = null;
+        } else if (updatedData.account_type === 'retail_agent') {
+            updatedData.agent_name = profile?.agent_name || 'Default Agent';
+            updatedData.agent_id = profile?.agent_id || null;
+            updatedData.date_of_birth = null;
+            updatedData.id_number = null;
+            updatedData.business_name = null;
+            updatedData.date_of_incorporation = null;
+            updatedData.full_name = null;
+        } else {
+            updatedData.full_name = profile?.full_name || 'Default User';
+            updatedData.id_number = profile?.id_number || null;
+            updatedData.date_of_birth = profile?.date_of_birth || null;
+            updatedData.business_name = null;
+            updatedData.agent_name = null;
+            updatedData.date_of_incorporation = null;
+            updatedData.agent_id = null;
+        }
+
         const { error: updateError } = await supabase
             .from('users')
-            .upsert({ id: currentUserId, unique_code: finalUniqueCode });
+            .upsert(updatedData);
 
         if (updateError) {
             console.error('Erreur lors de la sauvegarde du nouveau code unique :', updateError.message);
@@ -639,10 +674,19 @@ try {
             console.log('Nouveau code unique sauvegardé avec succès dans la base de données.');
             if (!profile) profile = {};
             profile.unique_code = finalUniqueCode;
+            profile.account_type = updatedData.account_type;
+            profile.business_name = updatedData.business_name;
+            profile.business_reg_number = updatedData.business_reg_number;
+            profile.date_of_incorporation = updatedData.date_of_incorporation;
+            profile.agent_name = updatedData.agent_name;
+            profile.agent_id = updatedData.agent_id;
+            profile.full_name = updatedData.full_name;
+            profile.id_number = updatedData.id_number;
+            profile.date_of_birth = updatedData.date_of_birth;
         }
     }
 
-    const balance = (profile.balance !== undefined && profile.balance !== null) ? parseFloat(profile.balance) : 0.00;
+    const balance = (profile?.balance !== undefined && profile?.balance !== null) ? parseFloat(profile.balance) : 0.00;
     populateIdCard(profile, session.user, balance);
 
 } catch (error) {
