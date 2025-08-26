@@ -110,8 +110,6 @@
         border-radius: 0 6px 6px 0;
         flex-grow: 1;
       }
-
-      /* Modal Specific Styles */
       .modal-overlay {
         position: fixed;
         top: 0;
@@ -136,7 +134,7 @@
         border-radius: 8px;
         width: 90%;
         max-width: 800px;
-        max-height: 90vh; /* Limit modal height */
+        max-height: 90vh;
         display: flex;
         flex-direction: column;
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
@@ -160,7 +158,7 @@
       }
       .modal-body {
         padding: 2rem;
-        overflow-y: auto; /* Enable scrolling for content */
+        overflow-y: auto;
         flex-grow: 1;
       }
       .modal-footer {
@@ -181,6 +179,9 @@
       .btn-modal-accept:hover {
         background-color: #004182;
       }
+      .hidden {
+        display: none;
+      }
     </style>
   </head>
   <body class="flex items-center justify-center min-h-screen p-4">
@@ -195,55 +196,95 @@
         <p class="text-sm text-gray-600 text-center mb-8">Join NOVA7 for disaster protection.</p>
         <form id="registerForm" class="space-y-6">
           <div>
-            <label for="fullName" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-            <input type="text" name="fullName" id="fullName" required
-                   class="form-input-linkedin w-full" placeholder="John Doe" />
-          </div>
-          <div>
-            <label for="language" class="block text-sm font-medium text-gray-700 mb-1">Language</label>
-            <select name="language" id="language" required class="form-input-linkedin w-full">
-              <option value="" disabled selected>Select your language</option>
-              <option value="ar">Arabic</option>
-              <option value="bn">Bengali</option>
-              <option value="zh">Chinese (Mandarin)</option>
-              <option value="ht">Creole (Haitian)</option>
-              <option value="mfe">Creole (Mauritian)</option>
-              <option value="de">German</option>
-              <option value="en">English</option>
-              <option value="fr">French</option>
-              <option value="ff">Fula (Pular)</option>
-              <option value="ha">Hausa</option>
-              <option value="hi">Hindi</option>
-              <option value="ig">Igbo</option>
-              <option value="ja">Japanese</option>
-              <option value="jv">Javanese</option>
-              <option value="ko">Korean</option>
-              <option value="ln">Lingala</option>
-              <option value="mr">Marathi</option>
-              <option value="pa">Punjabi</option>
-              <option value="pt">Portuguese</option>
-              <option value="ru">Russian</option>
-              <option value="es">Spanish</option>
-              <option value="sw">Swahili</option>
-              <option value="ta">Tamil</option>
-              <option value="te">Telugu</option>
-              <option value="tsh">Tshiluba</option>
-              <option value="tr">Turkish</option>
-              <option value="ur">Urdu</option>
-              <option value="wo">Wolof</option>
-              <option value="yo">Yoruba</option>
-              <option value="zu">Zulu</option>
+            <label for="accountType" class="block text-sm font-medium text-gray-700 mb-1">Account Type</label>
+            <select name="accountType" id="accountType" required class="form-input-linkedin w-full">
+              <option value="" disabled selected>Select your account type</option>
+              <option value="individual">Individual</option>
+              <option value="business_partner">Business Partner</option>
+              <option value="retail_agent">Retail Agent</option>
             </select>
           </div>
-          <div>
-            <label for="dateOfBirth" class="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
-            <input type="date" name="dateOfBirth" id="dateOfBirth" required
-                   class="form-input-linkedin w-full" />
+          <div id="individualFields">
+            <div>
+              <label for="fullName" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+              <input type="text" name="fullName" id="fullName" required
+                     class="form-input-linkedin w-full" placeholder="John Doe" />
+            </div>
+            <div>
+              <label for="language" class="block text-sm font-medium text-gray-700 mb-1">Language</label>
+              <select name="language" id="language" required class="form-input-linkedin w-full">
+                <option value="" disabled selected>Select your language</option>
+                <option value="ar">Arabic</option>
+                <option value="bn">Bengali</option>
+                <option value="zh">Chinese (Mandarin)</option>
+                <option value="ht">Creole (Haitian)</option>
+                <option value="mfe">Creole (Mauritian)</option>
+                <option value="de">German</option>
+                <option value="en">English</option>
+                <option value="fr">French</option>
+                <option value="ff">Fula (Pular)</option>
+                <option value="ha">Hausa</option>
+                <option value="hi">Hindi</option>
+                <option value="ig">Igbo</option>
+                <option value="ja">Japanese</option>
+                <option value="jv">Javanese</option>
+                <option value="ko">Korean</option>
+                <option value="ln">Lingala</option>
+                <option value="mr">Marathi</option>
+                <option value="pa">Punjabi</option>
+                <option value="pt">Portuguese</option>
+                <option value="ru">Russian</option>
+                <option value="es">Spanish</option>
+                <option value="sw">Swahili</option>
+                <option value="ta">Tamil</option>
+                <option value="te">Telugu</option>
+                <option value="tsh">Tshiluba</option>
+                <option value="tr">Turkish</option>
+                <option value="ur">Urdu</option>
+                <option value="wo">Wolof</option>
+                <option value="yo">Yoruba</option>
+                <option value="zu">Zulu</option>
+              </select>
+            </div>
+            <div>
+              <label for="dateOfBirth" class="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
+              <input type="date" name="dateOfBirth" id="dateOfBirth" required
+                     class="form-input-linkedin w-full" />
+            </div>
+            <div>
+              <label for="idNumber" class="block text-sm font-medium text-gray-700 mb-1">Government-Issued ID</label>
+              <input type="text" name="idNumber" id="idNumber"
+                     class="form-input-linkedin w-full" placeholder="National ID or passport number" />
+            </div>
           </div>
-          <div>
-            <label for="idNumber" class="block text-sm font-medium text-gray-700 mb-1">Government-Issued ID</label>
-            <input type="text" name="idNumber" id="idNumber"
-                   class="form-input-linkedin w-full" placeholder="National ID or passport number" />
+          <div id="businessFields" class="hidden">
+            <div>
+              <label for="businessName" class="block text-sm font-medium text-gray-700 mb-1">Business Name</label>
+              <input type="text" name="businessName" id="businessName"
+                     class="form-input-linkedin w-full" placeholder="e.g., ABC Corp" />
+            </div>
+            <div>
+              <label for="businessRegNumber" class="block text-sm font-medium text-gray-700 mb-1">Business Registration Number</label>
+              <input type="text" name="businessRegNumber" id="businessRegNumber"
+                     class="form-input-linkedin w-full" placeholder="e.g., CRN123456" />
+            </div>
+            <div>
+              <label for="contactPerson" class="block text-sm font-medium text-gray-700 mb-1">Contact Person Name</label>
+              <input type="text" name="contactPerson" id="contactPerson"
+                     class="form-input-linkedin w-full" placeholder="e.g., Jane Smith" />
+            </div>
+          </div>
+          <div id="retailAgentFields" class="hidden">
+            <div>
+              <label for="agentName" class="block text-sm font-medium text-gray-700 mb-1">Agent Full Name</label>
+              <input type="text" name="agentName" id="agentName"
+                     class="form-input-linkedin w-full" placeholder="e.g., John Doe" />
+            </div>
+            <div>
+              <label for="agentId" class="block text-sm font-medium text-gray-700 mb-1">Agent ID (if applicable)</label>
+              <input type="text" name="agentId" id="agentId"
+                     class="form-input-linkedin w-full" placeholder="e.g., AGT789" />
+            </div>
           </div>
           <div>
             <label for="country" class="block text-sm font-medium text-gray-700 mb-1">Country</label>
@@ -512,7 +553,6 @@
               </button>
             </div>
           </div>
-
           <div>
             <label for="agreeTerms" class="block text-sm font-medium text-gray-700 mb-1">
               <input type="checkbox" name="agreeTerms" id="agreeTerms" required class="mr-2" />
@@ -525,14 +565,12 @@
               I have read and agree to the <a href="#" id="viewPrivacy" class="link-linkedin">Privacy Policy</a>
             </label>
           </div>
-          
           <div>
             <label for="dataConsent" class="block text-sm font-medium text-gray-700 mb-1">
               <input type="checkbox" name="dataConsent" id="dataConsent" required class="mr-2" />
               I consent to sharing my data for disaster response and analytics
             </label>
           </div>
-          
           <div id="messageDiv" class="text-sm text-center font-medium pt-1"></div>
           <div id="resendContainer" class="text-center mt-2 hidden">
             <button id="resendNow" class="btn-resend mt-4">Resend Verification Email</button>
@@ -552,12 +590,11 @@
         © <span id="currentYear"></span> NOVA7. All rights reserved.
       </p>
     </div>
-
     <div id="policyModal" class="modal-overlay">
       <div class="modal-container">
         <div class="modal-header">
           <h3 id="modalTitle"></h3>
-          </div>
+        </div>
         <div class="modal-body" id="modalBody">
           <p class="text-center text-gray-500">Loading policy...</p>
         </div>
@@ -566,7 +603,6 @@
         </div>
       </div>
     </div>
-
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
       document.getElementById('currentYear').textContent = new Date().getFullYear();
@@ -589,30 +625,31 @@
         const agreeTermsCheckbox = document.getElementById('agreeTerms');
         const agreePrivacyCheckbox = document.getElementById('agreePrivacy');
         const dateOfBirthInput = document.getElementById('dateOfBirth');
-        const languageSelect = document.getElementById('language'); // Added language select
+        const languageSelect = document.getElementById('language');
+        const accountTypeSelect = document.getElementById('accountType');
+        const individualFields = document.getElementById('individualFields');
+        const businessFields = document.getElementById('businessFields');
+        const retailAgentFields = document.getElementById('retailAgentFields');
 
         // Password visibility toggles
         const togglePassword = document.getElementById('togglePassword');
         const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
 
         togglePassword.addEventListener('click', function () {
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
-            // Change SVG icon based on type
-            this.querySelector('svg').innerHTML = type === 'password'
-                ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />'
-                : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.879 10.428V10.5h.008v.008H13.88v-.008zM12 18c-2.822 0-5.467-1.636-7.147-4.322a9.697 9.697 0 010-3.356C6.533 5.636 9.178 4 12 4s5.467 1.636 7.147 4.322a9.697 9.697 0 010 3.356C17.467 16.364 14.822 18 12 18zm0-2a5.955 5.955 0 005.196-2.924l-1.403-1.403A3.01 3.01 0 0112 12a3 3 0 01-3.793-2.607L7.004 8.27C5.836 9.38 5 10.61 5 12a7 7 0 007 7zm0-8a3.001 3.001 0 00-2.992 2.766L6.5 6.5A7.002 7.002 0 0112 5c2.49 0 4.706.94 6.286 2.474l-1.597 1.597A3 3 0 0012 8z" />';
+          const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+          passwordInput.setAttribute('type', type);
+          this.querySelector('svg').innerHTML = type === 'password'
+            ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />'
+            : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.879 10.428V10.5h.008v.008H13.88v-.008zM12 18c-2.822 0-5.467-1.636-7.147-4.322a9.697 9.697 0 010-3.356C6.533 5.636 9.178 4 12 4s5.467 1.636 7.147 4.322a9.697 9.697 0 010 3.356C17.467 16.364 14.822 18 12 18zm0-2a5.955 5.955 0 005.196-2.924l-1.403-1.403A3.01 3.01 0 0112 12a3 3 0 01-3.793-2.607L7.004 8.27C5.836 9.38 5 10.61 5 12a7 7 0 007 7zm0-8a3.001 3.001 0 00-2.992 2.766L6.5 6.5A7.002 7.002 0 0112 5c2.49 0 4.706.94 6.286 2.474l-1.597 1.597A3 3 0 0012 8z" />';
         });
 
         toggleConfirmPassword.addEventListener('click', function () {
-            const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            confirmPasswordInput.setAttribute('type', type);
-            // Change SVG icon based on type
-            this.querySelector('svg').innerHTML = type === 'password'
-                ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />'
-                : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.879 10.428V10.5h.008v.008H13.88v-.008zM12 18c-2.822 0-5.467-1.636-7.147-4.322a9.697 9.697 0 010-3.356C6.533 5.636 9.178 4 12 4s5.467 1.636 7.147 4.322a9.697 9.697 0 010 3.356C17.467 16.364 14.822 18 12 18zm0-2a5.955 5.955 0 005.196-2.924l-1.403-1.403A3.01 3.01 0 0112 12a3 3 0 01-3.793-2.607L7.004 8.27C5.836 9.38 5 10.61 5 12a7 7 0 007 7zm0-8a3.001 3.001 0 00-2.992 2.766L6.5 6.5A7.002 7.002 0 0112 5c2.49 0 4.706.94 6.286 2.474l-1.597 1.597A3 3 0 0012 8z" />';
+          const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+          confirmPasswordInput.setAttribute('type', type);
+          this.querySelector('svg').innerHTML = type === 'password'
+            ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />'
+            : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.879 10.428V10.5h.008v.008H13.88v-.008zM12 18c-2.822 0-5.467-1.636-7.147-4.322a9.697 9.697 0 010-3.356C6.533 5.636 9.178 4 12 4s5.467 1.636 7.147 4.322a9.697 9.697 0 010 3.356C17.467 16.364 14.822 18 12 18zm0-2a5.955 5.955 0 005.196-2.924l-1.403-1.403A3.01 3.01 0 0112 12a3 3 0 01-3.793-2.607L7.004 8.27C5.836 9.38 5 10.61 5 12a7 7 0 007 7zm0-8a3.001 3.001 0 00-2.992 2.766L6.5 6.5A7.002 7.002 0 0112 5c2.49 0 4.706.94 6.286 2.474l-1.597 1.597A3 3 0 0012 8z" />';
         });
-
 
         // Modal elements
         const policyModal = document.getElementById('policyModal');
@@ -620,7 +657,7 @@
         const modalBody = document.getElementById('modalBody');
         const modalAcceptBtn = document.getElementById('modalAcceptBtn');
 
-        let currentCheckboxToUpdate = null; // To track which checkbox to check after modal acceptance
+        let currentCheckboxToUpdate = null;
 
         // Country to dialing code mapping
         const countryCodes = {
@@ -708,23 +745,56 @@
           });
         }
 
+        function updateFormFields() {
+          const accountType = accountTypeSelect.value;
+          individualFields.classList.add('hidden');
+          businessFields.classList.add('hidden');
+          retailAgentFields.classList.add('hidden');
+
+          // Reset required attributes
+          document.getElementById('fullName').required = false;
+          document.getElementById('language').required = false;
+          document.getElementById('dateOfBirth').required = false;
+          document.getElementById('businessName').required = false;
+          document.getElementById('businessRegNumber').required = false;
+          document.getElementById('contactPerson').required = false;
+          document.getElementById('agentName').required = false;
+
+          if (accountType === 'individual') {
+            individualFields.classList.remove('hidden');
+            document.getElementById('fullName').required = true;
+            document.getElementById('language').required = true;
+            document.getElementById('dateOfBirth').required = true;
+          } else if (accountType === 'business_partner') {
+            businessFields.classList.remove('hidden');
+            document.getElementById('businessName').required = true;
+            document.getElementById('businessRegNumber').required = true;
+            document.getElementById('contactPerson').required = true;
+          } else if (accountType === 'retail_agent') {
+            retailAgentFields.classList.remove('hidden');
+            document.getElementById('agentName').required = true;
+          }
+        }
+
         countrySelect.addEventListener('change', () => {
           updatePhoneCode();
           updatePaymentNetworks();
         });
 
+        accountTypeSelect.addEventListener('change', updateFormFields);
+
         // Initial update on page load
         updatePhoneCode();
         updatePaymentNetworks();
+        updateFormFields();
 
         let lastSignupAttempt = 0;
 
-        // Modal Functions
         async function openPolicyModal(title, url, checkboxElement) {
           modalTitle.textContent = title;
-          modalBody.innerHTML = '<p class="text-center text-gray-500">Loading policy...</p>'; // Show loading
+          modalBody.innerHTML = '<p class="text-center text-gray-500">Loading policy...</p>';
           policyModal.classList.add('open');
-          currentCheckboxToUpdate = checkboxElement; // Store which checkbox to update
+          currentCheckboxToUpdate = checkboxElement;
 
           try {
             const response = await fetch(url);
@@ -732,15 +802,10 @@
               throw new Error(`HTTP error! status: ${response.status}`);
             }
             const htmlContent = await response.text();
-            // Extract only the content of the main container if available
             const parser = new DOMParser();
             const doc = parser.parseFromString(htmlContent, 'text/html');
-            const containerContent = doc.querySelector('.container'); // Assuming policy files have a .container
-            if (containerContent) {
-                modalBody.innerHTML = containerContent.innerHTML;
-            } else {
-                modalBody.innerHTML = htmlContent; // Fallback to full content if .container not found
-            }
+            const containerContent = doc.querySelector('.container');
+            modalBody.innerHTML = containerContent ? containerContent.innerHTML : htmlContent;
           } catch (error) {
             console.error(`Failed to load policy from ${url}:`, error);
             modalBody.innerHTML = `<p class="text-red-500 text-center">Failed to load policy. Please try again later.</p>`;
@@ -752,25 +817,22 @@
           currentCheckboxToUpdate = null;
         }
 
-        // Event Listeners for policy links
         document.getElementById('viewTerms').addEventListener('click', function(e) {
-            e.preventDefault();
-            openPolicyModal('Terms of Service for NOVA7', 'terms-of-service.html', agreeTermsCheckbox);
+          e.preventDefault();
+          openPolicyModal('Terms of Service for NOVA7', 'terms-of-service.html', agreeTermsCheckbox);
         });
 
         document.getElementById('viewPrivacy').addEventListener('click', function(e) {
-            e.preventDefault();
-            openPolicyModal('Privacy Policy for NOVA7', 'privacy-policy.html', agreePrivacyCheckbox);
+          e.preventDefault();
+          openPolicyModal('Privacy Policy for NOVA7', 'privacy-policy.html', agreePrivacyCheckbox);
         });
 
-        // Event listener for modal's "Accept" button
         modalAcceptBtn.addEventListener('click', function() {
-            if (currentCheckboxToUpdate) {
-                currentCheckboxToUpdate.checked = true;
-            }
-            closePolicyModal();
+          if (currentCheckboxToUpdate) {
+            currentCheckboxToUpdate.checked = true;
+          }
+          closePolicyModal();
         });
-
 
         registerForm.addEventListener('submit', async function (event) {
           event.preventDefault();
@@ -787,10 +849,16 @@
           registerButton.textContent = 'Registering...';
 
           const formData = {
+            accountType: accountTypeSelect.value,
             fullName: document.getElementById('fullName').value.trim(),
-            language: document.getElementById('language').value, // Added language
+            language: document.getElementById('language').value,
             dateOfBirth: document.getElementById('dateOfBirth').value,
             idNumber: document.getElementById('idNumber').value.trim(),
+            businessName: document.getElementById('businessName').value.trim(),
+            businessRegNumber: document.getElementById('businessRegNumber').value.trim(),
+            contactPerson: document.getElementById('contactPerson').value.trim(),
+            agentName: document.getElementById('agentName').value.trim(),
+            agentId: document.getElementById('agentId').value.trim(),
             country: document.getElementById('country').value,
             paymentNetwork: document.getElementById('paymentNetwork').value,
             mobileMoney: document.getElementById('mobileMoney').value.trim(),
@@ -807,29 +875,60 @@
           };
 
           // Client-side validation
-          if (!formData.fullName || !formData.language || !formData.dateOfBirth || !formData.country || !formData.paymentNetwork ||
-              !formData.mobileMoney || !formData.province || !formData.city || !formData.address ||
-              !formData.phoneNumber || !formData.password || !formData.confirmPassword || !formData.dataConsent ||
-              !formData.agreeTerms || !formData.agreePrivacy) {
-            showMessage('Please fill in all required fields and agree to the terms and policies.', 'error');
+          if (!formData.accountType) {
+            showMessage('Please select an account type.', 'error');
             registerButton.disabled = false;
             registerButton.textContent = 'Sign Up';
             return;
           }
 
-          // Date of Birth Validation: User must be at least 13 years old
-          const dob = new Date(formData.dateOfBirth);
-          const today = new Date();
-          let age = today.getFullYear() - dob.getFullYear();
-          const m = today.getMonth() - dob.getMonth();
-          if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
-              age--;
-          }
-          if (age < 13) {
-              showMessage('You must be at least 13 years old to register.', 'error');
+          if (formData.accountType === 'individual') {
+            if (!formData.fullName || !formData.language || !formData.dateOfBirth || !formData.country ||
+                !formData.paymentNetwork || !formData.mobileMoney || !formData.province ||
+                !formData.city || !formData.address || !formData.phoneNumber ||
+                !formData.password || !formData.confirmPassword || !formData.dataConsent ||
+                !formData.agreeTerms || !formData.agreePrivacy) {
+              showMessage('Please fill in all required fields and agree to the terms and policies.', 'error');
               registerButton.disabled = false;
               registerButton.textContent = 'Sign Up';
               return;
+            }
+            // Date of Birth Validation: User must be at least 13 years old
+            const dob = new Date(formData.dateOfBirth);
+            const today = new Date();
+            let age = today.getFullYear() - dob.getFullYear();
+            const m = today.getMonth() - dob.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+              age--;
+            }
+            if (age < 13) {
+              showMessage('You must be at least 13 years old to register as an individual.', 'error');
+              registerButton.disabled = false;
+              registerButton.textContent = 'Sign Up';
+              return;
+            }
+          } else if (formData.accountType === 'business_partner') {
+            if (!formData.businessName || !formData.businessRegNumber || !formData.contactPerson ||
+                !formData.country || !formData.paymentNetwork || !formData.mobileMoney ||
+                !formData.province || !formData.city || !formData.address ||
+                !formData.phoneNumber || !formData.password || !formData.confirmPassword ||
+                !formData.dataConsent || !formData.agreeTerms || !formData.agreePrivacy) {
+              showMessage('Please fill in all required fields and agree to the terms and policies.', 'error');
+              registerButton.disabled = false;
+              registerButton.textContent = 'Sign Up';
+              return;
+            }
+          } else if (formData.accountType === 'retail_agent') {
+            if (!formData.agentName || !formData.country || !formData.paymentNetwork ||
+                !formData.mobileMoney || !formData.province || !formData.city ||
+                !formData.address || !formData.phoneNumber || !formData.password ||
+                !formData.confirmPassword || !formData.dataConsent ||
+                !formData.agreeTerms || !formData.agreePrivacy) {
+              showMessage('Please fill in all required fields and agree to the terms and policies.', 'error');
+              registerButton.disabled = false;
+              registerButton.textContent = 'Sign Up';
+              return;
+            }
           }
 
           if (formData.password !== formData.confirmPassword) {
@@ -843,28 +942,26 @@
           const password = formData.password;
           const passwordErrors = [];
           if (password.length < 8) {
-              passwordErrors.push('at least 8 characters long');
+            passwordErrors.push('at least 8 characters long');
           }
           if (!/[A-Z]/.test(password)) {
-              passwordErrors.push('at least one uppercase letter');
+            passwordErrors.push('at least one uppercase letter');
           }
           if (!/[a-z]/.test(password)) {
-              passwordErrors.push('at least one lowercase letter');
+            passwordErrors.push('at least one lowercase letter');
           }
           if (!/[0-9]/.test(password)) {
-              passwordErrors.push('at least one number');
+            passwordErrors.push('at least one number');
           }
-          if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~` ]/.test(password)) { // Includes space
-              passwordErrors.push('at least one special character (e.g., !@#$%)');
+          if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~` ]/.test(password)) {
+            passwordErrors.push('at least one special character (e.g., !@#$%)');
           }
-
           if (passwordErrors.length > 0) {
-              showMessage(`Password must be: ${passwordErrors.join(', ')}.`, 'error');
-              registerButton.disabled = false;
-              registerButton.textContent = 'Sign Up';
-              return;
+            showMessage(`Password must be: ${passwordErrors.join(', ')}.`, 'error');
+            registerButton.disabled = false;
+            registerButton.textContent = 'Sign Up';
+            return;
           }
-
 
           const fullPhoneNumber = `${phoneCodeSpan.textContent}${formData.phoneNumber}`;
           if (!formData.email && !fullPhoneNumber) {
@@ -883,8 +980,11 @@
                 password: formData.password,
                 options: {
                   data: {
-                    full_name: formData.fullName,
-                    phone_number: fullPhoneNumber
+                    full_name: formData.accountType === 'individual' ? formData.fullName :
+                              formData.accountType === 'business_partner' ? formData.contactPerson :
+                              formData.agentName,
+                    phone_number: fullPhoneNumber,
+                    account_type: formData.accountType
                   },
                   emailRedirectTo: 'http://www.lifeline-wdc.com/email-verification.html'
                 }
@@ -895,7 +995,10 @@
                 password: formData.password,
                 options: {
                   data: {
-                    full_name: formData.fullName
+                    full_name: formData.accountType === 'individual' ? formData.fullName :
+                              formData.accountType === 'business_partner' ? formData.contactPerson :
+                              formData.agentName,
+                    account_type: formData.accountType
                   }
                 }
               });
@@ -912,28 +1015,40 @@
 
             const user = authData.user;
 
+            // Prepare profile data based on account type
+            const profileData = {
+              id: user.id,
+              account_type: formData.accountType,
+              email: formData.email || null,
+              phone_number: fullPhoneNumber,
+              country: formData.country,
+              payment_network: formData.paymentNetwork,
+              mobile_money: formData.mobileMoney,
+              province: formData.province,
+              city: formData.city,
+              address: formData.address,
+              data_consent: formData.dataConsent,
+              password_hash: 'set-by-auth'
+            };
+
+            if (formData.accountType === 'individual') {
+              profileData.full_name = formData.fullName;
+              profileData.language = formData.language;
+              profileData.date_of_birth = formData.dateOfBirth;
+              profileData.id_number = formData.idNumber || null;
+            } else if (formData.accountType === 'business_partner') {
+              profileData.business_name = formData.businessName;
+              profileData.business_reg_number = formData.businessRegNumber;
+              profileData.contact_person = formData.contactPerson;
+            } else if (formData.accountType === 'retail_agent') {
+              profileData.agent_name = formData.agentName;
+              profileData.agent_id = formData.agentId || null;
+            }
+
             // Insert profile data into users table
             const { error: profileError } = await supabase
               .from('users')
-              .insert([
-                {
-                  id: user.id,
-                  full_name: formData.fullName,
-                  language: formData.language, // Added language to insertion
-                  email: formData.email || null,
-                  phone_number: fullPhoneNumber,
-                  date_of_birth: formData.dateOfBirth,
-                  id_number: formData.idNumber || null,
-                  country: formData.country,
-                  payment_network: formData.paymentNetwork,
-                  mobile_money: formData.mobileMoney,
-                  province: formData.province,
-                  city: formData.city,
-                  address: formData.address,
-                  data_consent: formData.dataConsent,
-                  password_hash: 'set-by-auth' // This is just a placeholder, password hash is handled by Supabase Auth
-                }
-              ]);
+              .insert([profileData]);
 
             if (profileError) {
               console.error('Supabase Profile Insert Error:', profileError);
@@ -973,14 +1088,6 @@
             }
 
             setTimeout(() => {
-              // Uncomment the redirect logic if needed
-              /*
-              if (formData.email) {
-                window.location.href = 'email-verification.html';
-              } else {
-                window.location.href = 'login.html';
-              }
-              */
               registerButton.disabled = false;
               registerButton.textContent = 'Sign Up';
             }, 6000);

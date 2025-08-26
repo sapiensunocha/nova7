@@ -8,392 +8,374 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://js.stripe.com/v3/"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #F0F2F5;
-            color: #1a202c;
-            display: flex;
-            min-height: 100vh;
-            font-size: 102%;
+            background-color: #F3F4F6;
         }
-        .header-nova7 {
-            background-color: #FFFFFF;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            padding: 0.75rem 1.5rem;
-            height: 60px;
-            position: sticky;
-            top: 0;
-            z-index: 50;
+        .message-box {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            background-color: #10B981;
+            color: white;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s ease-in-out;
         }
-        .nova7-logo-header {
-            max-height: 36px;
-            width: auto;
+        .message-box.show {
+            opacity: 1;
+            transform: translateY(0);
         }
-        .sidebar-nova7 {
-            background-color: #004182;
-            color: #E0F2FE;
-            width: 260px;
-            box-shadow: 2px 0 8px rgba(0,0,0,0.15);
-            height: 100vh;
+        .message-box.error {
+            background-color: #EF4444;
+        }
+        .mobile-header {
             position: fixed;
             top: 0;
             left: 0;
-            padding-top: 1rem;
-            transition: transform 0.3s ease-in-out;
-            z-index: 40;
-            display: flex;
-            flex-direction: column;
-        }
-        .sidebar-header {
-            padding: 0.75rem 1.5rem 1rem 1.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-bottom: 1px solid #0053a0;
-            margin-bottom: 0.75rem;
-        }
-        .sidebar-logo-img {
-            max-height: 120px;
-            width: auto;
-            filter: brightness(0) invert(1);
-        }
-        .sidebar-nova7 .nav-link-sidebar {
-            display: flex;
-            align-items: center;
-            padding: 0.75rem 1.5rem;
-            border-radius: 6px;
-            margin: 0.25rem 1rem;
-            font-weight: 500;
-            color: #E0F2FE;
-            text-decoration: none;
-            transition: background-color 0.2s, color 0.2s;
-        }
-        .sidebar-nova7 .nav-link-sidebar:hover {
-            background-color: #0A66C2;
-            color: #FFFFFF;
-        }
-        .sidebar-nova7 .nav-link-sidebar.active {
-            background-color: #FFFFFF;
-            color: #0A66C2;
-            font-weight: 600;
-        }
-        .sidebar-nova7 .nav-link-sidebar i {
-            width: 20px;
-            margin-right: 0.75rem;
-            text-align: center;
-        }
-        .main-content-area {
-            margin-left: 260px;
-            padding: 2rem;
-            width: calc(100% - 260px);
-            min-height: 100vh;
-        }
-        .card-styled {
-            background-color: #FFFFFF;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
-            margin-bottom: 1.5rem;
-            overflow: hidden;
-        }
-        .card-header {
-            background-color: #F8FAFC;
-            padding: 1rem 1.5rem;
-            cursor: pointer;
+            right: 0;
+            background-color: white;
+            padding: 0.5rem 1rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transition: background-color 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            z-index: 999;
         }
-        .card-header:hover {
-            background-color: #EDF2F7;
+        .sidebar-nova7 {
+            width: 260px;
+            background-color: white;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: -260px;
+            transition: left 0.3s ease-in-out;
+            z-index: 1000;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+        .sidebar-nova7.open {
+            left: 0;
+        }
+        .sidebar-header {
+            padding: 1rem;
+            border-bottom: 1px solid #E5E7EB;
+        }
+        .sidebar-logo-img {
+            width: 100px;
+        }
+        .nav-link-sidebar {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            color: #374151;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .nav-link-sidebar i {
+            margin-right: 0.75rem;
+        }
+        .nav-link-sidebar:hover {
+            background-color: #F3F4F6;
+            color: #0A66C2;
+        }
+        .nav-link-sidebar.active {
+            background-color: #E0F2FE;
+            color: #0A66C2;
+            font-weight: 600;
+        }
+        .main-content-area {
+            margin-left: 0;
+            padding: 1rem;
+            flex-grow: 1;
+            transition: margin-left 0.3s ease-in-out;
+        }
+        @media (min-width: 768px) {
+            .sidebar-nova7 {
+                left: 0;
+            }
+            .main-content-area {
+                margin-left: 260px;
+            }
+        }
+        .desktop-header {
+            padding: 1rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        .greeting-summary-card {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        .greeting-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #111827;
+        }
+        .ai-summary-text {
+            color: #4B5563;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+        .card-styled {
+            background-color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #E5E7EB;
+            cursor: pointer;
         }
         .card-content {
-            padding: 1.5rem;
             display: none;
+            padding-top: 1rem;
         }
         .card-content.open {
             display: block;
         }
-        .balance-display {
-            font-size: 2.55rem;
-            font-weight: 800;
-            color: #0A66C2;
-            text-align: center;
-            margin-bottom: 1rem;
-            position: relative;
-            transition: all 0.3s ease;
-        }
-        .balance-ring {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 100px;
-            height: 100px;
-            z-index: -1;
-        }
         .form-label {
             display: block;
-            font-size: 0.8925rem;
+            font-size: 0.875rem;
             font-weight: 500;
             color: #374151;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.25rem;
             position: relative;
-        }
-        .form-label .tooltip {
-            visibility: hidden;
-            background-color: #4A5568;
-            color: #FFFFFF;
-            text-align: center;
-            border-radius: 6px;
-            padding: 5px 10px;
-            position: absolute;
-            z-index: 10;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 0.765rem;
-            width: 200px;
-        }
-        .form-label:hover .tooltip {
-            visibility: visible;
         }
         .form-input, .form-select {
             width: 100%;
+            padding: 0.5rem;
             border: 1px solid #D1D5DB;
-            border-radius: 8px;
-            padding: 0.75rem 1rem;
-            font-size: 0.969rem;
-            color: #1D2939;
-            transition: border-color 0.2s, box-shadow 0.2s;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            color: #111827;
+            background-color: #F9FAFB;
         }
         .form-input:focus, .form-select:focus {
             outline: none;
             border-color: #0A66C2;
-            box-shadow: 0 0 0 2px rgba(10, 102, 194, 0.2);
+            box-shadow: 0 0 0 3px rgba(10, 102, 194, 0.1);
         }
         .btn-primary-action {
             background-color: #0A66C2;
             color: white;
-            border-radius: 8px;
-            padding: 0.75rem 1.5rem;
-            font-weight: 600;
-            font-size: 0.969rem;
-            transition: background-color 0.2s, box-shadow 0.2s, transform 0.1s;
-            border: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
-            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: background-color 0.2s;
         }
         .btn-primary-action:hover {
-            background-color: #004182;
-            box-shadow: 0 2px 4px 0 rgba(0,0,0,0.1);
-            transform: translateY(-1px);
+            background-color: #0B5A9F;
         }
         .btn-primary-action:disabled {
-            background-color: #A0AEC0;
+            background-color: #6B7280;
             cursor: not-allowed;
-            opacity: 0.7;
-            transform: none;
         }
         .btn-secondary-action {
-            background-color: #EDF2F7;
-            color: #4A5568;
-            border-radius: 8px;
-            padding: 0.75rem 1.5rem;
-            font-weight: 600;
-            font-size: 0.969rem;
-            transition: background-color 0.2s, box-shadow 0.2s, transform 0.1s;
-            border: none;
-            cursor: pointer;
+            background-color: #6B7280;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: background-color 0.2s;
         }
         .btn-secondary-action:hover {
-            background-color: #E2E8F0;
-            box-shadow: 0 2px 4px 0 rgba(0,0,0,0.1);
-            transform: translateY(-1px);
+            background-color: #4B5563;
         }
         .btn-danger-action {
             background-color: #EF4444;
             color: white;
-            border-radius: 8px;
-            padding: 0.75rem 1.5rem;
-            font-weight: 600;
-            font-size: 0.969rem;
-            transition: background-color 0.2s, box-shadow 0.2s, transform 0.1s;
-            border: none;
-            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: background-color 0.2s;
         }
         .btn-danger-action:hover {
             background-color: #DC2626;
-            box-shadow: 0 2px 4px 0 rgba(0,0,0,0.1);
-            transform: translateY(-1px);
         }
-        #card-element {
-            border: 1px solid #D1D5DB;
-            border-radius: 8px;
-            padding: 0.75rem 1rem;
-            background-color: white;
-            margin-bottom: 1rem;
-        }
-        .StripeElement--focus {
-            box-shadow: 0 0 0 2px rgba(10, 102, 194, 0.2);
-            border-color: #0A66C2;
-        }
-        .StripeElement--invalid {
-            border-color: #EF4444;
-        }
-        .message-box {
-            position: fixed;
-            top: 20px;
+        .tooltip {
+            visibility: hidden;
+            position: absolute;
+            background-color: #374151;
+            color: white;
+            padding: 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            top: -2rem;
             left: 50%;
             transform: translateX(-50%);
-            background-color: #4CAF50;
-            color: white;
-            padding: 15px 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            z-index: 1000;
-            display: none;
-            opacity: 0;
-            transition: opacity 0.5s ease-in-out;
-            text-align: center;
-            min-width: 240px;
-            font-size: 0.969rem;
+            white-space: nowrap;
+            z-index: 10;
         }
-        .message-box.error {
-            background-color: #F44336;
+        .form-label:hover .tooltip {
+            visibility: visible;
         }
-        .message-box.show {
-            display: block;
-            opacity: 1;
+        .balance-ring {
+            width: 100px;
+            height: 100px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
-        .greeting-summary-card {
-            background-color: #FFFFFF;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.07);
-            padding: 1.5rem 2rem;
-            margin-bottom: 1.5rem;
-            position: relative;
-        }
-        .greeting-text {
-            font-size: 1.53rem;
-            font-weight: 700;
-            color: #2D3748;
-            margin-bottom: 0.5rem;
-        }
-        .ai-summary-text {
-            font-size: 0.969rem;
-            color: #4A5568;
-            line-height: 1.6;
-        }
-        .ai-summary-text strong {
-            color: #004182;
+        .balance-display {
+            font-size: 1.25rem;
             font-weight: 600;
+            color: #0A66C2;
+            position: relative;
+            z-index: 1;
+            transition: transform 0.3s ease-in-out;
+        }
+        .table-container {
+            overflow-x: auto;
         }
         .transaction-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.918rem;
         }
         .transaction-table th, .transaction-table td {
-            padding: 1rem;
+            padding: 0.75rem;
             text-align: left;
-            border-bottom: 1px solid #E2E8F0;
+            font-size: 0.875rem;
+            color: #374151;
         }
         .transaction-table th {
-            background-color: #F8FAFC;
+            background-color: #F9FAFB;
             font-weight: 600;
-            color: #4A5568;
-            text-transform: uppercase;
-            font-size: 0.765rem;
         }
-        .transaction-table tbody tr:last-child td {
-            border-bottom: none;
-        }
-        .transaction-table tbody tr:hover {
-            background-color: #F0F4F8;
+        .transaction-table td {
+            border-bottom: 1px solid #E5E7EB;
         }
         .status-badge {
-            padding: 0.25rem 0.75rem;
+            padding: 0.25rem 0.5rem;
             border-radius: 9999px;
-            font-size: 0.765rem;
-            font-weight: 600;
-            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 500;
         }
-        .status-completed { background-color: #D1FAE5; color: #059669; }
-        .status-pending { background-color: #FEF3C7; color: #D97706; }
-        .status-failed { background-color: #FEE2E2; color: #EF4444; }
-        .status-deposit { background-color: #DBEAFE; color: #2563EB; }
-        .status-withdrawal { background-color: #E0F2FE; color: #0A66C2; }
-        .status-request { background-color: #FCE7F6; color: #C026D3; }
-        .status-transfer { background-color: #E0F7FA; color: #00ACC1; }
-        #recipientSuggestions, #senderSuggestions {
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            max-height: 200px;
-            overflow-y: auto;
-            background-color: #FFFFFF;
-            border-radius: 8px;
+        .status-deposit {
+            background-color: #D1FAE5;
+            color: #10B981;
+        }
+        .status-withdrawal {
+            background-color: #FEE2E2;
+            color: #EF4444;
+        }
+        .status-transfer {
+            background-color: #DBEAFE;
+            color: #3B82F6;
+        }
+        .status-request {
+            background-color: #FEF3C7;
+            color: #D97706;
+        }
+        .status-completed {
+            background-color: #D1FAE5;
+            color: #10B981;
+        }
+        .status-pending {
+            background-color: #FEF3C7;
+            color: #D97706;
+        }
+        .status-failed {
+            background-color: #FEE2E2;
+            color: #EF4444;
+        }
+        .status-bill-payment {
+            background-color: #EDE9FE;
+            color: #7C3AED;
+        }
+        .status-cash-transfer {
+            background-color: #E0F7FA;
+            color: #00ACC1;
         }
         .suggestion-item {
-            padding: 0.75rem;
+            padding: 0.5rem;
             cursor: pointer;
+            border-bottom: 1px solid #E5E7EB;
         }
         .suggestion-item:hover {
-            background-color: #F0F4F8;
+            background-color: #F3F4F6;
         }
-        @media (max-width: 768px) {
-            .sidebar-nova7 {
-                transform: translateX(-100%);
-                top: 0;
-                height: 100vh;
-            }
-            .sidebar-nova7.open {
-                transform: translateX(0);
-            }
-            .main-content-area {
-                margin-left: 0;
-                width: 100%;
-                padding-top: calc(60px + 1rem);
-                padding: 1rem;
-            }
-            .desktop-header { display: none; }
-            .mobile-header {
-                display: flex;
-                background-color: #FFFFFF;
-                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-                padding: 0 1rem;
-                height: 60px;
-                align-items: center;
-                justify-content: space-between;
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                z-index: 50;
-            }
-            .card-styled { padding: 1rem; }
-            .transaction-table th, .transaction-table td {
-                padding: 0.75rem;
-                font-size: 0.867rem;
-            }
-            .greeting-text {
-                font-size: 1.275rem;
-            }
-            .balance-display {
-                font-size: 2rem;
-            }
-            .mobile-header i {
-                font-size: 1.53rem;
-            }
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+        .recipient-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            background-color: #F3F4F6;
+            border-radius: 6px;
+        }
+        .recipient-item button {
+            color: #EF4444;
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            background-color: #FEE2E2;
+        }
+        .recipient-item button:hover {
+            background-color: #FECACA;
+        }
+        .qr-scanner-container {
+            display: none;
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin: 1rem auto;
+            border: 1px solid #D1D5DB;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .qr-scanner-container.active {
+            display: block;
+        }
+        #qrVideo, #withdrawalQrVideo, #depositQrVideo, #qrDepositVideo, #qrWithdrawalVideo {
+            width: 100%;
+            height: auto;
+        }
+        .schedule-options {
+            display: none;
+        }
+        .schedule-options.active {
+            display: block;
+        }
+        .print-btn {
+            cursor: pointer;
+            color: #0A66C2;
+            font-size: 0.765rem;
+            padding: 0.5rem;
+            border-radius: 4px;
+            background-color: #E0F2FE;
+        }
+        .print-btn:hover {
+            background-color: #DBEAFE;
         }
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
     <div id="messageBox" class="message-box"></div>
 
+    <!-- Mobile Header -->
     <header class="mobile-header md:hidden">
         <button id="hamburgerBtnMobile" class="p-2 text-gray-700 hover:text-blue-600">
             <i class="fas fa-bars text-2xl"></i>
@@ -408,6 +390,7 @@
         </a>
     </header>
 
+    <!-- Sidebar -->
     <aside id="sidebar" class="sidebar-nova7">
         <div class="sidebar-header">
             <a href="dashboard.html" class="flex items-center">
@@ -416,44 +399,23 @@
             </a>
         </div>
         <nav class="flex-grow">
-            <a href="dashboard.html" class="nav-link-sidebar">
-                <i class="fas fa-tachometer-alt"></i>Tableau de bord
-            </a>
-            <a href="view-transactions.html" class="nav-link-sidebar">
-                <i class="fas fa-exchange-alt"></i>Transactions
-            </a>
-            <a href="reports.html" class="nav-link-sidebar">
-                <i class="fas fa-chart-pie"></i>Rapports
-            </a>
-            <a href="community.html" class="nav-link-sidebar">
-                <i class="fas fa-users"></i>Communauté
-            </a>
-            <a href="chatbot.html" class="nav-link-sidebar">
-                <i class="fas fa-comments-dollar"></i>Conseiller Chat
-            </a>
-            <a href="resources.html" class="nav-link-sidebar">
-                <i class="fas fa-book-open"></i>Ressources
-            </a>
-            <a href="settings.html" class="nav-link-sidebar">
-                <i class="fas fa-cog"></i>Paramètres
-            </a>
-            <a href="wallet.html" class="nav-link-sidebar active">
-                <i class="fas fa-wallet"></i>Portefeuille
-            </a>
-            <a href="marketplace.html" class="nav-link-sidebar">
-                <i class="fas fa-store"></i>Marketplace
-            </a>
+            <a href="dashboard.html" class="nav-link-sidebar"><i class="fas fa-tachometer-alt"></i>Tableau de bord</a>
+            <a href="view-transactions.html" class="nav-link-sidebar"><i class="fas fa-exchange-alt"></i>Transactions</a>
+            <a href="reports.html" class="nav-link-sidebar"><i class="fas fa-chart-pie"></i>Rapports</a>
+            <a href="community.html" class="nav-link-sidebar"><i class="fas fa-users"></i>Communauté</a>
+            <a href="chatbot.html" class="nav-link-sidebar"><i class="fas fa-comments-dollar"></i>Conseiller Chat</a>
+            <a href="resources.html" class="nav-link-sidebar"><i class="fas fa-book-open"></i>Ressources</a>
+            <a href="settings.html" class="nav-link-sidebar"><i class="fas fa-cog"></i>Paramètres</a>
+            <a href="wallet.html" class="nav-link-sidebar active"><i class="fas fa-wallet"></i>Portefeuille</a>
+            <a href="marketplace.html" class="nav-link-sidebar"><i class="fas fa-store"></i>Marketplace</a>
         </nav>
         <div class="pb-4">
-            <a href="profile.html" class="nav-link-sidebar">
-                <i class="fas fa-user-circle"></i>Profil
-            </a>
-            <a href="#" id="sidebarLogoutLink" class="nav-link-sidebar">
-                <i class="fas fa-sign-out-alt"></i>Déconnexion
-            </a>
+            <a href="profile.html" class="nav-link-sidebar"><i class="fas fa-user-circle"></i>Profil</a>
+            <a href="#" id="sidebarLogoutLink" class="nav-link-sidebar"><i class="fas fa-sign-out-alt"></i>Déconnexion</a>
         </div>
     </aside>
 
+    <!-- Main Content -->
     <main class="main-content-area">
         <header class="desktop-header hidden md:flex items-center justify-between mb-8">
             <div></div>
@@ -469,16 +431,14 @@
             </p>
         </div>
 
+        <!-- Wallet Balance -->
         <div class="card-styled text-center">
             <h2 class="text-[1.02rem] font-semibold text-gray-700 mb-2">Solde actuel</h2>
             <div class="relative inline-block">
                 <svg class="balance-ring" viewBox="0 0 36 36">
-                    <path d="M18 2.0845
-                            a 15.9155 15.9155 0 0 1 0 31.831
-                            a 15.9155 15.9155 0 0 1 0 -31.831"
+                    <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                           fill="none" stroke="#E0F2FE" stroke-width="2"/>
-                    <path id="balanceProgress" d="M18 2.0845
-                            a 15.9155 15.9155 0 0 1 0 31.831"
+                    <path id="balanceProgress" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831"
                           fill="none" stroke="#0A66C2" stroke-width="2" stroke-dasharray="0, 100"/>
                 </svg>
                 <p id="walletBalance" class="balance-display">$0.00</p>
@@ -489,6 +449,259 @@
             </div>
         </div>
 
+        <!-- Pay Bill Section (All Users) -->
+        <div class="card-styled">
+            <div class="card-header">
+                <h2 class="text-[1.02rem] font-semibold text-gray-700">Payer une facture</h2>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="card-content">
+                <form id="payBillForm">
+                    <div class="mb-4 relative">
+                        <label for="billBusinessPartner" class="form-label">Partenaire commercial
+                            <span class="tooltip">Recherchez le partenaire commercial à payer</span>
+                        </label>
+                        <input type="text" id="billBusinessPartner" class="form-input" placeholder="Nom ou ID du partenaire commercial" required autocomplete="off">
+                        <div id="businessPartnerSuggestions" class="absolute z-10 w-full bg-white border border-gray-300 rounded-lg mt-1 hidden"></div>
+                    </div>
+                    <div class="mb-4">
+                        <label for="billServiceName" class="form-label">Nom du service
+                            <span class="tooltip">Entrez le nom du service (ex., Électricité, Internet)</span>
+                        </label>
+                        <input type="text" id="billServiceName" class="form-input" placeholder="ex., Électricité" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="billReferenceNumber" class="form-label">Numéro de référence (facultatif)
+                            <span class="tooltip">Entrez un numéro de référence si requis</span>
+                        </label>
+                        <input type="text" id="billReferenceNumber" class="form-input" placeholder="ex., 123456789">
+                    </div>
+                    <div class="mb-4">
+                        <label for="billAmount" class="form-label">Montant (USD)
+                            <span class="tooltip">Entrez le montant de la facture (minimum 0,01 $)</span>
+                        </label>
+                        <input type="number" id="billAmount" class="form-input" placeholder="ex., 50,00" step="0.01" min="0.01" required>
+                    </div>
+                    <button type="submit" id="payBillSubmitBtn" class="btn-primary-action w-full">
+                        <i class="fas fa-file-invoice-dollar mr-2"></i>Payer la facture
+                    </button>
+                </form>
+                <div id="payBillMessage" class="text-[0.867rem] text-center mt-4"></div>
+            </div>
+        </div>
+
+        <!-- Retail Agent: Process Withdrawal -->
+        <div id="retailAgentWithdrawalCard" class="card-styled hidden">
+            <div class="card-header">
+                <h2 class="text-[1.02rem] font-semibold text-gray-700">Traiter un retrait</h2>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="card-content">
+                <form id="retailAgentWithdrawalForm">
+                    <div class="mb-4">
+                        <label for="withdrawalQrCode" class="form-label">Code QR ou ID utilisateur
+                            <span class="tooltip">Scannez le code QR ou entrez l'ID utilisateur</span>
+                        </label>
+                        <input type="text" id="withdrawalQrCode" class="form-input" placeholder="ID utilisateur ou scannez le code QR">
+                        <button type="button" id="startWithdrawalQrScan" class="btn-secondary-action w-full mt-2">
+                            <i class="fas fa-qrcode mr-2"></i>Scanner le code QR
+                        </button>
+                        <div id="withdrawalQrScanner" class="qr-scanner-container">
+                            <video id="withdrawalQrVideo"></video>
+                            <button type="button" id="stopWithdrawalQrScan" class="btn-danger-action w-full mt-2">
+                                <i class="fas fa-times mr-2"></i>Arrêter le scan
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label for="retailWithdrawalAmount" class="form-label">Montant (USD)
+                            <span class="tooltip">Entrez le montant à retirer (minimum 0,01 $)</span>
+                        </label>
+                        <input type="number" id="retailWithdrawalAmount" class="form-input" placeholder="ex., 50,00" step="0.01" min="0.01" required>
+                    </div>
+                    <button type="submit" id="retailWithdrawalSubmitBtn" class="btn-primary-action w-full">
+                        <i class="fas fa-paper-plane mr-2"></i>Confirmer le retrait
+                    </button>
+                </form>
+                <div id="retailWithdrawalMessage" class="text-[0.867rem] text-center mt-4"></div>
+            </div>
+        </div>
+
+        <!-- Retail Agent: Process Deposit -->
+        <div id="retailAgentDepositCard" class="card-styled hidden">
+            <div class="card-header">
+                <h2 class="text-[1.02rem] font-semibold text-gray-700">Traiter un dépôt</h2>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="card-content">
+                <form id="retailAgentDepositForm">
+                    <div class="mb-4">
+                        <label for="depositQrCode" class="form-label">Code QR ou ID utilisateur
+                            <span class="tooltip">Scannez le code QR ou entrez l'ID utilisateur</span>
+                        </label>
+                        <input type="text" id="depositQrCode" class="form-input" placeholder="ID utilisateur ou scannez le code QR">
+                        <button type="button" id="startDepositQrScan" class="btn-secondary-action w-full mt-2">
+                            <i class="fas fa-qrcode mr-2"></i>Scanner le code QR
+                        </button>
+                        <div id="depositQrScanner" class="qr-scanner-container">
+                            <video id="depositQrVideo"></video>
+                            <button type="button" id="stopDepositQrScan" class="btn-danger-action w-full mt-2">
+                                <i class="fas fa-times mr-2"></i>Arrêter le scan
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label for="retailDepositAmount" class="form-label">Montant (USD)
+                            <span class="tooltip">Entrez le montant à déposer (minimum 0,01 $)</span>
+                        </label>
+                        <input type="number" id="retailDepositAmount" class="form-input" placeholder="ex., 50,00" step="0.01" min="0.01" required>
+                    </div>
+                    <button type="submit" id="retailDepositSubmitBtn" class="btn-primary-action w-full">
+                        <i class="fas fa-money-bill-wave mr-2"></i>Confirmer le dépôt
+                    </button>
+                </form>
+                <div id="retailDepositMessage" class="text-[0.867rem] text-center mt-4"></div>
+            </div>
+        </div>
+
+        <!-- Individual/Company: QR Code Deposit -->
+        <div id="qrDepositCard" class="card-styled hidden">
+            <div class="card-header">
+                <h2 class="text-[1.02rem] font-semibold text-gray-700">Déposer via code QR</h2>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="card-content">
+                <form id="qrDepositForm">
+                    <div class="mb-4">
+                        <label for="qrDepositAgentCode" class="form-label">Code QR ou ID de l'agent
+                            <span class="tooltip">Scannez le code QR de l'agent ou entrez son ID</span>
+                        </label>
+                        <input type="text" id="qrDepositAgentCode" class="form-input" placeholder="ID de l'agent ou scannez le code QR">
+                        <button type="button" id="startQrDepositScan" class="btn-secondary-action w-full mt-2">
+                            <i class="fas fa-qrcode mr-2"></i>Scanner le code QR
+                        </button>
+                        <div id="qrDepositScanner" class="qr-scanner-container">
+                            <video id="qrDepositVideo"></video>
+                            <button type="button" id="stopQrDepositScan" class="btn-danger-action w-full mt-2">
+                                <i class="fas fa-times mr-2"></i>Arrêter le scan
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label for="qrDepositAmount" class="form-label">Montant (USD)
+                            <span class="tooltip">Entrez le montant à déposer (minimum 0,01 $)</span>
+                        </label>
+                        <input type="number" id="qrDepositAmount" class="form-input" placeholder="ex., 50,00" step="0.01" min="0.01" required>
+                    </div>
+                    <button type="submit" id="qrDepositSubmitBtn" class="btn-primary-action w-full">
+                        <i class="fas fa-money-bill-wave mr-2"></i>Confirmer le dépôt
+                    </button>
+                </form>
+                <div id="qrDepositMessage" class="text-[0.867rem] text-center mt-4"></div>
+            </div>
+        </div>
+
+        <!-- Individual/Company: QR Code Withdrawal -->
+        <div id="qrWithdrawalCard" class="card-styled hidden">
+            <div class="card-header">
+                <h2 class="text-[1.02rem] font-semibold text-gray-700">Retirer via code QR</h2>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="card-content">
+                <form id="qrWithdrawalForm">
+                    <div class="mb-4">
+                        <label for="qrWithdrawalAgentCode" class="form-label">Code QR ou ID de l'agent
+                            <span class="tooltip">Scannez le code QR de l'agent ou entrez son ID</span>
+                        </label>
+                        <input type="text" id="qrWithdrawalAgentCode" class="form-input" placeholder="ID de l'agent ou scannez le code QR">
+                        <button type="button" id="startQrWithdrawalScan" class="btn-secondary-action w-full mt-2">
+                            <i class="fas fa-qrcode mr-2"></i>Scanner le code QR
+                        </button>
+                        <div id="qrWithdrawalScanner" class="qr-scanner-container">
+                            <video id="qrWithdrawalVideo"></video>
+                            <button type="button" id="stopQrWithdrawalScan" class="btn-danger-action w-full mt-2">
+                                <i class="fas fa-times mr-2"></i>Arrêter le scan
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label for="qrWithdrawalAmount" class="form-label">Montant (USD)
+                            <span class="tooltip">Entrez le montant à retirer (minimum 0,01 $)</span>
+                        </label>
+                        <input type="number" id="qrWithdrawalAmount" class="form-input" placeholder="ex., 50,00" step="0.01" min="0.01" required>
+                    </div>
+                    <button type="submit" id="qrWithdrawalSubmitBtn" class="btn-primary-action w-full">
+                        <i class="fas fa-paper-plane mr-2"></i>Confirmer le retrait
+                    </button>
+                </form>
+                <div id="qrWithdrawalMessage" class="text-[0.867rem] text-center mt-4"></div>
+            </div>
+        </div>
+
+        <!-- Business Partner: Cash Transfer -->
+        <div id="cashTransferCard" class="card-styled hidden">
+            <div class="card-header">
+                <h2 class="text-[1.02rem] font-semibold text-gray-700">Transfert de fonds</h2>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="card-content">
+                <form id="cashTransferForm">
+                    <div class="mb-4">
+                        <label for="cashTransferList" class="form-label">Liste des destinataires
+                            <span class="tooltip">Ajoutez des utilisateurs à la liste de paiement</span>
+                        </label>
+                        <div id="recipientList" class="border border-gray-300 rounded-lg p-2 mb-2"></div>
+                        <input type="text" id="cashTransferRecipient" class="form-input" placeholder="Rechercher un utilisateur par nom, email ou ID" autocomplete="off">
+                        <div id="cashTransferSuggestions" class="absolute z-10 w-full bg-white border border-gray-300 rounded-lg mt-1 hidden"></div>
+                    </div>
+                    <div class="mb-4">
+                        <label for="cashTransferAmount" class="form-label">Montant par destinataire (USD)
+                            <span class="tooltip">Entrez le montant à transférer à chaque destinataire</span>
+                        </label>
+                        <input type="number" id="cashTransferAmount" class="form-input" placeholder="ex., 100,00" step="0.01" min="0.01" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">
+                            <input type="checkbox" id="schedulePayment" class="mr-2">
+                            Programmer le paiement
+                            <span class="tooltip">Cochez pour programmer le paiement à une date ultérieure</span>
+                        </label>
+                    </div>
+                    <div id="scheduleOptions" class="schedule-options">
+                        <div class="mb-4">
+                            <label for="scheduleDate" class="form-label">Date du paiement
+                                <span class="tooltip">Sélectionnez la date du paiement</span>
+                            </label>
+                            <input type="datetime-local" id="scheduleDate" class="form-input">
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">
+                                <input type="checkbox" id="isRecurring" class="mr-2">
+                                Paiement récurrent
+                                <span class="tooltip">Cochez pour un paiement récurrent</span>
+                            </label>
+                        </div>
+                        <div id="recurringOptions" class="mb-4 hidden">
+                            <label for="recurrenceInterval" class="form-label">Intervalle de récurrence
+                                <span class="tooltip">Sélectionnez la fréquence du paiement</span>
+                            </label>
+                            <select id="recurrenceInterval" class="form-select">
+                                <option value="daily">Quotidien</option>
+                                <option value="weekly">Hebdomadaire</option>
+                                <option value="monthly">Mensuel</option>
+                                <option value="yearly">Annuel</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" id="cashTransferSubmitBtn" class="btn-primary-action w-full">
+                        <i class="fas fa-money-bill-transfer mr-2"></i>Confirmer le transfert
+                    </button>
+                </form>
+                <div id="cashTransferMessage" class="text-[0.867rem] text-center mt-4"></div>
+            </div>
+        </div>
+
+        <!-- Pending Requests -->
         <div id="pendingRequestsContainer" class="card-styled">
             <div class="card-header">
                 <h2 class="text-[1.02rem] font-semibold text-gray-700">Demandes en attente</h2>
@@ -497,6 +710,7 @@
             <div id="pendingRequestsContent" class="card-content"></div>
         </div>
 
+        <!-- Deposit via Stripe -->
         <div class="card-styled">
             <div class="card-header">
                 <h2 class="text-[1.02rem] font-semibold text-gray-700">Déposer des fonds (via Stripe)</h2>
@@ -525,6 +739,7 @@
             </div>
         </div>
 
+        <!-- Transfer Funds -->
         <div class="card-styled">
             <div class="card-header">
                 <h2 class="text-[1.02rem] font-semibold text-gray-700">Transférer des fonds</h2>
@@ -553,6 +768,7 @@
             </div>
         </div>
 
+        <!-- Request Money -->
         <div class="card-styled">
             <div class="card-header">
                 <h2 class="text-[1.02rem] font-semibold text-gray-700">Demander de l'argent</h2>
@@ -581,6 +797,7 @@
             </div>
         </div>
 
+        <!-- Withdraw Funds -->
         <div class="card-styled">
             <div class="card-header">
                 <h2 class="text-[1.02rem] font-semibold text-gray-700">Retirer des fonds</h2>
@@ -619,6 +836,7 @@
             </div>
         </div>
 
+        <!-- Transaction History -->
         <div class="card-styled">
             <div class="card-header">
                 <h2 class="text-[1.02rem] font-semibold text-gray-700">Transactions récentes du portefeuille</h2>
@@ -647,6 +865,7 @@
         </div>
     </main>
 
+    <!-- JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         document.addEventListener('DOMContentLoaded', async function() {
@@ -672,10 +891,10 @@
             const totalPendingAmount = document.getElementById('totalPendingAmount');
             const transactionTableBody = document.getElementById('transactionHistoryTableBody');
             const noTransactionsMessage = document.getElementById('noTransactionsMessage');
-
-            // User Info
             let userId = null;
             let userName = 'Utilisateur';
+            let accountType = 'individual';
+            let recipientList = [];
 
             // Authenticate User
             const { data: { user }, error: userError } = await supabase.auth.getUser();
@@ -686,36 +905,37 @@
                 return;
             }
             userId = user.id;
-            console.log('ID utilisateur authentifié :', userId);
 
-            // Fetch User Profile
+            // Fetch User Profile and Account Type
             try {
                 const { data: profile, error: profileError } = await supabase
                     .from('users')
-                    .select('full_name, email')
+                    .select('full_name, email, account_type')
                     .eq('id', userId)
                     .maybeSingle();
 
-                if (profileError) {
-                    console.error('Erreur lors de la récupération du profil utilisateur :', profileError.message);
-                    userName = user.email || 'Utilisateur';
-                } else {
-                    userName = profile?.full_name || user.email || 'Utilisateur';
-                }
+                if (profileError) throw profileError;
+                userName = profile?.full_name || profile?.email || 'Utilisateur';
+                accountType = profile?.account_type || 'individual';
 
                 // Update Greeting
                 const greetingElement = document.getElementById('personalizedGreeting');
                 const desktopUserWelcomeElement = document.getElementById('desktopUserWelcome');
-                if (greetingElement) {
-                    const currentHour = new Date().getHours();
-                    let timeOfDayGreeting = 'Bonjour';
-                    if (currentHour < 12) timeOfDayGreeting = 'Bonjour';
-                    else if (currentHour < 18) timeOfDayGreeting = 'Bon après-midi';
-                    else timeOfDayGreeting = 'Bonsoir';
-                    greetingElement.textContent = `${timeOfDayGreeting}, ${userName}!`;
+                const currentHour = new Date().getHours();
+                let timeOfDayGreeting = currentHour < 12 ? 'Bonjour' : currentHour < 18 ? 'Bon après-midi' : 'Bonsoir';
+                if (greetingElement) greetingElement.textContent = `${timeOfDayGreeting}, ${userName}!`;
+                if (desktopUserWelcomeElement) desktopUserWelcomeElement.textContent = `Bienvenue, ${userName}!`;
+
+                // Show/Hide Sections Based on Account Type
+                if (accountType === 'retail_agent') {
+                    document.getElementById('retailAgentWithdrawalCard').classList.remove('hidden');
+                    document.getElementById('retailAgentDepositCard').classList.remove('hidden');
+                } else {
+                    document.getElementById('qrDepositCard').classList.remove('hidden');
+                    document.getElementById('qrWithdrawalCard').classList.remove('hidden');
                 }
-                if (desktopUserWelcomeElement) {
-                    desktopUserWelcomeElement.textContent = `Bienvenue, ${userName}!`;
+                if (accountType === 'business_partner') {
+                    document.getElementById('cashTransferCard').classList.remove('hidden');
                 }
             } catch (error) {
                 console.error('Erreur lors de la récupération du profil utilisateur :', error);
@@ -759,15 +979,14 @@
             async function getCalculatedBalance() {
                 try {
                     const { data, error } = await supabase
-                    .from('user_balances')
-                    .select('balance')
-                    .eq('user_id', userId)
-                    .single();
+                        .from('user_balances')
+                        .select('balance')
+                        .eq('user_id', userId)
+                        .single();
                     if (error) throw error;
-                    console.log('Balance fetched from user_balances:', data?.balance || 0);
                     return data ? parseFloat(data.balance) : 0;
                 } catch (error) {
-                    console.error('Error fetching balance from user_balances view:', error.message);
+                    console.error('Erreur lors de la récupération du solde :', error.message);
                     showMessage('Erreur lors de la récupération du solde.', 'error');
                     return 0;
                 }
@@ -778,13 +997,11 @@
                 await supabase.auth.signOut();
                 window.location.href = 'login.html';
             }
-            const sidebarLogoutLink = document.getElementById('sidebarLogoutLink');
-            if (sidebarLogoutLink) sidebarLogoutLink.addEventListener('click', (e) => {
+            document.getElementById('sidebarLogoutLink').addEventListener('click', (e) => {
                 e.preventDefault();
                 handleLogout();
             });
-            const mobileLogoutLink = document.getElementById('mobileLogoutLink');
-            if (mobileLogoutLink) mobileLogoutLink.addEventListener('click', (e) => {
+            document.getElementById('mobileLogoutLink').addEventListener('click', (e) => {
                 e.preventDefault();
                 handleLogout();
             });
@@ -808,6 +1025,70 @@
                 };
             }
 
+            // QR Code Scanning
+            async function startQrScanner(videoElementId, inputElementId, stopButtonId) {
+                try {
+                    const video = document.getElementById(videoElementId);
+                    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                    video.srcObject = stream;
+                    video.play();
+                    document.getElementById(videoElementId).parentElement.classList.add('active');
+
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d');
+
+                    async function scan() {
+                        if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                            canvas.height = video.videoHeight;
+                            canvas.width = video.videoWidth;
+                            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                            const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+                            const code = jsQR(imageData.data, imageData.width, imageData.height);
+                            if (code) {
+                                document.getElementById(inputElementId).value = code.data;
+                                stopQrScanner(videoElementId, stopButtonId, stream);
+                            } else {
+                                requestAnimationFrame(scan);
+                            }
+                        } else {
+                            requestAnimationFrame(scan);
+                        }
+                    }
+                    requestAnimationFrame(scan);
+                } catch (error) {
+                    console.error('Erreur lors du démarrage du scanner QR :', error);
+                    showMessage('Échec du démarrage du scanner QR. Veuillez vérifier les permissions de la caméra.', 'error');
+                }
+            }
+
+            function stopQrScanner(videoElementId, stopButtonId, stream) {
+                stream.getTracks().forEach(track => track.stop());
+                document.getElementById(videoElementId).srcObject = null;
+                document.getElementById(videoElementId).parentElement.classList.remove('active');
+            }
+
+            // QR Scanner Event Listeners
+            document.getElementById('startWithdrawalQrScan')?.addEventListener('click', () => startQrScanner('withdrawalQrVideo', 'withdrawalQrCode', 'stopWithdrawalQrScan'));
+            document.getElementById('stopWithdrawalQrScan')?.addEventListener('click', () => {
+                const stream = document.getElementById('withdrawalQrVideo').srcObject;
+                if (stream) stopQrScanner('withdrawalQrVideo', 'stopWithdrawalQrScan', stream);
+            });
+            document.getElementById('startDepositQrScan')?.addEventListener('click', () => startQrScanner('depositQrVideo', 'depositQrCode', 'stopDepositQrScan'));
+            document.getElementById('stopDepositQrScan')?.addEventListener('click', () => {
+                const stream = document.getElementById('depositQrVideo').srcObject;
+                if (stream) stopQrScanner('depositQrVideo', 'stopDepositQrScan', stream);
+            });
+            document.getElementById('startQrDepositScan')?.addEventListener('click', () => startQrScanner('qrDepositVideo', 'qrDepositAgentCode', 'stopQrDepositScan'));
+            document.getElementById('stopQrDepositScan')?.addEventListener('click', () => {
+                const stream = document.getElementById('qrDepositVideo').srcObject;
+                if (stream) stopQrScanner('qrDepositVideo', 'stopQrDepositScan', stream);
+            });
+            document.getElementById('startQrWithdrawalScan')?.addEventListener('click', () => startQrScanner('qrWithdrawalVideo', 'qrWithdrawalAgentCode', 'stopQrWithdrawalScan'));
+            document.getElementById('stopQrWithdrawalScan')?.addEventListener('click', () => {
+                const stream = document.getElementById('qrWithdrawalVideo').srcObject;
+                if (stream) stopQrScanner('qrWithdrawalVideo', 'stopQrWithdrawalScan', stream);
+            });
+
             // Fetch Wallet Balance
             async function fetchWalletBalance() {
                 try {
@@ -820,7 +1101,7 @@
                     balanceProgress.setAttribute('stroke-dasharray', `${activityPercent}, 100`);
                     document.getElementById('aiSummaryText').innerHTML = `Votre solde de portefeuille actuel est de <strong>$${balance.toFixed(2)}</strong>. Gérez vos fonds ci-dessous.`;
                 } catch (error) {
-                    console.error('Erreur lors de la récupération du solde pour la mise à jour de l\'interface utilisateur :', error);
+                    console.error('Erreur lors de la récupération du solde :', error);
                     showMessage('Erreur réseau lors de la récupération du solde.', 'error');
                     walletBalanceElement.textContent = '$0.00';
                 }
@@ -831,18 +1112,13 @@
                 try {
                     const { data, error } = await supabase
                         .from('transactions')
-                        .select('id, amount, transaction_type, description, status, created_at, user_id')
+                        .select('id, amount, transaction_type, description, status, created_at, user_id, service_name, reference_number')
                         .eq('recipient_id', userId)
                         .eq('transaction_type', 'money_request')
                         .eq('status', 'pending')
                         .order('created_at', { ascending: false });
 
-                    if (error) {
-                        console.error('Erreur lors de la récupération des demandes en attente :', error.message);
-                        showMessage('Échec du chargement des demandes en attente.', 'error');
-                        pendingRequestsContainer.innerHTML = '<p class="text-gray-500">Échec du chargement des demandes en attente.</p>';
-                        return;
-                    }
+                    if (error) throw error;
 
                     const pendingRequests = data || [];
                     numPendingRequests.textContent = pendingRequests.length;
@@ -860,20 +1136,17 @@
                         .select('id, full_name')
                         .in('id', senderIds);
 
-                    if (userError) {
-                        console.error('Erreur lors de la récupération des noms d\'utilisateur :', userError.message);
-                    }
+                    if (userError) throw userError;
 
-                    const userMap = users ? users.reduce((map, user) => ({ ...map, [user.id]: user.full_name }), {}) : {};
-
-                    pendingRequestsContainer.innerHTML = pendingRequests
-                        .filter(req => req.transaction_type === 'money_request')
-                        .map(req => `
+                    const userMap = users.reduce((map, user) => ({ ...map, [user.id]: user.full_name }), {});
+                    pendingRequestsContainer.innerHTML = pendingRequests.map(req => `
                         <div class="bg-white p-4 rounded-lg shadow-md mb-4 flex justify-between items-center">
                             <div>
                                 <p><strong>Montant :</strong> $${parseFloat(req.amount).toFixed(2)}</p>
                                 <p><strong>De :</strong> ${userMap[req.user_id] || 'Inconnu'} (ID : ${req.user_id})</p>
                                 <p><strong>Description :</strong> ${req.description || 'N/A'}</p>
+                                ${req.service_name ? `<p><strong>Service :</strong> ${req.service_name}</p>` : ''}
+                                ${req.reference_number ? `<p><strong>Référence :</strong> ${req.reference_number}</p>` : ''}
                             </div>
                             <div class="flex space-x-2">
                                 <button class="btn-primary-action text-xs px-3 py-1 accept-request-btn" data-request-id="${req.id}">
@@ -887,23 +1160,105 @@
                     `).join('');
 
                     pendingRequestsContainer.querySelectorAll('.accept-request-btn').forEach(btn => {
-                        btn.addEventListener('click', () => {
-                            if (!btn.disabled) {
-                                handleAcceptRequest(btn.dataset.requestId);
-                            }
-                        });
+                        btn.addEventListener('click', () => handleAcceptRequest(btn.dataset.requestId));
                     });
                     pendingRequestsContainer.querySelectorAll('.delete-request-btn').forEach(btn => {
-                        btn.addEventListener('click', () => {
-                            if (!btn.disabled) {
-                                handleDeclineRequest(btn.dataset.requestId);
-                            }
-                        });
+                        btn.addEventListener('click', () => handleDeclineRequest(btn.dataset.requestId));
                     });
                 } catch (error) {
                     console.error('Erreur lors de la récupération des demandes en attente :', error);
                     showMessage('Erreur réseau lors du chargement des demandes en attente.', 'error');
                     pendingRequestsContainer.innerHTML = '<p class="text-gray-500">Erreur réseau lors du chargement des demandes en attente.</p>';
+                }
+            }
+
+            // Handle Accept Request
+            async function handleAcceptRequest(requestId) {
+                try {
+                    const { data: request, error: fetchError } = await supabase
+                        .from('transactions')
+                        .select('amount, user_id, description')
+                        .eq('id', requestId)
+                        .eq('recipient_id', userId)
+                        .eq('status', 'pending')
+                        .single();
+
+                    if (fetchError || !request) throw new Error('Demande non trouvée ou déjà traitée.');
+
+                    const balance = await getCalculatedBalance();
+                    if (balance < request.amount) {
+                        showMessage('Solde insuffisant pour accepter la demande.', 'error');
+                        return;
+                    }
+
+                    const netAmount = parseFloat(request.amount) * (1 - TRANSACTION_FEE_RATE);
+                    const { error: updateError } = await supabase
+                        .from('transactions')
+                        .update({ status: 'completed' })
+                        .eq('id', requestId);
+
+                    if (updateError) throw updateError;
+
+                    const { error: txError } = await supabase
+                        .from('transactions')
+                        .insert([
+                            {
+                                user_id: userId,
+                                amount: -request.amount,
+                                transaction_type: 'transfer',
+                                status: 'completed',
+                                description: `Paiement pour demande : ${request.description || 'N/A'}`,
+                                recipient_id: request.user_id,
+                                created_at: new Date().toISOString()
+                            },
+                            {
+                                user_id: request.user_id,
+                                amount: netAmount,
+                                transaction_type: 'transfer',
+                                status: 'completed',
+                                description: `Reçu de ${userName} pour demande : ${request.description || 'N/A'}`,
+                                recipient_id: userId,
+                                created_at: new Date().toISOString()
+                            }
+                        ]);
+
+                    if (txError) throw txError;
+
+                    await supabase.functions.invoke('send-transaction-email', {
+                        body: {
+                            user_id: userId,
+                            transaction_type: 'transfer',
+                            amount: request.amount,
+                            status: 'completed',
+                            description: `Paiement pour demande : ${request.description || 'N/A'}`
+                        }
+                    });
+
+                    showMessage('Demande acceptée et fonds transférés.', 'success');
+                    await Promise.all([fetchPendingRequests(), fetchWalletBalance(), fetchTransactionHistory()]);
+                } catch (error) {
+                    console.error('Erreur lors de l\'acceptation de la demande :', error);
+                    showMessage(`Échec de l\'acceptation : ${error.message}`, 'error');
+                }
+            }
+
+            // Handle Decline Request
+            async function handleDeclineRequest(requestId) {
+                try {
+                    const { error } = await supabase
+                        .from('transactions')
+                        .update({ status: 'failed' })
+                        .eq('id', requestId)
+                        .eq('recipient_id', userId)
+                        .eq('status', 'pending');
+
+                    if (error) throw error;
+
+                    showMessage('Demande refusée.', 'success');
+                    await fetchPendingRequests();
+                } catch (error) {
+                    console.error('Erreur lors du refus de la demande :', error);
+                    showMessage(`Échec du refus : ${error.message}`, 'error');
                 }
             }
 
@@ -915,17 +1270,12 @@
                 try {
                     const { data, error } = await supabase
                         .from('transactions')
-                        .select('id, amount, transaction_type, description, status, created_at, recipient_id, user_id')
+                        .select('id, amount, transaction_type, description, status, created_at, recipient_id, user_id, service_name, reference_number, scheduled_at, is_recurring, recurrence_interval')
                         .or(`user_id.eq.${userId},recipient_id.eq.${userId}`)
                         .order('created_at', { ascending: false })
                         .limit(50);
 
-                    if (error) {
-                        console.error('Erreur lors de la récupération des transactions :', error.message);
-                        showMessage('Échec du chargement des transactions.', 'error');
-                        transactionTableBody.innerHTML = `<tr><td colspan="6" class="text-center text-red-500 py-4">Échec du chargement des transactions : ${error.message}</td></tr>`;
-                        return;
-                    }
+                    if (error) throw error;
 
                     if (!data || data.length === 0) {
                         noTransactionsMessage.classList.remove('hidden');
@@ -939,59 +1289,58 @@
                         .select('id, full_name')
                         .in('id', recipientIds);
 
-                    if (userError) {
-                        console.error('Erreur lors de la récupération des noms d\'utilisateur :', userError.message);
-                    }
+                    if (userError) throw userError;
 
-                    const userMap = users ? users.reduce((map, user) => ({ ...map, [user.id]: user.full_name }), {}) : {};
-
-                    transactionTableBody.innerHTML = '';
-                    data.forEach(tx => {
+                    const userMap = users.reduce((map, user) => ({ ...map, [user.id]: user.full_name }), {});
+                    transactionTableBody.innerHTML = data.map(tx => {
                         const typeClass = {
                             'deposit': 'status-deposit',
                             'withdrawal': 'status-withdrawal',
                             'transfer': 'status-transfer',
-                            'money_request': 'status-request'
-                        }[(tx.transaction_type || '').toLowerCase()] || '';
+                            'money_request': 'status-request',
+                            'bill_payment': 'status-bill-payment',
+                            'cash_transfer': 'status-cash-transfer'
+                        }[tx.transaction_type.toLowerCase()] || '';
                         const statusClass = {
                             'completed': 'status-completed',
                             'pending': 'status-pending',
                             'failed': 'status-failed'
-                        }[(tx.status || '').toLowerCase()] || '';
-
+                        }[tx.status.toLowerCase()] || '';
                         const description = tx.recipient_id && userMap[tx.recipient_id]
                             ? `${tx.description || ''} (À : ${userMap[tx.recipient_id]})`
                             : tx.description || 'N/A';
-
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${new Date(tx.created_at).toLocaleDateString('fr-FR', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</td>
-                            <td><span class="status-badge ${typeClass}">${(tx.transaction_type || '').toUpperCase()}</span></td>
-                            <td>$${parseFloat(tx.amount).toFixed(2)}</td>
-                            <td>${description}</td>
-                            <td><span class="status-badge ${statusClass}">${(tx.status || '').toUpperCase()}</span></td>
-                            <td>
-                                ${(tx.transaction_type || '').toLowerCase() === 'money_request' && tx.status === 'pending' && tx.recipient_id === userId ?
-                                    `<button class="btn-primary-action text-[0.765rem] px-2 py-1 accept-request-btn" data-request-id="${tx.id}"><i class="fas fa-check mr-1"></i>Accepter</button>
-                                     <button class="btn-danger-action text-[0.765rem] px-2 py-1 delete-request-btn ml-1" data-request-id="${tx.id}"><i class="fas fa-times mr-1"></i>Refuser</button>`
-                                    : ''
-                                }
-                            </td>
+                        return `
+                            <tr>
+                                <td>${new Date(tx.created_at).toLocaleDateString('fr-FR', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</td>
+                                <td><span class="status-badge ${typeClass}">${tx.transaction_type.toUpperCase()}</span></td>
+                                <td>$${parseFloat(tx.amount).toFixed(2)}</td>
+                                <td>
+                                    ${description}
+                                    ${tx.service_name ? `<br><strong>Service :</strong> ${tx.service_name}` : ''}
+                                    ${tx.reference_number ? `<br><strong>Référence :</strong> ${tx.reference_number}` : ''}
+                                    ${tx.scheduled_at ? `<br><strong>Programmé :</strong> ${new Date(tx.scheduled_at).toLocaleDateString('fr-FR')}` : ''}
+                                    ${tx.is_recurring ? `<br><strong>Récurrent :</strong> ${tx.recurrence_interval}` : ''}
+                                </td>
+                                <td><span class="status-badge ${statusClass}">${tx.status.toUpperCase()}</span></td>
+                                <td>
+                                    ${tx.transaction_type === 'money_request' && tx.status === 'pending' && tx.recipient_id === userId ?
+                                        `<button class="btn-primary-action text-[0.765rem] px-2 py-1 accept-request-btn" data-request-id="${tx.id}"><i class="fas fa-check mr-1"></i>Accepter</button>
+                                         <button class="btn-danger-action text-[0.765rem] px-2 py-1 delete-request-btn ml-1" data-request-id="${tx.id}"><i class="fas fa-times mr-1"></i>Refuser</button>`
+                                        : `<button class="print-btn" data-transaction-id="${tx.id}"><i class="fas fa-print mr-1"></i>Imprimer</button>`
+                                    }
+                                </td>
+                            </tr>
                         `;
-                        transactionTableBody.appendChild(row);
+                    }).join('');
 
-                        if ((tx.transaction_type || '').toLowerCase() === 'money_request' && tx.status === 'pending' && tx.recipient_id === userId) {
-                            row.querySelector('.accept-request-btn').addEventListener('click', () => {
-                                if (!row.querySelector('.accept-request-btn').disabled) {
-                                    handleAcceptRequest(tx.id);
-                                }
-                            });
-                            row.querySelector('.delete-request-btn').addEventListener('click', () => {
-                                if (!row.querySelector('.delete-request-btn').disabled) {
-                                    handleDeclineRequest(tx.id);
-                                }
-                            });
-                        }
+                    transactionTableBody.querySelectorAll('.accept-request-btn').forEach(btn => {
+                        btn.addEventListener('click', () => handleAcceptRequest(btn.dataset.requestId));
+                    });
+                    transactionTableBody.querySelectorAll('.delete-request-btn').forEach(btn => {
+                        btn.addEventListener('click', () => handleDeclineRequest(btn.dataset.requestId));
+                    });
+                    transactionTableBody.querySelectorAll('.print-btn').forEach(btn => {
+                        btn.addEventListener('click', () => handlePrintTransaction(btn.dataset.transactionId));
                     });
                 } catch (error) {
                     console.error('Erreur lors de la récupération de l\'historique des transactions :', error);
@@ -1000,11 +1349,69 @@
                 }
             }
 
-            // Handle Recipient Search
-            async function handleRecipientSearch(event) {
-                const query = event.target.value.trim();
-                const suggestionsContainer = document.getElementById('recipientSuggestions');
+            // Print Transaction
+            async function handlePrintTransaction(transactionId) {
+                try {
+                    const { data, error } = await supabase
+                        .from('transactions')
+                        .select('id, amount, transaction_type, description, status, created_at, recipient_id, user_id, service_name, reference_number, scheduled_at, is_recurring, recurrence_interval')
+                        .eq('id', transactionId)
+                        .single();
 
+                    if (error) throw error;
+
+                    const recipientId = data.recipient_id;
+                    let recipientName = 'N/A';
+                    if (recipientId) {
+                        const { data: recipient, error: recipientError } = await supabase
+                            .from('users')
+                            .select('full_name')
+                            .eq('id', recipientId)
+                            .single();
+                        if (!recipientError) recipientName = recipient.full_name;
+                    }
+
+                    const printWindow = window.open('', '_blank');
+                    printWindow.document.write(`
+                        <html>
+                            <head><title>Reçu de transaction</title>
+                            <style>
+                                body { font-family: Arial, sans-serif; padding: 20px; }
+                                .receipt { max-width: 600px; margin: auto; border: 1px solid #ccc; padding: 20px; }
+                                h1 { text-align: center; }
+                                p { margin: 10px 0; }
+                            </style>
+                            </head>
+                            <body>
+                                <div class="receipt">
+                                    <h1>Reçu de transaction - nova7</h1>
+                                    <p><strong>ID de transaction :</strong> ${data.id}</p>
+                                    <p><strong>Date :</strong> ${new Date(data.created_at).toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
+                                    <p><strong>Type :</strong> ${data.transaction_type.toUpperCase()}</p>
+                                    <p><strong>Montant :</strong> $${parseFloat(data.amount).toFixed(2)}</p>
+                                    <p><strong>Description :</strong> ${data.description || 'N/A'}</p>
+                                    ${data.service_name ? `<p><strong>Service :</strong> ${data.service_name}</p>` : ''}
+                                    ${data.reference_number ? `<p><strong>Référence :</strong> ${data.reference_number}</p>` : ''}
+                                    ${data.scheduled_at ? `<p><strong>Programmé :</strong> ${new Date(data.scheduled_at).toLocaleDateString('fr-FR')}</p>` : ''}
+                                    ${data.is_recurring ? `<p><strong>Récurrent :</strong> ${data.recurrence_interval}</p>` : ''}
+                                    <p><strong>Statut :</strong> ${data.status.toUpperCase()}</p>
+                                    <p><strong>Destinataire :</strong> ${recipientName}</p>
+                                </div>
+                            </body>
+                        </html>
+                    `);
+                    printWindow.document.close();
+                    printWindow.print();
+                } catch (error) {
+                    console.error('Erreur lors de l\'impression :', error);
+                    showMessage('Erreur lors de l\'impression du reçu.', 'error');
+                }
+            }
+
+            // Handle Business Partner Search
+            const handleBusinessPartnerSearch = debounce(async function(event) {
+                const query = event.target.value.trim();
+                const suggestionsContainer = document.getElementById('businessPartnerSuggestions');
                 if (query.length < 2) {
                     suggestionsContainer.classList.add('hidden');
                     suggestionsContainer.innerHTML = '';
@@ -1012,38 +1419,64 @@
                 }
 
                 try {
-                    let orQueryString = `full_name.ilike.%${query}%,email.ilike.%${query}%`;
-                    const isUUID = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(query);
-                    if (isUUID) {
-                        orQueryString += `,id.eq.${query}`;
-                    }
-
                     const { data, error } = await supabase
                         .from('users')
-                        .select('id, full_name, email')
-                        .or(orQueryString)
+                        .select('id, business_name, email')
+                        .eq('account_type', 'business_partner')
+                        .or(`business_name.ilike.%${query}%,email.ilike.%${query}%,id.eq.${query}`)
                         .neq('id', userId)
                         .limit(5);
 
-                    if (error) {
-                        console.error('Erreur lors de la recherche d\'utilisateurs :', error.message);
-                        showMessage('Erreur lors du chargement des suggestions d\'utilisateurs.', 'error');
-                        suggestionsContainer.innerHTML = '<p class="p-2 text-gray-500">Erreur lors du chargement des suggestions.</p>';
-                        return;
-                    }
+                    if (error) throw error;
 
-                    if (!data || data.length === 0) {
-                        suggestionsContainer.innerHTML = '<p class="p-2 text-gray-500">Aucun utilisateur trouvé.</p>';
-                        suggestionsContainer.classList.remove('hidden');
-                        return;
-                    }
-
-                    suggestionsContainer.innerHTML = data.map(user => `
-                        <div class="suggestion-item flex items-center" data-id="${user.id}" data-email="${user.email}">
-                            <i class="fas fa-user-circle mr-2 text-gray-500"></i>
-                            <div>${user.full_name} (ID : ${user.id}, Email : ${user.email})</div>
+                    suggestionsContainer.innerHTML = data.length ? data.map(user => `
+                        <div class="suggestion-item flex items-center" data-id="${user.id}" data-name="${user.business_name}">
+                            <i class="fas fa-building mr-2 text-gray-500"></i>
+                            <div>${user.business_name} (ID : ${user.id}, Email : ${user.email})</div>
                         </div>
-                    `).join('');
+                    `).join('') : '<p class="p-2 text-gray-500">Aucun partenaire commercial trouvé.</p>';
+                    suggestionsContainer.classList.remove('hidden');
+
+                    suggestionsContainer.querySelectorAll('.suggestion-item').forEach(item => {
+                        item.addEventListener('click', () => {
+                            document.getElementById('billBusinessPartner').value = item.dataset.id;
+                            suggestionsContainer.classList.add('hidden');
+                        });
+                    });
+                } catch (error) {
+                    console.error('Erreur lors de la recherche de partenaires commerciaux :', error);
+                    showMessage('Erreur réseau lors du chargement des suggestions.', 'error');
+                    suggestionsContainer.innerHTML = '<p class="p-2 text-gray-500">Erreur réseau.</p>';
+                    suggestionsContainer.classList.remove('hidden');
+                }
+            }, 300);
+
+            // Handle Recipient Search for Transfer
+            const handleRecipientSearch = debounce(async function(event) {
+                const query = event.target.value.trim();
+                const suggestionsContainer = document.getElementById('recipientSuggestions');
+                if (query.length < 2) {
+                    suggestionsContainer.classList.add('hidden');
+                    suggestionsContainer.innerHTML = '';
+                    return;
+                }
+
+                try {
+                    const { data, error } = await supabase
+                        .from('users')
+                        .select('id, full_name, email')
+                        .or(`full_name.ilike.%${query}%,email.ilike.%${query}%,id.eq.${query}`)
+                        .neq('id', userId)
+                        .limit(5);
+
+                    if (error) throw error;
+
+                    suggestionsContainer.innerHTML = data.length ? data.map(user => `
+                        <div class="suggestion-item flex items-center" data-id="${user.id}" data-name="${user.full_name}">
+                            <i class="fas fa-user mr-2 text-gray-500"></i>
+                            <div>${user.full_name} (Email : ${user.email}, ID : ${user.id})</div>
+                        </div>
+                    `).join('') : '<p class="p-2 text-gray-500">Aucun utilisateur trouvé.</p>';
                     suggestionsContainer.classList.remove('hidden');
 
                     suggestionsContainer.querySelectorAll('.suggestion-item').forEach(item => {
@@ -1053,18 +1486,17 @@
                         });
                     });
                 } catch (error) {
-                    console.error('Erreur de recherche :', error);
+                    console.error('Erreur lors de la recherche d\'utilisateur :', error);
                     showMessage('Erreur réseau lors du chargement des suggestions.', 'error');
                     suggestionsContainer.innerHTML = '<p class="p-2 text-gray-500">Erreur réseau.</p>';
                     suggestionsContainer.classList.remove('hidden');
                 }
-            }
+            }, 300);
 
-            // Handle Sender Search
-            async function handleSenderSearch(event) {
+            // Handle Sender Search for Request
+            const handleSenderSearch = debounce(async function(event) {
                 const query = event.target.value.trim();
                 const suggestionsContainer = document.getElementById('senderSuggestions');
-
                 if (query.length < 2) {
                     suggestionsContainer.classList.add('hidden');
                     suggestionsContainer.innerHTML = '';
@@ -1072,38 +1504,21 @@
                 }
 
                 try {
-                    let orQueryString = `full_name.ilike.%${query}%,email.ilike.%${query}%`;
-                    const isUUID = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(query);
-                    if (isUUID) {
-                        orQueryString += `,id.eq.${query}`;
-                    }
-
                     const { data, error } = await supabase
                         .from('users')
                         .select('id, full_name, email')
-                        .or(orQueryString)
+                        .or(`full_name.ilike.%${query}%,email.ilike.%${query}%,id.eq.${query}`)
                         .neq('id', userId)
                         .limit(5);
 
-                    if (error) {
-                        console.error('Erreur lors de la recherche d\'utilisateurs :', error.message);
-                        showMessage('Erreur lors du chargement des suggestions d\'utilisateurs.', 'error');
-                        suggestionsContainer.innerHTML = '<p class="p-2 text-gray-500">Erreur lors du chargement des suggestions.</p>';
-                        return;
-                    }
+                    if (error) throw error;
 
-                    if (!data || data.length === 0) {
-                        suggestionsContainer.innerHTML = '<p class="p-2 text-gray-500">Aucun utilisateur trouvé.</p>';
-                        suggestionsContainer.classList.remove('hidden');
-                        return;
-                    }
-
-                    suggestionsContainer.innerHTML = data.map(user => `
-                        <div class="suggestion-item flex items-center" data-id="${user.id}" data-email="${user.email}">
-                            <i class="fas fa-user-circle mr-2 text-gray-500"></i>
-                            <div>${user.full_name} (ID : ${user.id}, Email : ${user.email})</div>
+                    suggestionsContainer.innerHTML = data.length ? data.map(user => `
+                        <div class="suggestion-item flex items-center" data-id="${user.id}" data-name="${user.full_name}">
+                            <i class="fas fa-user mr-2 text-gray-500"></i>
+                            <div>${user.full_name} (Email : ${user.email}, ID : ${user.id})</div>
                         </div>
-                    `).join('');
+                    `).join('') : '<p class="p-2 text-gray-500">Aucun utilisateur trouvé.</p>';
                     suggestionsContainer.classList.remove('hidden');
 
                     suggestionsContainer.querySelectorAll('.suggestion-item').forEach(item => {
@@ -1113,221 +1528,713 @@
                         });
                     });
                 } catch (error) {
-                    console.error('Erreur de recherche :', error);
+                    console.error('Erreur lors de la recherche d\'utilisateur :', error);
                     showMessage('Erreur réseau lors du chargement des suggestions.', 'error');
                     suggestionsContainer.innerHTML = '<p class="p-2 text-gray-500">Erreur réseau.</p>';
                     suggestionsContainer.classList.remove('hidden');
                 }
-            }
+            }, 300);
 
-            // Handle Deposit
-            async function handleDeposit(event) {
-                event.preventDefault();
-                const amountInput = document.getElementById('depositAmount');
-                const amount = parseFloat(amountInput.value);
-                const submitBtn = document.getElementById('depositSubmitBtn');
-                const messageDiv = document.getElementById('depositMessage');
-
-                if (isNaN(amount) || amount < 1) {
-                    showMessage('Veuillez entrer un montant valide (minimum 1,00 $).', 'error');
-                    messageDiv.textContent = 'Le dépôt minimum est de 1,00 $.';
+            // Handle Cash Transfer Recipient Search
+            const handleCashTransferSearch = debounce(async function(event) {
+                const query = event.target.value.trim();
+                const suggestionsContainer = document.getElementById('cashTransferSuggestions');
+                if (query.length < 2) {
+                    suggestionsContainer.classList.add('hidden');
+                    suggestionsContainer.innerHTML = '';
                     return;
                 }
-
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Traitement...';
-                messageDiv.textContent = '';
 
                 try {
-                    const { data, error } = await supabase.functions.invoke('create-payment-intent-handler', {
-                        body: { amount: Math.round(amount * 100), user_id: userId }
-                    });
+                    const { data, error } = await supabase
+                        .from('users')
+                        .select('id, full_name, email')
+                        .or(`full_name.ilike.%${query}%,email.ilike.%${query}%,id.eq.${query}`)
+                        .neq('id', userId)
+                        .limit(5);
 
-                    if (error || !data.clientSecret) {
-                        throw new Error(error?.message || 'Impossible de créer l\'intention de paiement.');
-                    }
+                    if (error) throw error;
 
-                    const { paymentIntent, error: stripeError } = await stripe.confirmCardPayment(data.clientSecret, {
-                        payment_method: { card: cardElement }
-                    });
+                    suggestionsContainer.innerHTML = data.length ? data.map(user => `
+                        <div class="suggestion-item flex items-center" data-id="${user.id}" data-name="${user.full_name}">
+                            <i class="fas fa-user mr-2 text-gray-500"></i>
+                            <div>${user.full_name} (Email : ${user.email}, ID : ${user.id})</div>
+                        </div>
+                    `).join('') : '<p class="p-2 text-gray-500">Aucun utilisateur trouvé.</p>';
+                    suggestionsContainer.classList.remove('hidden');
 
-                    if (stripeError) {
-                        throw new Error(stripeError.message);
-                    }
-
-                    const { error: txError } = await supabase
-                        .from('transactions')
-                        .insert({
-                            user_id: userId,
-                            amount: amount,
-                            transaction_type: 'deposit',
-                            status: 'pending',
-                            description: `Dépôt via Stripe (Intention de paiement : ${paymentIntent.id})`,
-                            created_at: new Date().toISOString()
+                    suggestionsContainer.querySelectorAll('.suggestion-item').forEach(item => {
+                        item.addEventListener('click', () => {
+                            const recipientId = item.dataset.id;
+                            const recipientName = item.dataset.name;
+                            if (!recipientList.some(rec => rec.id === recipientId)) {
+                                recipientList.push({ id: recipientId, name: recipientName });
+                                updateRecipientList();
+                            }
+                            document.getElementById('cashTransferRecipient').value = '';
+                            suggestionsContainer.classList.add('hidden');
                         });
-
-                    if (txError) {
-                        console.error('Erreur lors de l\'enregistrement du dépôt :', txError.message);
-                        showMessage('Dépôt initié, mais échec de l\'enregistrement.', 'error');
-                        messageDiv.textContent = 'Échec de l\'enregistrement de la transaction.';
-                        return;
-                    }
-
-                    showMessage('Dépôt initié, en attente de confirmation. Vous recevrez une notification par email.', 'success');
-                    messageDiv.textContent = 'Dépôt initié ! En attente de confirmation.';
-                    amountInput.value = '';
-                    cardElement.clear();
-                    await fetchWalletBalance();
-                    await fetchTransactionHistory();
+                    });
                 } catch (error) {
-                    console.error('Erreur de dépôt :', error);
-                    showMessage(`Échec du dépôt : ${error.message}`, 'error');
-                    messageDiv.textContent = `Erreur : ${error.message}`;
-                } finally {
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<i class="fas fa-money-bill-wave mr-2"></i>Confirmer le dépôt';
+                    console.error('Erreur lors de la recherche d\'utilisateur :', error);
+                    showMessage('Erreur réseau lors du chargement des suggestions.', 'error');
+                    suggestionsContainer.innerHTML = '<p class="p-2 text-gray-500">Erreur réseau.</p>';
+                    suggestionsContainer.classList.remove('hidden');
                 }
+            }, 300);
+
+            // Update Recipient List for Cash Transfer
+            function updateRecipientList() {
+                const recipientListContainer = document.getElementById('recipientList');
+                recipientListContainer.innerHTML = recipientList.length ? recipientList.map(rec => `
+                    <div class="recipient-item">
+                        <span>${rec.name} (ID : ${rec.id})</span>
+                        <button type="button" class="remove-recipient" data-id="${rec.id}"><i class="fas fa-trash"></i> Supprimer</button>
+                    </div>
+                `).join('') : '<p class="text-gray-500">Aucun destinataire ajouté.</p>';
+
+                recipientListContainer.querySelectorAll('.remove-recipient').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        recipientList = recipientList.filter(rec => rec.id !== btn.dataset.id);
+                        updateRecipientList();
+                    });
+                });
             }
 
-            // Handle Withdrawal
-            async function handleWithdrawal(event) {
-                event.preventDefault();
-                const amount = parseFloat(document.getElementById('withdrawalAmount').value);
-                const method = document.getElementById('withdrawalMethod').value;
-                const account = document.getElementById('withdrawalAccount').value.trim();
-                const submitBtn = document.getElementById('withdrawalSubmitBtn');
-                const messageDiv = document.getElementById('withdrawalMessage');
+            // Schedule Payment Toggle
+            const schedulePaymentCheckbox = document.getElementById('schedulePayment');
+            const scheduleOptions = document.getElementById('scheduleOptions');
+            const isRecurringCheckbox = document.getElementById('isRecurring');
+            const recurringOptions = document.getElementById('recurringOptions');
 
-                if (isNaN(amount) || amount < 1 || !method || !account) {
-                    showMessage('Veuillez remplir correctement tous les détails de retrait.', 'error');
-                    messageDiv.textContent = 'Détails de retrait invalides.';
-                    return;
-                }
+            if (schedulePaymentCheckbox && scheduleOptions) {
+                schedulePaymentCheckbox.addEventListener('change', () => {
+                    scheduleOptions.classList.toggle('active', schedulePaymentCheckbox.checked);
+                });
+            }
 
-                if (method === 'office_withdrawal' && account.length < 5) {
-                    showMessage('Veuillez fournir une référence valide pour le retrait au bureau.', 'error');
-                    messageDiv.textContent = 'La référence doit comporter au moins 5 caractères.';
-                    return;
-                }
+            if (isRecurringCheckbox && recurringOptions) {
+                isRecurringCheckbox.addEventListener('change', () => {
+                    recurringOptions.classList.toggle('hidden', !isRecurringCheckbox.checked);
+                });
+            }
 
+            // Form Submissions
+            async function handlePayBillForm(e) {
+                e.preventDefault();
+                const submitBtn = document.getElementById('payBillSubmitBtn');
                 submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Traitement...';
-                messageDiv.textContent = '';
+                const businessPartnerId = document.getElementById('billBusinessPartner').value;
+                const serviceName = document.getElementById('billServiceName').value;
+                const referenceNumber = document.getElementById('billReferenceNumber').value;
+                const amount = parseFloat(document.getElementById('billAmount').value);
+                const messageDiv = document.getElementById('payBillMessage');
+
+                if (!businessPartnerId || !amount || amount < 0.01) {
+                    showMessage('Veuillez remplir tous les champs obligatoires avec des valeurs valides.', 'error');
+                    submitBtn.disabled = false;
+                    return;
+                }
 
                 try {
                     const balance = await getCalculatedBalance();
                     if (balance < amount) {
-                        showMessage('Solde insuffisant pour le retrait. Veuillez recharger votre compte.', 'error');
-                        messageDiv.textContent = 'Solde insuffisant.';
+                        showMessage('Solde insuffisant pour effectuer ce paiement.', 'error');
+                        submitBtn.disabled = false;
                         return;
                     }
 
-                    const description = `Retrait via ${method}: ${account}`;
-                    const { error: txError } = await supabase
+                    const netAmount = amount * (1 - TRANSACTION_FEE_RATE);
+                    const { error } = await supabase
                         .from('transactions')
-                        .insert({
-                            user_id: userId,
-                            amount: -amount,
-                            transaction_type: 'withdrawal',
-                            status: 'pending',
-                            description,
-                            created_at: new Date().toISOString()
-                        });
+                        .insert([
+                            {
+                                user_id: userId,
+                                amount: -amount,
+                                transaction_type: 'bill_payment',
+                                status: 'completed',
+                                description: `Paiement de facture à ${businessPartnerId} pour ${serviceName}`,
+                                recipient_id: businessPartnerId,
+                                service_name: serviceName,
+                                reference_number: referenceNumber || null,
+                                created_at: new Date().toISOString()
+                            },
+                            {
+                                user_id: businessPartnerId,
+                                amount: netAmount,
+                                transaction_type: 'bill_payment',
+                                status: 'completed',
+                                description: `Paiement reçu de ${userName} pour ${serviceName}`,
+                                recipient_id: userId,
+                                service_name: serviceName,
+                                reference_number: referenceNumber || null,
+                                created_at: new Date().toISOString()
+                            }
+                        ]);
 
-                    if (txError) {
-                        console.error('Erreur lors de l\'enregistrement du retrait :', txError.message);
-                        showMessage('Échec du traitement du retrait.', 'error');
-                        messageDiv.textContent = 'Échec du traitement du retrait.';
+                    if (error) throw error;
+
+                    await supabase.functions.invoke('send-transaction-email', {
+                        body: {
+                            user_id: userId,
+                            transaction_type: 'bill_payment',
+                            amount: amount,
+                            status: 'completed',
+                            description: `Paiement de facture à ${businessPartnerId} pour ${serviceName}`,
+                            service_name: serviceName,
+                            reference_number: referenceNumber
+                        }
+                    });
+
+                    showMessage('Paiement de facture effectué avec succès !', 'success');
+                    messageDiv.textContent = 'Paiement effectué avec succès !';
+                    messageDiv.className = 'text-green-500 text-[0.867rem] text-center mt-4';
+                    document.getElementById('payBillForm').reset();
+                    await Promise.all([fetchWalletBalance(), fetchTransactionHistory()]);
+                } catch (error) {
+                    console.error('Erreur lors du paiement de la facture :', error);
+                    showMessage(`Échec du paiement : ${error.message}`, 'error');
+                    messageDiv.textContent = `Échec du paiement : ${error.message}`;
+                    messageDiv.className = 'text-red-500 text-[0.867rem] text-center mt-4';
+                } finally {
+                    submitBtn.disabled = false;
+                }
+            }
+
+            async function handleRetailAgentWithdrawalForm(e) {
+                e.preventDefault();
+                const submitBtn = document.getElementById('retailWithdrawalSubmitBtn');
+                submitBtn.disabled = true;
+                const userCode = document.getElementById('withdrawalQrCode').value;
+                const amount = parseFloat(document.getElementById('retailWithdrawalAmount').value);
+                const messageDiv = document.getElementById('retailWithdrawalMessage');
+
+                if (!userCode || !amount || amount < 0.01) {
+                    showMessage('Veuillez remplir tous les champs obligatoires avec des valeurs valides.', 'error');
+                    submitBtn.disabled = false;
+                    return;
+                }
+
+                try {
+                    const { data: recipient, error: userError } = await supabase
+                        .from('users')
+                        .select('id')
+                        .eq('id', userCode)
+                        .single();
+
+                    if (userError || !recipient) {
+                        showMessage('Utilisateur non trouvé.', 'error');
+                        submitBtn.disabled = false;
                         return;
                     }
 
-                    // Trigger email notification
+                    const balance = await getCalculatedBalance();
+                    if (balance < amount) {
+                        showMessage('Solde insuffisant pour effectuer ce retrait.', 'error');
+                        submitBtn.disabled = false;
+                        return;
+                    }
+
+                    const netAmount = amount * (1 - TRANSACTION_FEE_RATE);
+                    const { error } = await supabase
+                        .from('transactions')
+                        .insert([
+                            {
+                                user_id: recipient.id,
+                                amount: -amount,
+                                transaction_type: 'withdrawal',
+                                status: 'completed',
+                                description: `Retrait traité par l\'agent ${userName}`,
+                                recipient_id: userId,
+                                created_at: new Date().toISOString()
+                            },
+                            {
+                                user_id: userId,
+                                amount: netAmount,
+                                transaction_type: 'withdrawal',
+                                status: 'completed',
+                                description: `Retrait pour l\'utilisateur ${recipient.id}`,
+                                recipient_id: recipient.id,
+                                created_at: new Date().toISOString()
+                            }
+                        ]);
+
+                    if (error) throw error;
+
                     await supabase.functions.invoke('send-transaction-email', {
                         body: {
                             user_id: userId,
                             transaction_type: 'withdrawal',
                             amount: amount,
-                            status: 'pending',
-                            description
+                            status: 'completed',
+                            description: `Retrait traité pour l\'utilisateur ${recipient.id}`
                         }
                     });
 
-                    showMessage('Demande de retrait soumise avec succès ! Une notification a été envoyée par email.', 'success');
-                    messageDiv.textContent = 'Demande de retrait soumise !';
-                    document.getElementById('withdrawalForm').reset();
-                    await fetchWalletBalance();
-                    await fetchTransactionHistory();
+                    showMessage('Retrait traité avec succès !', 'success');
+                    messageDiv.textContent = 'Retrait traité avec succès !';
+                    messageDiv.className = 'text-green-500 text-[0.867rem] text-center mt-4';
+                    document.getElementById('retailAgentWithdrawalForm').reset();
+                    await Promise.all([fetchWalletBalance(), fetchTransactionHistory()]);
                 } catch (error) {
-                    console.error('Erreur de retrait :', error);
+                    console.error('Erreur lors du traitement du retrait :', error);
                     showMessage(`Échec du retrait : ${error.message}`, 'error');
-                    messageDiv.textContent = `Erreur : ${error.message}`;
+                    messageDiv.textContent = `Échec du retrait : ${error.message}`;
+                    messageDiv.className = 'text-red-500 text-[0.867rem] text-center mt-4';
                 } finally {
                     submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Confirmer le retrait';
                 }
             }
 
-            // Handle Transfer
-            async function handleTransfer(event) {
-                event.preventDefault();
-                const recipientInput = document.getElementById('transferRecipient');
-                const amountInput = document.getElementById('transferAmount');
-                const recipient = recipientInput.value.trim();
-                const amount = parseFloat(amountInput.value);
-                const submitBtn = document.getElementById('transferSubmitBtn');
-                const messageDiv = document.getElementById('transferMessage');
-                const suggestionsContainer = document.getElementById('recipientSuggestions');
+            async function handleRetailAgentDepositForm(e) {
+                e.preventDefault();
+                const submitBtn = document.getElementById('retailDepositSubmitBtn');
+                submitBtn.disabled = true;
+                const userCode = document.getElementById('depositQrCode').value;
+                const amount = parseFloat(document.getElementById('retailDepositAmount').value);
+                const messageDiv = document.getElementById('retailDepositMessage');
 
-                if (!recipient || isNaN(amount) || amount <= 0) {
-                    showMessage('Veuillez entrer un destinataire et un montant valides.', 'error');
-                    messageDiv.textContent = 'Destinataire ou montant invalide.';
+                if (!userCode || !amount || amount < 0.01) {
+                    showMessage('Veuillez remplir tous les champs obligatoires avec des valeurs valides.', 'error');
+                    submitBtn.disabled = false;
                     return;
                 }
 
+                try {
+                    const { data: recipient, error: userError } = await supabase
+                        .from('users')
+                        .select('id')
+                        .eq('id', userCode)
+                        .single();
+
+                    if (userError || !recipient) {
+                        showMessage('Utilisateur non trouvé.', 'error');
+                        submitBtn.disabled = false;
+                        return;
+                    }
+
+                    const { error } = await supabase
+                        .from('transactions')
+                        .insert([
+                            {
+                                user_id: userId,
+                                amount: -amount,
+                                transaction_type: 'deposit',
+                                status: 'completed',
+                                description: `Dépôt traité pour l\'utilisateur ${recipient.id}`,
+                                recipient_id: recipient.id,
+                                created_at: new Date().toISOString()
+                            },
+                            {
+                                user_id: recipient.id,
+                                amount: amount,
+                                transaction_type: 'deposit',
+                                status: 'completed',
+                                description: `Dépôt reçu de l\'agent ${userName}`,
+                                recipient_id: userId,
+                                created_at: new Date().toISOString()
+                            }
+                        ]);
+
+                    if (error) throw error;
+
+                    await supabase.functions.invoke('send-transaction-email', {
+                        body: {
+                            user_id: userId,
+                            transaction_type: 'deposit',
+                            amount: amount,
+                            status: 'completed',
+                            description: `Dépôt traité pour l\'utilisateur ${recipient.id}`
+                        }
+                    });
+
+                    showMessage('Dépôt traité avec succès !', 'success');
+                    messageDiv.textContent = 'Dépôt traité avec succès !';
+                    messageDiv.className = 'text-green-500 text-[0.867rem] text-center mt-4';
+                    document.getElementById('retailAgentDepositForm').reset();
+                    await Promise.all([fetchWalletBalance(), fetchTransactionHistory()]);
+                } catch (error) {
+                    console.error('Erreur lors du traitement du dépôt :', error);
+                    showMessage(`Échec du dépôt : ${error.message}`, 'error');
+                    messageDiv.textContent = `Échec du dépôt : ${error.message}`;
+                    messageDiv.className = 'text-red-500 text-[0.867rem] text-center mt-4';
+                } finally {
+                    submitBtn.disabled = false;
+                }
+            }
+
+            async function handleQrDepositForm(e) {
+                e.preventDefault();
+                const submitBtn = document.getElementById('qrDepositSubmitBtn');
                 submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Traitement...';
-                messageDiv.textContent = '';
-                suggestionsContainer.classList.add('hidden');
+                const agentCode = document.getElementById('qrDepositAgentCode').value;
+                const amount = parseFloat(document.getElementById('qrDepositAmount').value);
+                const messageDiv = document.getElementById('qrDepositMessage');
+
+                if (!agentCode || !amount || amount < 0.01) {
+                    showMessage('Veuillez remplir tous les champs obligatoires avec des valeurs valides.', 'error');
+                    submitBtn.disabled = false;
+                    return;
+                }
 
                 try {
-                    const { data: recipientData, error: recipientError } = await supabase
+                    const { data: agent, error: agentError } = await supabase
+                        .from('users')
+                        .select('id')
+                        .eq('id', agentCode)
+                        .eq('account_type', 'retail_agent')
+                        .single();
+
+                    if (agentError || !agent) {
+                        showMessage('Agent non trouvé.', 'error');
+                        submitBtn.disabled = false;
+                        return;
+                    }
+
+                    const { error } = await supabase
+                        .from('transactions')
+                        .insert([
+                            {
+                                user_id: userId,
+                                amount: amount,
+                                transaction_type: 'deposit',
+                                status: 'completed',
+                                description: `Dépôt via l\'agent ${agent.id}`,
+                                recipient_id: agent.id,
+                                created_at: new Date().toISOString()
+                            },
+                            {
+                                user_id: agent.id,
+                                amount: -amount,
+                                transaction_type: 'deposit',
+                                status: 'completed',
+                                description: `Dépôt traité pour l\'utilisateur ${userName}`,
+                                recipient_id: userId,
+                                created_at: new Date().toISOString()
+                            }
+                        ]);
+
+                    if (error) throw error;
+
+                    await supabase.functions.invoke('send-transaction-email', {
+                        body: {
+                            user_id: userId,
+                            transaction_type: 'deposit',
+                            amount: amount,
+                            status: 'completed',
+                            description: `Dépôt via l\'agent ${agent.id}`
+                        }
+                    });
+
+                    showMessage('Dépôt effectué avec succès !', 'success');
+                    messageDiv.textContent = 'Dépôt effectué avec succès !';
+                    messageDiv.className = 'text-green-500 text-[0.867rem] text-center mt-4';
+                    document.getElementById('qrDepositForm').reset();
+                    await Promise.all([fetchWalletBalance(), fetchTransactionHistory()]);
+                } catch (error) {
+                    console.error('Erreur lors du dépôt :', error);
+                    showMessage(`Échec du dépôt : ${error.message}`, 'error');
+                    messageDiv.textContent = `Échec du dépôt : ${error.message}`;
+                    messageDiv.className = 'text-red-500 text-[0.867rem] text-center mt-4';
+                } finally {
+                    submitBtn.disabled = false;
+                }
+            }
+
+            async function handleQrWithdrawalForm(e) {
+                e.preventDefault();
+                const submitBtn = document.getElementById('qrWithdrawalSubmitBtn');
+                submitBtn.disabled = true;
+                const agentCode = document.getElementById('qrWithdrawalAgentCode').value;
+                const amount = parseFloat(document.getElementById('qrWithdrawalAmount').value);
+                const messageDiv = document.getElementById('qrWithdrawalMessage');
+
+                if (!agentCode || !amount || amount < 0.01) {
+                    showMessage('Veuillez remplir tous les champs obligatoires avec des valeurs valides.', 'error');
+                    submitBtn.disabled = false;
+                    return;
+                }
+
+                try {
+                    const { data: agent, error: agentError } = await supabase
+                        .from('users')
+                        .select('id')
+                        .eq('id', agentCode)
+                        .eq('account_type', 'retail_agent')
+                        .single();
+
+                    if (agentError || !agent) {
+                        showMessage('Agent non trouvé.', 'error');
+                        submitBtn.disabled = false;
+                        return;
+                    }
+
+                    const balance = await getCalculatedBalance();
+                    if (balance < amount) {
+                        showMessage('Solde insuffisant pour effectuer ce retrait.', 'error');
+                        submitBtn.disabled = false;
+                        return;
+                    }
+
+                    const netAmount = amount * (1 - TRANSACTION_FEE_RATE);
+                    const { error } = await supabase
+                        .from('transactions')
+                        .insert([
+                            {
+                                user_id: userId,
+                                amount: -amount,
+                                transaction_type: 'withdrawal',
+                                status: 'completed',
+                                description: `Retrait via l\'agent ${agent.id}`,
+                                recipient_id: agent.id,
+                                created_at: new Date().toISOString()
+                            },
+                            {
+                                user_id: agent.id,
+                                amount: netAmount,
+                                transaction_type: 'withdrawal',
+                                status: 'completed',
+                                description: `Retrait traité pour l\'utilisateur ${userName}`,
+                                recipient_id: userId,
+                                created_at: new Date().toISOString()
+                            }
+                        ]);
+
+                    if (error) throw error;
+
+                    await supabase.functions.invoke('send-transaction-email', {
+                        body: {
+                            user_id: userId,
+                            transaction_type: 'withdrawal',
+                            amount: amount,
+                            status: 'completed',
+                            description: `Retrait via l\'agent ${agent.id}`
+                        }
+                    });
+
+                    showMessage('Retrait effectué avec succès !', 'success');
+                    messageDiv.textContent = 'Retrait effectué avec succès !';
+                    messageDiv.className = 'text-green-500 text-[0.867rem] text-center mt-4';
+                    document.getElementById('qrWithdrawalForm').reset();
+                    await Promise.all([fetchWalletBalance(), fetchTransactionHistory()]);
+                } catch (error) {
+                    console.error('Erreur lors du retrait :', error);
+                    showMessage(`Échec du retrait : ${error.message}`, 'error');
+                    messageDiv.textContent = `Échec du retrait : ${error.message}`;
+                    messageDiv.className = 'text-red-500 text-[0.867rem] text-center mt-4';
+                } finally {
+                    submitBtn.disabled = false;
+                }
+            }
+
+            async function handleCashTransferForm(e) {
+                e.preventDefault();
+                const submitBtn = document.getElementById('cashTransferSubmitBtn');
+                submitBtn.disabled = true;
+                const amount = parseFloat(document.getElementById('cashTransferAmount').value);
+                const scheduleDate = document.getElementById('scheduleDate').value;
+                const isRecurring = document.getElementById('isRecurring').checked;
+                const recurrenceInterval = document.getElementById('recurrenceInterval').value;
+                const messageDiv = document.getElementById('cashTransferMessage');
+
+                if (!recipientList.length || !amount || amount < 0.01) {
+                    showMessage('Veuillez ajouter au moins un destinataire et un montant valide.', 'error');
+                    submitBtn.disabled = false;
+                    return;
+                }
+
+                try {
+                    const balance = await getCalculatedBalance();
+                    if (balance < amount * recipientList.length) {
+                        showMessage('Solde insuffisant pour effectuer ce transfert.', 'error');
+                        submitBtn.disabled = false;
+                        return;
+                    }
+
+                    const transactions = [];
+                    const netAmount = amount * (1 - TRANSACTION_FEE_RATE);
+                    for (const recipient of recipientList) {
+                        transactions.push(
+                            {
+                                user_id: userId,
+                                amount: -amount,
+                                transaction_type: 'cash_transfer',
+                                status: scheduleDate ? 'pending' : 'completed',
+                                description: `Transfert de fonds à ${recipient.name}`,
+                                recipient_id: recipient.id,
+                                created_at: new Date().toISOString(),
+                                scheduled_at: scheduleDate || null,
+                                is_recurring: isRecurring,
+                                recurrence_interval: isRecurring ? recurrenceInterval : null
+                            },
+                            {
+                                user_id: recipient.id,
+                                amount: netAmount,
+                                transaction_type: 'cash_transfer',
+                                status: scheduleDate ? 'pending' : 'completed',
+                                description: `Transfert reçu de ${userName}`,
+                                recipient_id: userId,
+                                created_at: new Date().toISOString(),
+                                scheduled_at: scheduleDate || null,
+                                is_recurring: isRecurring,
+                                recurrence_interval: isRecurring ? recurrenceInterval : null
+                            }
+                        );
+                    }
+
+                    const { error } = await supabase
+                        .from('transactions')
+                        .insert(transactions);
+
+                    if (error) throw error;
+
+                    await supabase.functions.invoke('send-transaction-email', {
+                        body: {
+                            user_id: userId,
+                            transaction_type: 'cash_transfer',
+                            amount: amount * recipientList.length,
+                            status: scheduleDate ? 'pending' : 'completed',
+                            description: `Transfert de fonds à ${recipientList.length} destinataires`,
+                            scheduled_at: scheduleDate || null,
+                            is_recurring: isRecurring,
+                            recurrence_interval: isRecurring ? recurrenceInterval : null
+                        }
+                    });
+
+                    showMessage('Transfert de fonds effectué avec succès !', 'success');
+                    messageDiv.textContent = 'Transfert effectué avec succès !';
+                    messageDiv.className = 'text-green-500 text-[0.867rem] text-center mt-4';
+                    document.getElementById('cashTransferForm').reset();
+                    recipientList = [];
+                    updateRecipientList();
+                    scheduleOptions.classList.remove('active');
+                    recurringOptions.classList.add('hidden');
+                    await Promise.all([fetchWalletBalance(), fetchTransactionHistory()]);
+                } catch (error) {
+                    console.error('Erreur lors du transfert de fonds :', error);
+                    showMessage(`Échec du transfert : ${error.message}`, 'error');
+                    messageDiv.textContent = `Échec du transfert : ${error.message}`;
+                    messageDiv.className = 'text-red-500 text-[0.867rem] text-center mt-4';
+                } finally {
+                    submitBtn.disabled = false;
+                }
+            }
+
+            async function handleDepositForm(e) {
+                e.preventDefault();
+                const submitBtn = document.getElementById('depositSubmitBtn');
+                submitBtn.disabled = true;
+                const amount = parseFloat(document.getElementById('depositAmount').value);
+                const messageDiv = document.getElementById('depositMessage');
+
+                if (!amount || amount < 1) {
+                    showMessage('Veuillez entrer un montant valide (minimum 1,00 $).', 'error');
+                    submitBtn.disabled = false;
+                    return;
+                }
+
+                try {
+                    const { paymentIntent, error: stripeError } = await stripe.createPaymentIntent({
+                        amount: Math.round(amount * 100),
+                        currency: 'usd',
+                        payment_method_types: ['card'],
+                    });
+
+                    if (stripeError) {
+                        showMessage(`Échec du dépôt : ${stripeError.message}`, 'error');
+                        messageDiv.textContent = `Échec du dépôt : ${stripeError.message}`;
+                        messageDiv.className = 'text-red-500 text-[0.867rem] text-center mt-4';
+                        submitBtn.disabled = false;
+                        return;
+                    }
+
+                    const { error: confirmError } = await stripe.confirmCardPayment(paymentIntent.client_secret, {
+                        payment_method: { card: cardElement }
+                    });
+
+                    if (confirmError) {
+                        showMessage(`Échec du dépôt : ${confirmError.message}`, 'error');
+                        messageDiv.textContent = `Échec du dépôt : ${confirmError.message}`;
+                        messageDiv.className = 'text-red-500 text-[0.867rem] text-center mt-4';
+                        submitBtn.disabled = false;
+                        return;
+                    }
+
+                    const { error } = await supabase
+                        .from('transactions')
+                        .insert({
+                            user_id: userId,
+                            amount: amount,
+                            transaction_type: 'deposit',
+                            status: 'completed',
+                            description: 'Dépôt via Stripe',
+                            created_at: new Date().toISOString()
+                        });
+
+                    if (error) throw error;
+
+                    await supabase.functions.invoke('send-transaction-email', {
+                        body: {
+                            user_id: userId,
+                            transaction_type: 'deposit',
+                            amount: amount,
+                            status: 'completed',
+                            description: 'Dépôt via Stripe'
+                        }
+                    });
+
+                    showMessage('Dépôt effectué avec succès !', 'success');
+                    messageDiv.textContent = 'Dépôt effectué avec succès !';
+                    messageDiv.className = 'text-green-500 text-[0.867rem] text-center mt-4';
+                    document.getElementById('depositForm').reset();
+                    cardElement.clear();
+                    await Promise.all([fetchWalletBalance(), fetchTransactionHistory()]);
+                } catch (error) {
+                    console.error('Erreur lors du dépôt :', error);
+                    showMessage(`Échec du dépôt : ${error.message}`, 'error');
+                    messageDiv.textContent = `Échec du dépôt : ${error.message}`;
+                    messageDiv.className = 'text-red-500 text-[0.867rem] text-center mt-4';
+                } finally {
+                    submitBtn.disabled = false;
+                }
+            }
+
+            async function handleTransferForm(e) {
+                e.preventDefault();
+                const submitBtn = document.getElementById('transferSubmitBtn');
+                submitBtn.disabled = true;
+                const recipientId = document.getElementById('transferRecipient').value;
+                const amount = parseFloat(document.getElementById('transferAmount').value);
+                const messageDiv = document.getElementById('transferMessage');
+
+                if (!recipientId || !amount || amount < 0.01) {
+                    showMessage('Veuillez remplir tous les champs obligatoires avec des valeurs valides.', 'error');
+                    submitBtn.disabled = false;
+                    return;
+                }
+
+                try {
+                    const { data: recipient, error: userError } = await supabase
                         .from('users')
                         .select('id, full_name')
-                        .or(`email.eq.${recipient},id.eq.${recipient},full_name.ilike.${recipient}`)
-                        .maybeSingle();
+                        .eq('id', recipientId)
+                        .single();
 
-                    if (recipientError || !recipientData) {
-                        console.error('Erreur de recherche du destinataire :', recipientError?.message);
+                    if (userError || !recipient) {
                         showMessage('Destinataire non trouvé.', 'error');
-                        messageDiv.textContent = 'Destinataire non trouvé.';
-                        return;
-                    }
-
-                    const recipientId = recipientData.id;
-                    const recipientName = recipientData.full_name;
-                    if (recipientId === userId) {
-                        showMessage('Impossible de vous transférer de l\'argent.', 'error');
-                        messageDiv.textContent = 'Impossible de vous transférer de l\'argent.';
-                        return;
-                    }
-
-                    if (!confirm(`Envoyer ${amount.toFixed(2)} $ à ${recipientName} (ID : ${recipientId}) ?`)) {
                         submitBtn.disabled = false;
-                        submitBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Confirmer le transfert';
                         return;
                     }
 
-                    const { data: balanceData, error: balanceError } = await supabase.from('user_balances').select('balance').eq('user_id', userId).single(); const balance = balanceError ? 0 : balanceData.balance;
+                    const balance = await getCalculatedBalance();
                     if (balance < amount) {
-                        showMessage('Solde insuffisant pour le transfert. Veuillez recharger votre compte.', 'error');
-                        messageDiv.textContent = 'Solde insuffisant.';
+                        showMessage('Solde insuffisant pour effectuer ce transfert.', 'error');
+                        submitBtn.disabled = false;
                         return;
                     }
 
-                    const senderDescription = `Transfert à ${recipientName} (ID : ${recipientId})`;
-                    const recipientDescription = `Transfert de ${userName} (ID : ${userId})`;
                     const netAmount = amount * (1 - TRANSACTION_FEE_RATE);
-                    const { error: txError } = await supabase
+                    const { error } = await supabase
                         .from('transactions')
                         .insert([
                             {
@@ -1335,7 +2242,7 @@
                                 amount: -amount,
                                 transaction_type: 'transfer',
                                 status: 'completed',
-                                description: senderDescription,
+                                description: `Transfert à ${recipient.full_name}`,
                                 recipient_id: recipientId,
                                 created_at: new Date().toISOString()
                             },
@@ -1344,339 +2251,197 @@
                                 amount: netAmount,
                                 transaction_type: 'transfer',
                                 status: 'completed',
-                                description: recipientDescription,
-                                recipient_id: userId, // Set to sender's userId to satisfy RLS policy
+                                description: `Transfert reçu de ${userName}`,
+                                recipient_id: userId,
                                 created_at: new Date().toISOString()
                             }
                         ]);
 
-                    if (txError) {
-                        console.error('Erreur lors de l\'enregistrement du transfert :', txError.message);
-                        showMessage('Échec de l\'enregistrement du transfert.', 'error');
-                        messageDiv.textContent = 'Échec de l\'enregistrement du transfert.';
-                        return;
-                    }
+                    if (error) throw error;
 
-                    // Trigger email notifications for both sender and recipient
-                    await Promise.all([
-                        supabase.functions.invoke('send-transaction-email', {
-                            body: {
-                                user_id: userId,
-                                transaction_type: 'transfer',
-                                amount: amount,
-                                status: 'completed',
-                                description: senderDescription
-                            }
-                        }),
-                        supabase.functions.invoke('send-transaction-email', {
-                            body: {
-                                user_id: recipientId,
-                                transaction_type: 'transfer',
-                                amount: netAmount,
-                                status: 'completed',
-                                description: recipientDescription
-                            }
-                        })
-                    ]);
+                    await supabase.functions.invoke('send-transaction-email', {
+                        body: {
+                            user_id: userId,
+                            transaction_type: 'transfer',
+                            amount: amount,
+                            status: 'completed',
+                            description: `Transfert à ${recipient.full_name}`
+                        }
+                    });
 
-                    showMessage('Transfert réussi ! Une notification a été envoyée par email.', 'success');
-                    messageDiv.textContent = 'Fonds transférés avec succès !';
+                    showMessage('Transfert effectué avec succès !', 'success');
+                    messageDiv.textContent = 'Transfert effectué avec succès !';
+                    messageDiv.className = 'text-green-500 text-[0.867rem] text-center mt-4';
                     document.getElementById('transferForm').reset();
-                    await fetchWalletBalance();
-                    await fetchTransactionHistory();
-                    await fetchPendingRequests();
+                    await Promise.all([fetchWalletBalance(), fetchTransactionHistory()]);
                 } catch (error) {
-                    console.error('Erreur de transfert :', error);
+                    console.error('Erreur lors du transfert :', error);
                     showMessage(`Échec du transfert : ${error.message}`, 'error');
-                    messageDiv.textContent = `Erreur : ${error.message}`;
+                    messageDiv.textContent = `Échec du transfert : ${error.message}`;
+                    messageDiv.className = 'text-red-500 text-[0.867rem] text-center mt-4';
                 } finally {
                     submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Confirmer le transfert';
                 }
             }
 
-            // Handle Request Money
-            async function handleRequestMoney(event) {
-                event.preventDefault();
-                const senderInput = document.getElementById('requestSender');
-                const amountInput = document.getElementById('requestAmount');
-                const sender = senderInput.value.trim();
-                const amount = parseFloat(amountInput.value);
+            async function handleRequestForm(e) {
+                e.preventDefault();
                 const submitBtn = document.getElementById('requestSubmitBtn');
+                submitBtn.disabled = true;
+                const senderId = document.getElementById('requestSender').value;
+                const amount = parseFloat(document.getElementById('requestAmount').value);
                 const messageDiv = document.getElementById('requestMessage');
-                const suggestionsContainer = document.getElementById('senderSuggestions');
 
-                if (!sender || isNaN(amount) || amount <= 0) {
-                    showMessage('Veuillez entrer un expéditeur et un montant valides.', 'error');
-                    messageDiv.textContent = 'Expéditeur ou montant invalide.';
+                if (!senderId || !amount || amount < 0.01) {
+                    showMessage('Veuillez remplir tous les champs obligatoires avec des valeurs valides.', 'error');
+                    submitBtn.disabled = false;
                     return;
                 }
 
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Envoi de la demande...';
-                messageDiv.textContent = '';
-                suggestionsContainer.classList.add('hidden');
-
                 try {
-                    const { data: senderData, error: senderError } = await supabase
+                    const { data: sender, error: userError } = await supabase
                         .from('users')
                         .select('id, full_name')
-                        .or(`email.eq.${sender},id.eq.${sender},full_name.ilike.${sender}`)
-                        .maybeSingle();
+                        .eq('id', senderId)
+                        .single();
 
-                    if (senderError || !senderData) {
-                        console.error('Erreur de recherche de l\'expéditeur :', senderError?.message);
-                        showMessage('Expéditeur non trouvé.', 'error');
-                        messageDiv.textContent = 'Expéditeur non trouvé.';
+                    if (userError || !sender) {
+                        showMessage('Utilisateur non trouvé.', 'error');
+                        submitBtn.disabled = false;
                         return;
                     }
 
-                    const senderId = senderData.id;
-                    const senderName = senderData.full_name;
-                    if (senderId === userId) {
-                        showMessage('Impossible de vous demander de l\'argent à vous-même.', 'error');
-                        messageDiv.textContent = 'Impossible de vous demander de l\'argent à vous-même.';
-                        return;
-                    }
-
-                    const description = `Demande d'argent à ${senderName} (ID : ${senderId})`;
-                    const { error: txError } = await supabase
+                    const { error } = await supabase
                         .from('transactions')
                         .insert({
                             user_id: userId,
                             amount: amount,
                             transaction_type: 'money_request',
                             status: 'pending',
-                            description,
+                            description: `Demande d\'argent à ${sender.full_name}`,
                             recipient_id: senderId,
                             created_at: new Date().toISOString()
                         });
 
-                    if (txError) {
-                        console.error('Erreur lors de la création de la demande :', txError.message);
-                        showMessage('Échec de l\'envoi de la demande.', 'error');
-                        messageDiv.textContent = 'Échec de l\'envoi de la demande.';
-                        return;
-                    }
+                    if (error) throw error;
 
-                    // Trigger email notification for the requester
                     await supabase.functions.invoke('send-transaction-email', {
                         body: {
                             user_id: userId,
                             transaction_type: 'money_request',
                             amount: amount,
                             status: 'pending',
-                            description
+                            description: `Demande d\'argent à ${sender.full_name}`
                         }
                     });
 
-                    showMessage('Demande envoyée avec succès ! Une notification a été envoyée par email.', 'success');
+                    showMessage('Demande d\'argent envoyée avec succès !', 'success');
                     messageDiv.textContent = 'Demande envoyée avec succès !';
+                    messageDiv.className = 'text-green-500 text-[0.867rem] text-center mt-4';
                     document.getElementById('requestForm').reset();
-                    await fetchPendingRequests();
-                    await fetchTransactionHistory();
+                    await Promise.all([fetchPendingRequests(), fetchTransactionHistory()]);
                 } catch (error) {
-                    console.error('Erreur de demande d\'argent :', error);
+                    console.error('Erreur lors de la demande d\'argent :', error);
                     showMessage(`Échec de la demande : ${error.message}`, 'error');
-                    messageDiv.textContent = `Erreur : ${error.message}`;
+                    messageDiv.textContent = `Échec de la demande : ${error.message}`;
+                    messageDiv.className = 'text-red-500 text-[0.867rem] text-center mt-4';
                 } finally {
                     submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<i class="fas fa-hand-holding-usd mr-2"></i>Envoyer la demande';
                 }
             }
 
-            // Handle Accept Request
-            async function handleAcceptRequest(requestId) {
-                if (!confirm('Êtes-vous sûr de vouloir accepter cette demande d\'argent ?')) return;
+            async function handleWithdrawalForm(e) {
+                e.preventDefault();
+                const submitBtn = document.getElementById('withdrawalSubmitBtn');
+                submitBtn.disabled = true;
+                const amount = parseFloat(document.getElementById('withdrawalAmount').value);
+                const method = document.getElementById('withdrawalMethod').value;
+                const account = document.getElementById('withdrawalAccount').value;
+                const messageDiv = document.getElementById('withdrawalMessage');
+
+                if (!amount || amount < 1 || !method || !account) {
+                    showMessage('Veuillez remplir tous les champs obligatoires avec des valeurs valides.', 'error');
+                    submitBtn.disabled = false;
+                    return;
+                }
 
                 try {
-                    const { data: request, error: fetchError } = await supabase
-                        .from('transactions')
-                        .select('amount, user_id, description')
-                        .eq('id', requestId)
-                        .eq('status', 'pending')
-                        .eq('transaction_type', 'money_request')
-                        .eq('recipient_id', userId)
-                        .single();
-
-                    if (fetchError || !request) {
-                        console.error('Erreur lors de la récupération de la demande :', fetchError?.message);
-                        showMessage('Demande non trouvée ou déjà traitée.', 'error');
-                        return;
-                    }
-
-                    const amount = parseFloat(request.amount);
-                    const requesterId = request.user_id;
-
                     const balance = await getCalculatedBalance();
                     if (balance < amount) {
-                        showMessage('Solde insuffisant pour accepter la demande. Veuillez recharger votre compte.', 'error');
-                        return;
-                    }
-
-                    const { data: requesterData, error: requesterError } = await supabase
-                        .from('users')
-                        .select('full_name')
-                        .eq('id', requesterId)
-                        .single();
-
-                    if (requesterError) {
-                        console.error('Erreur lors de la récupération du nom du demandeur :', requesterError.message);
-                    }
-
-                    const requesterName = requesterData?.full_name || 'Inconnu';
-                    const senderDescription = `Demande d'argent acceptée ${requestId} à ${requesterName} (ID : ${requesterId})`;
-                    const recipientDescription = `Reçu de la demande acceptée ${requestId} de ${userName} (ID : ${userId})`;
-                    const netAmount = amount * (1 - TRANSACTION_FEE_RATE);
-                    const { error: updateError } = await supabase
-                        .from('transactions')
-                        .insert([
-                            {
-                                user_id: userId,
-                                amount: -amount,
-                                transaction_type: 'transfer',
-                                status: 'completed',
-                                description: senderDescription,
-                                recipient_id: requesterId,
-                                created_at: new Date().toISOString()
-                            },
-                            {
-                                user_id: requesterId,
-                                amount: netAmount,
-                                transaction_type: 'transfer',
-                                status: 'completed',
-                                description: recipientDescription,
-                                recipient_id: userId,
-                                created_at: new Date().toISOString()
-                            }
-                        ]);
-
-                    if (updateError) {
-                        console.error('Erreur lors du traitement de la demande :', updateError.message);
-                        showMessage('Échec de l\'acceptation de la demande.', 'error');
-                        return;
-                    }
-
-                    const { error: statusError } = await supabase
-                        .from('transactions')
-                        .update({ status: 'completed' })
-                        .eq('id', requestId)
-                        .eq('transaction_type', 'money_request');
-
-                    if (statusError) {
-                        console.error('Erreur lors de la mise à jour du statut de la demande :', statusError.message);
-                        showMessage('Demande acceptée, mais la mise à jour du statut a échoué.', 'error');
-                        return;
-                    }
-
-                    // Trigger email notifications for both accepter and requester
-                    await Promise.all([
-                        supabase.functions.invoke('send-transaction-email', {
-                            body: {
-                                user_id: userId,
-                                transaction_type: 'transfer',
-                                amount: amount,
-                                status: 'completed',
-                                description: senderDescription
-                            }
-                        }),
-                        supabase.functions.invoke('send-transaction-email', {
-                            body: {
-                                user_id: requesterId,
-                                transaction_type: 'transfer',
-                                amount: netAmount,
-                                status: 'completed',
-                                description: recipientDescription
-                            }
-                        })
-                    ]);
-
-                    showMessage('Demande acceptée avec succès ! Une notification a été envoyée par email.', 'success');
-                    await fetchWalletBalance();
-                    await fetchPendingRequests();
-                    await fetchTransactionHistory();
-                } catch (error) {
-                    console.error('Erreur lors de l\'acceptation de la demande :', error);
-                    showMessage(`Échec de l\'acceptation de la demande : ${error.message}`, 'error');
-                }
-            }
-
-            // Handle Decline Request
-            async function handleDeclineRequest(requestId) {
-                if (!confirm('Êtes-vous sûr de vouloir refuser cette demande d\'argent ?')) return;
-
-                try {
-                    const { data: request, error: fetchError } = await supabase
-                        .from('transactions')
-                        .select('amount, user_id, description')
-                        .eq('id', requestId)
-                        .eq('status', 'pending')
-                        .eq('transaction_type', 'money_request')
-                        .eq('recipient_id', userId)
-                        .single();
-
-                    if (fetchError || !request) {
-                        console.error('Erreur lors de la récupération de la demande :', fetchError?.message);
-                        showMessage('Demande non trouvée ou déjà traitée.', 'error');
+                        showMessage('Solde insuffisant pour effectuer ce retrait.', 'error');
+                        submitBtn.disabled = false;
                         return;
                     }
 
                     const { error } = await supabase
                         .from('transactions')
-                        .update({ status: 'failed' })
-                        .eq('id', requestId)
-                        .eq('status', 'pending')
-                        .eq('transaction_type', 'money_request')
-                        .eq('recipient_id', userId);
+                        .insert({
+                            user_id: userId,
+                            amount: -amount,
+                            transaction_type: 'withdrawal',
+                            status: 'pending',
+                            description: `Retrait via ${method} vers ${account}`,
+                            created_at: new Date().toISOString()
+                        });
 
-                    if (error) {
-                        console.error('Erreur lors du refus de la demande :', error.message);
-                        showMessage('Échec du refus de la demande.', 'error');
-                        return;
-                    }
+                    if (error) throw error;
 
-                    // Trigger email notification for the requester
                     await supabase.functions.invoke('send-transaction-email', {
                         body: {
-                            user_id: request.user_id,
-                            transaction_type: 'money_request',
-                            amount: parseFloat(request.amount),
-                            status: 'failed',
-                            description: request.description
+                            user_id: userId,
+                            transaction_type: 'withdrawal',
+                            amount: amount,
+                            status: 'pending',
+                            description: `Retrait via ${method} vers ${account}`
                         }
                     });
 
-                    showMessage('Demande refusée avec succès. Une notification a été envoyée par email.', 'success');
-                    await fetchPendingRequests();
-                    await fetchTransactionHistory();
+                    showMessage('Demande de retrait envoyée avec succès !', 'success');
+                    messageDiv.textContent = 'Demande de retrait envoyée avec succès !';
+                    messageDiv.className = 'text-green-500 text-[0.867rem] text-center mt-4';
+                    document.getElementById('withdrawalForm').reset();
+                    await Promise.all([fetchWalletBalance(), fetchTransactionHistory()]);
                 } catch (error) {
-                    console.error('Erreur de refus de la demande :', error);
-                    showMessage(`Échec du refus de la demande : ${error.message}`, 'error');
+                    console.error('Erreur lors du retrait :', error);
+                    showMessage(`Échec du retrait : ${error.message}`, 'error');
+                    messageDiv.textContent = `Échec du retrait : ${error.message}`;
+                    messageDiv.className = 'text-red-500 text-[0.867rem] text-center mt-4';
+                } finally {
+                    submitBtn.disabled = false;
                 }
             }
 
-            // Event Listeners
-            document.getElementById('depositForm').addEventListener('submit', handleDeposit);
-            document.getElementById('transferForm').addEventListener('submit', handleTransfer);
-            document.getElementById('requestForm').addEventListener('submit', handleRequestMoney);
-            document.getElementById('withdrawalForm').addEventListener('submit', handleWithdrawal);
-            document.getElementById('transferRecipient').addEventListener('input', debounce(handleRecipientSearch, 300));
-            document.getElementById('requestSender').addEventListener('input', debounce(handleSenderSearch, 300));
+            // View Pending Requests
             document.getElementById('viewPendingRequestsBtn').addEventListener('click', () => {
                 const pendingRequestsCard = document.getElementById('pendingRequestsContainer');
+                pendingRequestsCard.scrollIntoView({ behavior: 'smooth' });
                 const content = document.getElementById('pendingRequestsContent');
-                const icon = pendingRequestsCard.querySelector('i');
-                content.classList.toggle('open');
-                icon.classList.toggle('fa-chevron-down');
-                icon.classList.toggle('fa-chevron-up');
+                const icon = pendingRequestsCard.querySelector('.card-header i');
+                content.classList.add('open');
+                icon.classList.remove('fa-chevron-down');
+                icon.classList.add('fa-chevron-up');
             });
 
-            // Initialize Data
-            await Promise.all([
-                fetchWalletBalance(),
-                fetchPendingRequests(),
-                fetchTransactionHistory()
-            ]);
+            // Form Event Listeners
+            document.getElementById('payBillForm').addEventListener('submit', handlePayBillForm);
+            document.getElementById('retailAgentWithdrawalForm')?.addEventListener('submit', handleRetailAgentWithdrawalForm);
+            document.getElementById('retailAgentDepositForm')?.addEventListener('submit', handleRetailAgentDepositForm);
+            document.getElementById('qrDepositForm')?.addEventListener('submit', handleQrDepositForm);
+            document.getElementById('qrWithdrawalForm')?.addEventListener('submit', handleQrWithdrawalForm);
+            document.getElementById('cashTransferForm')?.addEventListener('submit', handleCashTransferForm);
+            document.getElementById('depositForm').addEventListener('submit', handleDepositForm);
+            document.getElementById('transferForm').addEventListener('submit', handleTransferForm);
+            document.getElementById('requestForm').addEventListener('submit', handleRequestForm);
+            document.getElementById('withdrawalForm').addEventListener('submit', handleWithdrawalForm);
+
+            // Autocomplete Event Listeners
+            document.getElementById('billBusinessPartner').addEventListener('input', handleBusinessPartnerSearch);
+            document.getElementById('transferRecipient').addEventListener('input', handleRecipientSearch);
+            document.getElementById('requestSender').addEventListener('input', handleSenderSearch);
+            document.getElementById('cashTransferRecipient')?.addEventListener('input', handleCashTransferSearch);
+
+            // Initial Data Fetch
+            await Promise.all([fetchWalletBalance(), fetchPendingRequests(), fetchTransactionHistory()]);
         });
     </script>
 </body>
