@@ -1,0 +1,1561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOVA7 | The World Disaster Center's Platform for Global Aid</title>
+
+    <meta name="description" content="NOVA7 is the mission-critical platform by the World Disaster Center for real-time humanitarian support, secure transfers, and community-driven assistance worldwide.">
+    <meta name="keywords" content="NOVA7, World Disaster Center, humanitarian aid, disaster relief, non-profit, fintech, partnership, Happy Coffee Shop">
+    <meta name="author" content="World Disaster Center">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#005A9C">
+
+    <meta property="og:title" content="NOVA7 | A World Disaster Center Initiative">
+    <meta property="og:description" content="Delivering transparent, real-time support and financial aid to disaster-affected populations through a clean, secure, and accessible platform.">
+    <meta property="og:image" content="../assets/aids.jpg">
+    <meta property="og:type" content="website">
+
+    <link rel="icon" type="image/png" href="../assets/nova7-favicon.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <style>
+        /*
+        ==========================================================================
+        NOVA7 LANDING PAGE STYLESHEET
+        --------------------------------------------------------------------------
+        - Design System (Variables)
+        - Global Resets & Typography
+        - Reusable Components (Buttons, Cards, Grids)
+        - Section-Specific Styling
+        - Header & Navigation
+        - Hero Section
+        - Form & Table Enhancements
+        - Modal System
+        - Animations & Transitions
+        - Floating Button
+        - Responsive Design
+        ==========================================================================
+        */
+
+        /* --- Design System (Variables) --- */
+        :root {
+            --color-primary: #005A9C;         /* Deep Corporate Blue */
+            --color-secondary: #007BFF;       /* Bright Action Blue */
+            --color-accent: #FFC107;          /* Warm Accent Yellow */
+            --color-background: #F8F9FA;      /* Clean Off-White */
+            --color-surface: #FFFFFF;         /* Pure White for Cards */
+            --color-text: #212529;            /* Dark Grey for Readability */
+            --color-text-light: #6C757D;      /* Lighter Grey for Subtitles */
+            --color-border: #DEE2E6;          /* Light Border Color */
+            --color-success: #28a745;
+            
+            --font-family: 'Poppins', sans-serif;
+            --header-height: 80px;
+            --border-radius: 12px;
+            --transition-smooth: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 15px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 10px 30px rgba(0, 90, 156, 0.15);
+            
+            --gradient-primary: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+        }
+
+        /* --- Global Resets & Typography --- */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: var(--font-family);
+            background-color: var(--color-background);
+            color: var(--color-text);
+            line-height: 1.8;
+            font-weight: 400;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1, h2, h3, h4 { line-height: 1.3; font-weight: 600; color: var(--color-primary); }
+        h1 { font-size: 3rem; font-weight: 700; margin-bottom: 1rem; }
+        h2 { font-size: 2.5rem; margin: 3rem 0 2rem; }
+        h3 { font-size: 1.5rem; }
+        p { margin-bottom: 1rem; color: var(--color-text-light); }
+        ol, ul { padding-left: 1.5rem; margin-bottom: 1.5rem; text-align: left; }
+        li { margin-bottom: 0.75rem; color: var(--color-text-light); }
+        a { color: var(--color-secondary); text-decoration: none; transition: color 0.3s; }
+        a:hover { color: var(--color-primary); }
+
+        /* --- Language Switching Logic --- */
+        .lang-fr { display: none; }
+        body.fr .lang-en { display: none; }
+        body.fr .lang-fr { display: block; }
+        /* Special handling for tables */
+        .hcs-table th > span, .hcs-table td > span { display: none; }
+        body.en .hcs-table .lang-en { display: inline; }
+        body.fr .hcs-table .lang-fr { display: inline; }
+        
+        /* --- Reusable Components --- */
+        .page-section {
+            padding: 6rem 2rem;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .page-section:nth-of-type(even) { background-color: var(--color-surface); }
+
+        .container { 
+            width: 100%; 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 0 1.5rem; 
+            text-align: center; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center;
+        }
+        .page-header { 
+            max-width: 900px; 
+            margin: 0 auto 4rem; 
+            text-align: center;
+        }
+        .page-header .subtitle {
+            font-size: 1.2rem;
+            font-weight: 300;
+            color: var(--color-text-light);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.8rem 2.2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            color: var(--color-surface);
+            background-image: var(--gradient-primary);
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            box-shadow: 0 5px 15px rgba(0, 123, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+        .btn:hover::before {
+            left: 100%;
+        }
+        .btn:hover {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(0, 90, 156, 0.3);
+        }
+        .btn-secondary {
+            background: transparent;
+            color: var(--color-text);
+            box-shadow: none;
+            border: 2px solid var(--color-border);
+        }
+        .btn-secondary:hover {
+            background-color: var(--color-primary);
+            border-color: var(--color-primary);
+            color: var(--color-surface);
+            box-shadow: 0 5px 15px rgba(0, 90, 156, 0.2);
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            width: 100%;
+            text-align: left;
+            justify-items: center;
+        }
+        .card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--border-radius);
+            padding: 2.5rem;
+            box-shadow: var(--shadow-md);
+            transition: var(--transition-smooth);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            transform: perspective(1000px) rotateY(0deg);
+        }
+        .card:hover {
+            transform: perspective(1000px) rotateY(5deg) translateY(-10px);
+            box-shadow: var(--shadow-lg);
+        }
+        .card .icon {
+            font-size: 2.5rem;
+            color: var(--color-secondary);
+            margin-bottom: 1.5rem;
+            height: 50px;
+            width: 50px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #e6f2ff, #f2f7ff);
+            border-radius: 50%;
+            transition: transform 0.5s;
+        }
+        .card:hover .icon {
+            transform: scale(1.2) rotate(360deg);
+        }
+        .card h3 { color: var(--color-primary); margin-bottom: 1rem; }
+        .card p { flex-grow: 1; color: var(--color-text-light); }
+        .card img { width: 100%; margin-top: 1rem; border-radius: var(--border-radius); object-fit: cover; max-height: 200px; }
+        .card .btn { margin-top: 1.5rem; align-self: flex-start; }
+
+        /* --- Animations --- */
+        .animated-section .animated-item {
+            opacity: 0;
+            transform: translateY(40px) scale(0.95);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .animated-section.is-visible .animated-item {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+        .animated-section.is-visible .animated-item:nth-child(2) { transition-delay: 0.1s; }
+        .animated-section.is-visible .animated-item:nth-child(3) { transition-delay: 0.2s; }
+        .animated-section.is-visible .animated-item:nth-child(4) { transition-delay: 0.3s; }
+        .animated-section.is-visible .animated-item:nth-child(5) { transition-delay: 0.4s; }
+        .animated-section.is-visible .animated-item:nth-child(6) { transition-delay: 0.5s; }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* --- Header & Navigation --- */
+        .main-header {
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: var(--header-height);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 4rem;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            transition: box-shadow 0.3s ease, background-color 0.3s ease;
+            border-bottom: 1px solid transparent;
+        }
+        .header-scrolled {
+            box-shadow: var(--shadow-md);
+            background: rgba(255, 255, 255, 0.98);
+            border-bottom: 1px solid var(--color-border);
+        }
+        .header-logo {
+            font-size: 1.8rem; font-weight: 700; color: var(--color-primary); text-decoration: none;
+        }
+        .header-logo i { color: var(--color-secondary); margin-right: 0.5rem; transition: transform 0.4s; }
+        .header-logo:hover i { transform: rotate(360deg); }
+        
+        .main-nav { display: flex; list-style: none; align-items: center; gap: 0.5rem; }
+        .main-nav a {
+            color: var(--color-text); text-decoration: none; font-weight: 500;
+            padding: 0.5rem 1rem; border-radius: var(--border-radius);
+            transition: color 0.3s ease, transform 0.3s ease;
+            position: relative;
+        }
+        .main-nav a:hover { 
+            color: var(--color-secondary); 
+            transform: translateY(-2px);
+        }
+        .main-nav a.active { 
+            color: var(--color-primary); 
+            font-weight: 600; 
+        }
+        .main-nav a.active::after {
+            content: ''; position: absolute; bottom: -5px; left: 50%;
+            transform: translateX(-50%); width: 40%; height: 3px;
+            background-color: var(--color-secondary); border-radius: 2px;
+        }
+
+        .language-selector { 
+            display: flex; align-items: center; gap: 0.5rem; margin-left: 1rem; 
+        }
+        .language-selector button {
+            background: none; border: 1px solid var(--color-border); cursor: pointer;
+            font-weight: 600; color: var(--color-text-light); transition: all 0.3s;
+            width: 40px; height: 30px; border-radius: 20px;
+        }
+        .language-selector button.active { 
+            color: var(--color-surface); 
+            background: var(--color-primary); 
+            border-color: var(--color-primary); 
+        }
+        .language-selector button:hover {
+            transform: scale(1.1);
+        }
+        
+        .menu-toggle { 
+            display: none; background: none; border: none; font-size: 1.8rem; 
+            cursor: pointer; color: var(--color-primary); 
+        }
+
+        /* --- Hero Section --- */
+        #home {
+            padding-top: var(--header-height); 
+            min-height: 100vh;
+            color: var(--color-surface);
+            background: var(--gradient-primary);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #hero-video {
+            position: absolute; top: 50%; left: 50%;
+            min-width: 100%; min-height: 100%;
+            width: auto; height: auto;
+            transform: translate(-50%, -50%);
+            z-index: 1; object-fit: cover;
+        }
+        #home::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 90, 156, 0.7); z-index: 2;
+        }
+        #home .container { z-index: 3; }
+        #home .page-header h1 { 
+            font-size: 4rem; 
+            font-weight: 700; 
+            color: var(--color-surface); 
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2); 
+            animation: fadeInUp 1s ease-out;
+        }
+        #home .page-header .subtitle { 
+            font-size: 1.25rem; 
+            color: rgba(255, 255, 255, 0.9); 
+            animation: fadeInUp 1s ease-out 0.2s;
+            animation-fill-mode: backwards;
+        }
+        .cta-buttons { 
+            margin-top: 2.5rem; 
+            display: flex; 
+            gap: 1.5rem; 
+            justify-content: center; 
+            flex-wrap: wrap; 
+            animation: fadeInUp 1s ease-out 0.4s;
+            animation-fill-mode: backwards;
+        }
+        #home .btn-secondary { 
+            color: var(--color-surface); 
+            border-color: var(--color-surface); 
+            background: transparent; 
+        }
+        #home .btn-secondary:hover { 
+            background: var(--color-surface); 
+            color: var(--color-primary); 
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Partnerships Section --- */
+        .step-process { 
+            display: flex; 
+            justify-content: center; 
+            gap: 3rem; 
+            margin-top: 3rem; 
+            flex-wrap: wrap; 
+        }
+        .step-card {
+            background: var(--color-background); 
+            padding: 2rem; 
+            border-radius: var(--border-radius);
+            width: 250px; 
+            text-align: center; 
+            border: 1px solid var(--color-border);
+            transition: var(--transition-smooth); 
+            position: relative;
+        }
+        .step-card:not(:last-child)::after {
+            content: '\f061'; 
+            font-family: 'Font Awesome 6 Free'; 
+            font-weight: 900;
+            position: absolute; 
+            top: 35px; 
+            right: -36px;
+            font-size: 1.5rem; 
+            color: var(--color-border);
+        }
+        .step-card:hover { 
+            transform: translateY(-8px) rotate(2deg); 
+            box-shadow: var(--shadow-lg); 
+        }
+        .step-card .step-number {
+            width: 50px; 
+            height: 50px; 
+            background-color: var(--color-secondary); 
+            color: var(--color-surface);
+            border-radius: 50%; 
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center;
+            font-size: 1.5rem; 
+            font-weight: 600; 
+            margin-bottom: 1rem;
+            border: 3px solid var(--color-surface); 
+            box-shadow: 0 0 0 3px var(--color-secondary);
+            transition: transform 0.5s;
+        }
+        .step-card:hover .step-number {
+            transform: scale(1.2);
+        }
+        .step-card h4 { 
+            color: var(--color-primary); 
+            font-size: 1.1rem; 
+            margin-bottom: 0.5rem; 
+        }
+        .step-card p { font-size: 0.9rem; }
+        
+        /* --- Form Enhancements --- */
+        .partner-form-container {
+            background: var(--color-surface); 
+            padding: 3rem; 
+            border-radius: var(--border-radius);
+            margin-top: 4rem; 
+            width: 100%; 
+            max-width: 800px; 
+            text-align: left;
+            border: 1px solid var(--color-border); 
+            box-shadow: var(--shadow-md);
+            transition: transform 0.5s ease-out;
+        }
+        .partner-form-container:hover {
+            transform: translateY(-5px);
+        }
+        .form-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 1.5rem; 
+        }
+        .form-grid .full-width { grid-column: 1 / -1; }
+        .form-group { 
+            position: relative; 
+            margin-top: 1rem; 
+        }
+        .form-group label {
+            position: absolute; 
+            top: -0.75rem; 
+            left: 1rem;
+            font-size: 0.85rem; 
+            font-weight: 500;
+            color: var(--color-primary);
+            background-color: var(--color-surface);
+            padding: 0 0.5rem;
+            transition: color 0.3s;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; 
+            padding: 0.9rem 1rem; 
+            border-radius: var(--border-radius);
+            border: 1px solid var(--color-border); 
+            background: var(--color-surface);
+            color: var(--color-text); 
+            font-family: var(--font-family); 
+            font-size: 1rem;
+            transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none; 
+            border-color: var(--color-secondary);
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+            transform: scale(1.02);
+        }
+        .form-group textarea { resize: vertical; min-height: 120px; }
+        .form-checkbox { 
+            display: flex; 
+            align-items: flex-start; 
+            gap: 0.75rem; 
+            margin-top: 1.5rem; 
+        }
+        .form-checkbox input { margin-top: 5px; }
+        .form-checkbox label { font-size: 0.9rem; color: var(--color-text-light); }
+        #form-feedback {
+            margin-top: 1.5rem; 
+            padding: 1rem; 
+            border-radius: var(--border-radius);
+            text-align: center; 
+            font-weight: 500; 
+            display: none;
+            background-color: #e9f7ef; 
+            color: #1d6a3b; 
+            border: 1px solid #a3d9b8;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        /* --- Happy Coffee Shop Section --- */
+        #happy-coffee-shop { 
+            background: linear-gradient(180deg, var(--color-surface) 0%, #eef5ff 100%); 
+        }
+        .hcs-model-grid {
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem; 
+            margin-top: 3rem;
+            justify-items: center;
+        }
+        .hcs-model-card {
+            background: var(--color-surface); 
+            padding: 0; 
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md); 
+            text-align: center;
+            transition: var(--transition-smooth); 
+            overflow: hidden;
+        }
+        .hcs-model-card:hover { 
+            transform: scale(1.05) rotate(1deg); 
+            box-shadow: var(--shadow-lg); 
+        }
+        .hcs-model-card img { 
+            width: 100%; 
+            height: 220px; 
+            object-fit: cover; 
+            transition: transform 0.5s;
+        }
+        .hcs-model-card:hover img {
+            transform: scale(1.1);
+        }
+        .hcs-model-card .card-content { padding: 2rem; }
+        .hcs-model-card h3 { margin-bottom: 0.5rem; }
+        .hcs-model-card p { color: var(--color-text-light); margin-bottom: 1.5rem; font-size: 0.9rem; }
+        
+        .hcs-table {
+            width: 100%; 
+            max-width: 1200px; 
+            margin: 3rem auto;
+            border-collapse: separate; 
+            border-spacing: 0;
+            border: 1px solid var(--color-border); 
+            border-radius: var(--border-radius);
+            overflow: hidden; 
+            box-shadow: var(--shadow-sm);
+            text-align: left;
+            transition: transform 0.5s ease-out;
+        }
+        .hcs-table:hover {
+            transform: translateY(-5px);
+        }
+        .hcs-table th, .hcs-table td { 
+            padding: 1rem; 
+            border-bottom: 1px solid var(--color-border); 
+        }
+        .hcs-table th { 
+            background: var(--color-primary); 
+            color: var(--color-surface); 
+            font-weight: 600; 
+        }
+        .hcs-table tbody tr:last-child td { border-bottom: none; }
+        .hcs-table tbody tr:nth-child(even) { background-color: var(--color-background); }
+        .hcs-table tbody tr:hover {
+            background-color: rgba(0, 123, 255, 0.1);
+        }
+
+        /* --- Modal System --- */
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 2000;
+            left: 0; top: 0; 
+            width: 100%; 
+            height: 100%;
+            overflow: auto; 
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.4s;
+        }
+        .modal-content {
+            background-color: var(--color-surface); 
+            margin: 3% auto;
+            width: 90%; 
+            max-width: 900px;
+            border-radius: var(--border-radius); 
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            position: relative; 
+            overflow: hidden;
+            animation: slideIn 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+        .modal-header {
+            padding: 1.5rem 2.5rem; 
+            border-bottom: 1px solid var(--color-border);
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+        }
+        .modal-header h2 { 
+            margin: 0; 
+            font-size: 1.8rem; 
+            animation: fadeInUp 0.5s ease-out;
+        }
+        .close-button {
+            color: var(--color-text-light); 
+            font-size: 2rem; 
+            font-weight: bold; 
+            cursor: pointer;
+            transition: color 0.3s, transform 0.3s;
+        }
+        .close-button:hover { 
+            color: var(--color-primary); 
+            transform: rotate(90deg); 
+        }
+        .modal-body { 
+            padding: 2.5rem; 
+            max-height: 70vh; 
+            overflow-y: auto; 
+            text-align: left;
+        }
+        .modal-body h3 {
+            border-left: 4px solid var(--color-secondary); 
+            padding-left: 1rem;
+            margin: 2rem 0 1.5rem; 
+            font-size: 1.4rem;
+            animation: slideInLeft 0.5s ease-out;
+        }
+        .modal-body p, .modal-body li { 
+            line-height: 1.9; 
+            color: var(--color-text-light); 
+        }
+        .modal-body ul { 
+            list-style: none; 
+            padding-left: 0; 
+        }
+        .modal-body ul li { 
+            padding-left: 1.5rem; 
+            position: relative; 
+        }
+        .modal-body ul li::before {
+            content: '\f00c'; 
+            font-family: 'Font Awesome 6 Free'; 
+            font-weight: 900;
+            color: var(--color-secondary); 
+            position: absolute; 
+            left: 0; 
+            top: 5px;
+        }
+        .modal-media { 
+            margin-bottom: 2rem; 
+            border-radius: var(--border-radius); 
+            overflow: hidden; 
+        }
+        .modal-media img, .modal-media video { 
+            display: block; 
+            width: 100%; 
+            height: auto; 
+            max-height: 400px; 
+            object-fit: cover; 
+            transition: transform 0.5s;
+        }
+        .modal-media:hover img, .modal-media:hover video {
+            transform: scale(1.05);
+        }
+        
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* --- Floating Join NOVA7 Button --- */
+        .floating-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 3000;
+            padding: 1rem 2.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--color-surface);
+            background-image: var(--gradient-primary);
+            border-radius: 50px;
+            box-shadow: var(--shadow-lg);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            animation: pulse 2s infinite ease-in-out;
+            transition: var(--transition-smooth);
+        }
+        .floating-btn:hover {
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: 0 12px 30px rgba(0, 90, 156, 0.4);
+        }
+        .floating-btn i {
+            font-size: 1.2rem;
+        }
+
+        /* --- Footer --- */
+        footer {
+            background: var(--color-primary); 
+            color: var(--color-surface);
+            padding: 5rem 2rem;
+            text-align: center;
+        }
+        footer h1 { 
+            color: var(--color-surface); 
+            animation: fadeInUp 0.5s ease-out;
+        }
+        footer .subtitle { 
+            color: rgba(255,255,255,0.8); 
+        }
+        footer .btn-secondary {
+            color: var(--color-surface);
+            border-color: rgba(255,255,255,0.5);
+        }
+        footer .btn-secondary:hover {
+            background: var(--color-surface);
+            color: var(--color-primary);
+            border-color: var(--color-surface);
+        }
+        footer .copyright { 
+            margin-top: 4rem; 
+            font-size: 0.9rem; 
+            opacity: 0.8; 
+        }
+        
+        /* --- Responsive Design --- */
+        @media (max-width: 992px) {
+            h1 { font-size: 2.5rem; }
+            .main-header { padding: 0 2rem; }
+            #home .page-header h1 { font-size: 3rem; }
+            
+            .main-nav {
+                position: fixed; 
+                top: var(--header-height); 
+                left: 0;
+                width: 100%; 
+                height: calc(100vh - var(--header-height));
+                background: var(--color-surface);
+                flex-direction: column; 
+                align-items: center; 
+                justify-content: center;
+                transform: translateX(100%);
+                transition: transform 0.4s ease-in-out;
+                border-top: 1px solid var(--color-border);
+            }
+            .main-nav.open { transform: translateX(0); }
+            .main-nav li { margin: 1.5rem 0; }
+            .menu-toggle { display: block; z-index: 1001; }
+            .language-selector { margin-left: auto; margin-right: 1rem; }
+            
+            .form-grid { grid-template-columns: 1fr; }
+            .step-card:not(:last-child)::after { display: none; }
+            .floating-btn { 
+                bottom: 20px; 
+                right: 20px; 
+                padding: 0.8rem 2rem; 
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            :root { --header-height: 70px; }
+            .page-section { padding: 4rem 1.5rem; }
+            h1 { font-size: 2.2rem; }
+            #home .page-header h1 { font-size: 2.5rem; }
+            
+            .main-header { padding: 0 1.5rem; }
+            .cta-buttons { flex-direction: column; gap: 1rem; align-items: center; }
+            .step-process { flex-direction: column; align-items: center; gap: 1rem; }
+            
+            .hcs-table { display: block; overflow-x: auto; white-space: nowrap; }
+            .hcs-table th, .hcs-table td { padding: 0.75rem; }
+            .floating-btn { 
+                bottom: 15px; 
+                right: 15px; 
+                padding: 0.7rem 1.8rem; 
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body class="en">
+
+    <header class="main-header" id="main-header">
+        <a href="#home" class="header-logo"><i class="fas fa-satellite-dish"></i> NOVA7</a>
+        <nav>
+            <ul class="main-nav" id="main-nav">
+                <li><a href="#home" class="nav-link"><span class="lang-en">Home</span><span class="lang-fr">Accueil</span></a></li>
+                <li><a href="#features" class="nav-link"><span class="lang-en">Features</span><span class="lang-fr">Fonctionnalités</span></a></li>
+                <li><a href="#partnerships" class="nav-link"><span class="lang-en">Partnerships</span><span class="lang-fr">Partenariats</span></a></li>
+                <li><a href="#happy-coffee-shop" class="nav-link"><span class="lang-en">Happy Coffee Shop</span><span class="lang-fr">Happy Coffee Shop</span></a></li>
+                <li><a href="#playbook" class="nav-link"><span class="lang-en">Playbook</span><span class="lang-fr">Playbook</span></a></li>
+                <li><a href="#security" class="nav-link"><span class="lang-en">Security</span><span class="lang-fr">Sécurité</span></a></li>
+            </ul>
+        </nav>
+        <div class="language-selector">
+            <button class="lang-btn active" data-lang="en">EN</button>
+            <button class="lang-btn" data-lang="fr">FR</button>
+        </div>
+        <button class="menu-toggle" id="menu-toggle" aria-label="Open Navigation Menu">
+            <i class="fas fa-bars"></i>
+        </button>
+    </header>
+
+    <main class="main-content">
+
+        <section id="home" class="page-section">
+            <video autoplay muted loop playsinline id="hero-video">
+                <source src="../assets/WhatsApp Video 2025-08-30 at 18.15.58 (1).mp4" type="video/mp4">
+            </video>
+            <div class="container">
+                <div class="page-header animated-section is-visible">
+                    <h1 class="animated-item"><span class="lang-en">Humanity's Lifeline, Reimagined.</span><span class="lang-fr">La Ligne de Vie de l'Humanité, Réimaginée.</span></h1>
+                    <p class="subtitle animated-item" style="transition-delay: 0.1s;"><span class="lang-en">NOVA7 is the World Disaster Center's mission-critical platform delivering transparent, real-time support and financial aid to disaster-affected populations worldwide.</span><span class="lang-fr">NOVA7 est la plateforme critique de mission du Centre Mondial des Catastrophes, offrant un soutien transparent en temps réel et une aide financière aux populations touchées par les catastrophes dans le monde entier.</span></p>
+                    <div class="cta-buttons animated-item" style="transition-delay: 0.2s;">
+                        <a href="#partnerships" class="btn nav-link-jumper"><span class="lang-en">Become a Partner</span><span class="lang-fr">Devenir Partenaire</span></a>
+                        <a href="#happy-coffee-shop" class="btn btn-secondary nav-link-jumper"><span class="lang-en">Join Happy Coffee Shop</span><span class="lang-fr">Rejoindre Happy Coffee Shop</span></a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="page-section animated-section">
+            <div class="container">
+                <div class="page-header animated-item">
+                    <h1><span class="lang-en">An Ecosystem of Trust and Support</span><span class="lang-fr">Un Écosystème de Confiance et de Soutien</span></h1>
+                    <p class="subtitle"><span class="lang-en">NOVA7 is more than a wallet. It's a suite of powerful tools designed to provide stability, opportunity, and direct connection in times of crisis.</span><span class="lang-fr">NOVA7 est plus qu'un portefeuille. C'est une suite d'outils puissants conçus pour fournir stabilité, opportunité et connexion directe en temps de crise.</span></p>
+                </div>
+                <div class="content-grid">
+                    <div class="card animated-item">
+                        <div class="icon"><i class="fas fa-globe-americas"></i></div>
+                        <h3><span class="lang-en">Real-Time Global Transfers</span><span class="lang-fr">Transferts Globaux en Temps Réel</span></h3>
+                        <p><span class="lang-en">Send and receive funds across the globe instantly with a radically low 0.1% fee. A lifeline for remittances and direct, cross-border humanitarian aid.</span><span class="lang-fr">Envoyez et recevez des fonds à travers le monde instantanément avec un frais radicalement bas de 0,1%. Une ligne de vie pour les transferts et l'aide humanitaire directe transfrontalière.</span></p>
+                        <img src="../assets/transfers.png" alt="Global Transfers Illustration">
+                    </div>
+                    <div class="card animated-item">
+                        <div class="icon"><i class="fas fa-id-card"></i></div>
+                        <h3><span class="lang-en">Verified Digital Identity</span><span class="lang-fr">Identité Numérique Vérifiée</span></h3>
+                        <p><span class="lang-en">A secure, portable digital ID (KYC) that prevents fraud and ensures aid reaches the right people, restoring access to essential services.</span><span class="lang-fr">Une identité numérique sécurisée et portable (KYC) qui prévient la fraude et assure que l'aide atteint les bonnes personnes, restaurant l'accès aux services essentiels.</span></p>
+                        <img src="../assets/identity.png" alt="Digital Identity Card">
+                    </div>
+                    <div class="card animated-item">
+                        <div class="icon"><i class="fas fa-heart"></i></div>
+                        <h3><span class="lang-en">Peer-to-Peer Solidarity</span><span class="lang-fr">Solidarité Pair-à-Pair</span></h3>
+                        <p><span class="lang-en">Empower community support through "Love" micro-donations. Send funds directly to individuals' campaigns, fostering a global network of traceable aid.</span><span class="lang-fr">Renforcez le soutien communautaire via des micro-dons "Love". Envoyez des fonds directement aux campagnes individuelles, favorisant un réseau global d'aide traçable.</span></p>
+                    </div>
+                    <div class="card animated-item">
+                        <div class="icon"><i class="fas fa-store"></i></div>
+                        <h3><span class="lang-en">Humanitarian Marketplace</span><span class="lang-fr">Marché Humanitaire</span></h3>
+                        <p><span class="lang-en">Access essential goods at fair international prices, helping local economies recover and empowering individuals with choice and dignity.</span><span class="lang-fr">Accédez à des biens essentiels à des prix internationaux justes, aidant les économies locales à se remettre et empowerant les individus avec choix et dignité.</span></p>
+                        <img src="../assets/market.png" alt="Marketplace for goods">
+                    </div>
+                    <div class="card animated-item">
+                        <div class="icon"><i class="fas fa-users-cog"></i></div>
+                        <h3><span class="lang-en">Coordination Dashboard</span><span class="lang-fr">Tableau de Bord de Coordination</span></h3>
+                        <p><span class="lang-en">A powerful tool for NGOs and field partners to manage aid distribution, register beneficiaries, and track impact with real-time, transparent data.</span><span class="lang-fr">Un outil puissant pour les ONG et partenaires de terrain pour gérer la distribution d'aide, enregistrer les bénéficiaires et suivre l'impact avec des données transparentes en temps réel.</span></p>
+                        <img src="../assets/Cash-Transfers.png" alt="Dashboard showing charts and data">
+                    </div>
+                    <div class="card animated-item">
+                        <div class="icon"><i class="fas fa-shield-alt"></i></div>
+                        <h3><span class="lang-en">Unyielding Security</span><span class="lang-fr">Sécurité Inébranlable</span></h3>
+                        <p><span class="lang-en">Built on a foundation of bank-grade encryption and AI fraud detection to protect the data, assets, and privacy of the world's most vulnerable.</span><span class="lang-fr">Construit sur une base de chiffrement de niveau bancaire et détection de fraude IA pour protéger les données, actifs et vie privée des plus vulnérables du monde.</span></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="partnerships" class="page-section animated-section">
+            <div class="container">
+                <div class="page-header animated-item">
+                    <h1><span class="lang-en">Become a Partner</span><span class="lang-fr">Devenir Partenaire</span></h1>
+                    <p class="subtitle"><span class="lang-en">Collective action is our greatest strength. We partner with organizations of all sizes to amplify impact, enhance efficiency, and extend our reach. Join us in redefining humanitarian aid.</span><span class="lang-fr">L'action collective est notre plus grande force. Nous nous associons à des organisations de toutes tailles pour amplifier l'impact, améliorer l'efficacité et étendre notre portée. Rejoignez-nous pour redéfinir l'aide humanitaire.</span></p>
+                </div>
+                
+                <h2 class="animated-item"><span class="lang-en">How It Works</span><span class="lang-fr">Comment Ça Marche</span></h2>
+                <div class="step-process animated-item">
+                    <div class="step-card">
+                        <div class="step-number">1</div>
+                        <h4><span class="lang-en">Apply</span><span class="lang-fr">Postuler</span></h4>
+                        <p><span class="lang-en">Submit your organization's details through our secure online form.</span><span class="lang-fr">Soumettez les détails de votre organisation via notre formulaire en ligne sécurisé.</span></p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">2</div>
+                        <h4><span class="lang-en">Review</span><span class="lang-fr">Examen</span></h4>
+                        <p><span class="lang-en">Our partnership team reviews your application for alignment and compliance.</span><span class="lang-fr">Notre équipe de partenariat examine votre candidature pour alignement et conformité.</span></p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">3</div>
+                        <h4><span class="lang-en">Onboard</span><span class="lang-fr">Intégration</span></h4>
+                        <p><span class="lang-en">Sign the partnership agreement and receive training on the NOVA7 platform.</span><span class="lang-fr">Signez l'accord de partenariat et recevez une formation sur la plateforme NOVA7.</span></p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">4</div>
+                        <h4><span class="lang-en">Impact</span><span class="lang-fr">Impact</span></h4>
+                        <p><span class="lang-en">Deploy NOVA7 in your programs and start measuring your impact in real-time.</span><span class="lang-fr">Déployez NOVA7 dans vos programmes et commencez à mesurer votre impact en temps réel.</span></p>
+                    </div>
+                </div>
+
+                <h2 class="animated-item" style="margin-top: 5rem;"><span class="lang-en">Partnership Opportunities</span><span class="lang-fr">Opportunités de Partenariat</span></h2>
+                <div class="content-grid animated-item">
+                    <div class="card">
+                        <div class="icon"><i class="fas fa-hands-helping"></i></div>
+                        <h3><span class="lang-en">Local & International NGOs</span><span class="lang-fr">ONG Locales & Internationales</span></h3>
+                        <p><span class="lang-en">Become a certified field partner. Utilize the NOVA7 platform to streamline your cash and voucher assistance (CVA) programs, reduce overhead, and increase transparency. We provide training and support to integrate our tools into your workflow.</span><span class="lang-fr">Devenez un partenaire de terrain certifié. Utilisez la plateforme NOVA7 pour rationaliser vos programmes d'assistance en espèces et bons (CVA), réduire les frais généraux et augmenter la transparence. Nous fournissons une formation et un soutien pour intégrer nos outils dans votre flux de travail.</span></p>
+                    </div>
+                    <div class="card">
+                        <div class="icon"><i class="fas fa-laptop-code"></i></div>
+                        <h3><span class="lang-en">Technology Partners</span><span class="lang-fr">Partenaires Technologiques</span></h3>
+                        <p><span class="lang-en">Help us build the future of aid. We collaborate with companies providing services in cybersecurity, cloud infrastructure, satellite connectivity, and data analytics to keep our platform resilient, secure, and innovative. Lend your expertise to a world-changing mission.</span><span class="lang-fr">Aidez-nous à construire l'avenir de l'aide. Nous collaborons avec des entreprises fournissant des services en cybersécurité, infrastructure cloud, connectivité satellite et analyse de données pour garder notre plateforme résiliente, sécurisée et innovante. Prêtez votre expertise à une mission qui change le monde.</span></p>
+                    </div>
+                    <div class="card">
+                        <div class="icon"><i class="fas fa-building"></i></div>
+                        <h3><span class="lang-en">Corporate Sponsors</span><span class="lang-fr">Sponsors Corporatifs</span></h3>
+                        <p><span class="lang-en">Align your brand with measurable, transparent social impact. Sponsor specific programs, fund technological development, or support our core operations. We provide detailed impact reporting for your CSR initiatives and powerful co-branding opportunities.</span><span class="lang-fr">Alignez votre marque avec un impact social mesurable et transparent. Sponsorisez des programmes spécifiques, financez le développement technologique ou soutenez nos opérations principales. Nous fournissons des rapports d'impact détaillés pour vos initiatives RSE et des opportunités de co-branding puissantes.</span></p>
+                    </div>
+                </div>
+
+                <div class="partner-form-container animated-item">
+                    <h2 style="text-align: left; margin:0 0 2rem 0;"><span class="lang-en">Start Your Partnership Application</span><span class="lang-fr">Commencez Votre Demande de Partenariat</span></h2>
+                    <form id="partner-form" novalidate>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="fullName"><span class="lang-en">Your Full Name</span><span class="lang-fr">Votre Nom Complet</span></label>
+                                <input type="text" id="fullName" name="fullName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email"><span class="lang-en">Work Email</span><span class="lang-fr">Email Professionnel</span></label>
+                                <input type="email" id="email" name="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="orgName"><span class="lang-en">Organization Name</span><span class="lang-fr">Nom de l'Organisation</span></label>
+                                <input type="text" id="orgName" name="orgName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="orgType"><span class="lang-en">Organization Type</span><span class="lang-fr">Type d'Organisation</span></label>
+                                <select id="orgType" name="orgType" required>
+                                    <option value="" disabled selected><span class="lang-en">Select a type...</span><span class="lang-fr">Sélectionnez un type...</span></option>
+                                    <option value="small-ngo"><span class="lang-en">Small/Medium NGO</span><span class="lang-fr">Petite/Moyenne ONG</span></option>
+                                    <option value="large-ngo"><span class="lang-en">Large INGO</span><span class="lang-fr">Grande INGO</span></option>
+                                    <option value="tech-startup"><span class="lang-en">Technology Startup</span><span class="lang-fr">Startup Technologique</span></option>
+                                    <option value="tech-corp"><span class="lang-en">Large Technology Company</span><span class="lang-fr">Grande Entreprise Technologique</span></option>
+                                    <option value="corporate"><span class="lang-en">Corporate Sponsor</span><span class="lang-fr">Sponsor Corporatif</span></option>
+                                    <option value="foundation"><span class="lang-en">Foundation</span><span class="lang-fr">Fondation</span></option>
+                                </select>
+                            </div>
+                            <div class="form-group full-width">
+                                <label for="message"><span class="lang-en">How do you envision us working together?</span><span class="lang-fr">Comment envisagez-vous notre collaboration ?</span></label>
+                                <textarea id="message" name="message" rows="5" required></textarea>
+                            </div>
+                        </div>
+                        <div class="form-checkbox full-width">
+                            <input type="checkbox" id="agreement" name="agreement" required>
+                            <label for="agreement"><span class="lang-en">I understand that this is the first step in a formal partnership application process with the World Disaster Center.</span><span class="lang-fr">Je comprends que c'est la première étape d'un processus de demande de partenariat formel avec le Centre Mondial des Catastrophes.</span></label>
+                        </div>
+                        <button type="submit" class="btn" style="margin-top: 2rem;">
+                            <span class="lang-en">Submit Application</span>
+                            <span class="lang-fr">Soumettre la Demande</span>
+                        </button>
+                        <div id="form-feedback"></div>
+                    </form>
+                </div>
+            </div>
+        </section>
+        
+        <section id="happy-coffee-shop" class="page-section animated-section">
+            <div class="container">
+                <div class="page-header animated-item">
+                    <h1><span class="lang-en">Happy Coffee Shop — Join Our Franchise Model</span><span class="lang-fr">Happy Coffee Shop — Rejoignez Notre Modèle de Franchise</span></h1>
+                    <p class="subtitle"><span class="lang-en">Happy Coffee Shop (HCS) is our innovative franchise model designed to onboard users to NOVA7 while creating social impact and sustainable income. Choose between Small, Medium, or Large levels to start your journey with us.</span><span class="lang-fr">Happy Coffee Shop (HCS) est notre modèle de franchise innovant conçu pour intégrer les utilisateurs à NOVA7 tout en créant un impact social et un revenu durable. Choisissez entre les niveaux Petit, Moyen ou Grand pour commencer votre voyage avec nous.</span></p>
+                </div>
+
+                <div class="animated-item">
+                    <h2><span class="lang-en">High-Level Model — Step-by-Step</span><span class="lang-fr">Modèle de Haut Niveau — Étape par Étape</span></h2>
+                    <ol>
+                        <li><span class="lang-en">Attract — Free coffee & a welcoming space draws people in daily.</span><span class="lang-fr">Attirer — Café gratuit et espace accueillant attirent les gens quotidiennement.</span></li>
+                        <li><span class="lang-en">Engage — Ambassadors greet visitors, offer workshops and short demos (WDC preparedness, Nova7 walkthroughs).</span><span class="lang-fr">Engager — Les ambassadeurs saluent les visiteurs, offrent des ateliers et des démos courtes (préparation WDC, tutoriels Nova7).</span></li>
+                        <li><span class="lang-en">Onboard — Ambassadors guide sign-ups (app/tablet/USSD) and help complete a minimal KYC. First test transaction is encouraged to build confidence.</span><span class="lang-fr">Intégrer — Les ambassadeurs guident les inscriptions (app/tablette/USSD) et aident à compléter un KYC minimal. La première transaction test est encouragée pour bâtir la confiance.</span></li>
+                        <li><span class="lang-en">Convert — Casual visitors become Nova7 users, event participants, or repeat visitors who attend deeper programs.</span><span class="lang-fr">Convertir — Les visiteurs occasionnels deviennent des utilisateurs Nova7, participants à des événements ou visiteurs répétés qui assistent à des programmes plus profonds.</span></li>
+                        <li><span class="lang-en">Monetize (indirect) — Shop obtains money from sponsors, grants, paid partner events, Nova7 ecosystem incentives/commissions, and optional merch/donations — NOT from charging customers for coffee.</span><span class="lang-fr">Monétiser (indirect) — Le magasin obtient de l'argent des sponsors, subventions, événements partenaires payants, incitations/commissions de l'écosystème Nova7, et merch/dons optionnels — PAS en facturant les clients pour le café.</span></li>
+                        <li><span class="lang-en">Measure & Scale — Collect anonymized, consented data and KPIs to prove impact; use that proof to win bigger sponsor contracts and replicate via franchise partners.</span><span class="lang-fr">Mesurer & Échelle — Collecter des données anonymisées et consenties et KPIs pour prouver l'impact ; utiliser cette preuve pour gagner de plus gros contrats de sponsors et répliquer via des partenaires de franchise.</span></li>
+                    </ol>
+                </div>
+                
+                <div class="animated-item">
+                    <h2><span class="lang-en">Products & Services Inside Each HCS</span><span class="lang-fr">Produits & Services Dans Chaque HCS</span></h2>
+                    <ul>
+                        <li><span class="lang-en">Free hospitality: coffee, tea, water, light snacks (daily).</span><span class="lang-fr">Hospitalité gratuite : café, thé, eau, collations légères (quotidien).</span></li>
+                        <li><span class="lang-en">Nova7 onboarding: live sign-up (tablet/phone/USSD), first-top-up assistance, PIN/PIN recovery help.</span><span class="lang-fr">Intégration Nova7 : inscription en direct (tablette/téléphone/USSD), assistance premier rechargement, aide récupération PIN.</span></li>
+                        <li><span class="lang-en">Disaster preparedness workshops: 30–60 minute modules (family first aid, evacuation plans, early warning awareness).</span><span class="lang-fr">Ateliers de préparation aux catastrophes : modules de 30 à 60 minutes (premiers secours familiaux, plans d'évacuation, sensibilisation aux alertes précoces).</span></li>
+                        <li><span class="lang-en">Digital literacy & financial sessions: Nova7 advanced features, merchant onboarding, savings groups.</span><span class="lang-fr">Sessions d'alphabétisation numérique et financière : fonctionnalités avancées de Nova7, intégration des commerçants, groupes d'épargne.</span></li>
+                        <li><span class="lang-en">Merchant acceptance corner: QR stickers, merchant IDs, POS demonstration.</span><span class="lang-fr">Coin d'acceptation des commerçants : autocollants QR, identifiants commerçants, démonstration POS.</span></li>
+                        <li><span class="lang-en">Micro-events: sponsor-led talks, health clinics, recruitment fairs.</span><span class="lang-fr">Micro-événements : conférences sponsorisées, cliniques de santé, foires de recrutement.</span></li>
+                        <li><span class="lang-en">Community services: meeting space for groups, youth clubs, and microloan education.</span><span class="lang-fr">Services communautaires : espace de réunion pour groupes, clubs de jeunes, éducation aux microcrédits.</span></li>
+                        <li><span class="lang-en">Data/insights product (for partners): anonymized monthly reports (footfall, program uptake, transaction categories).</span><span class="lang-fr">Produit de données/insights (pour partenaires) : rapports mensuels anonymisés (fréquentation, adoption des programmes, catégories de transactions).</span></li>
+                    </ul>
+                </div>
+                
+                <div class="animated-item">
+                    <h2><span class="lang-en">How HCS Generates Benefits</span><span class="lang-fr">Comment HCS Génère des Avantages</span></h2>
+                    <h3 style="text-align: center;"><span class="lang-en">Revenue Streams</span><span class="lang-fr">Sources de Revenus</span></h3>
+                    <ul>
+                        <li><span class="lang-en">Sponsorships/CSR: Local businesses, telcos, NGOs pay monthly to sponsor the space or events.</span><span class="lang-fr">Sponsoring/RSE : Entreprises locales, opérateurs télécoms, ONG paient mensuellement pour sponsoriser l'espace ou les événements.</span></li>
+                        <li><span class="lang-en">Program grants: Donors/UN/NGOs fund disaster-prep or education programs hosted at HCS.</span><span class="lang-fr">Subventions de programmes : Donateurs/ONU/ONG financent des programmes de préparation aux catastrophes ou d'éducation organisés à HCS.</span></li>
+                        <li><span class="lang-en">Nova7 ecosystem value: Onboarding users generates transaction volume; Nova7 pays referral bonuses or commissions.</span><span class="lang-fr">Valeur de l'écosystème Nova7 : L'intégration des utilisateurs génère du volume de transactions ; Nova7 paie des bonus de parrainage ou des commissions.</span></li>
+                        <li><span class="lang-en">Paid partner events: Companies pay to host workshops or hiring drives.</span><span class="lang-fr">Événements partenaires payants : Les entreprises paient pour organiser des ateliers ou des campagnes de recrutement.</span></li>
+                        <li><span class="lang-en">Data & reports: Anonymized insights sold or used to secure larger contracts.</span><span class="lang-fr">Données & rapports : Insights anonymisés vendus ou utilisés pour sécuriser de plus gros contrats.</span></li>
+                        <li><span class="lang-en">Optional extras: Merchandise, tiny membership/donation box, paid certified courses for merchants.</span><span class="lang-fr">Extras optionnels : Marchandises, petite boîte de dons/adhésions, cours certifiés payants pour commerçants.</span></li>
+                    </ul>
+                    <h3 style="text-align: center;"><span class="lang-en">Strategic Value</span><span class="lang-fr">Valeur Stratégique</span></h3>
+                    <ul>
+                        <li><span class="lang-en">User acquisition for Nova7 with high lifetime value.</span><span class="lang-fr">Acquisition d'utilisateurs pour Nova7 avec une valeur à vie élevée.</span></li>
+                        <li><span class="lang-en">Proof-of-impact that attracts large contracts.</span><span class="lang-fr">Preuve d'impact qui attire de gros contrats.</span></li>
+                        <li><span class="lang-en">Local brand trust for WDC, easier emergency deployment.</span><span class="lang-fr">Confiance locale pour WDC, déploiement d'urgence plus facile.</span></li>
+                        <li><span class="lang-en">Community network raising awareness and resilience.</span><span class="lang-fr">Réseau communautaire augmentant la sensibilisation et la résilience.</span></li>
+                    </ul>
+                </div>
+
+                <h2 class="animated-item"><span class="lang-en">Choose Your Model: Small, Medium, Large</span><span class="lang-fr">Choisissez Votre Modèle : Petit, Moyen, Grand</span></h2>
+                <div class="hcs-model-grid animated-item">
+                    <div class="hcs-model-card">
+                        <img src="../assets/WhatsApp Image 2025-09-09 at 00.53.39.jpeg" alt="Small Model coffee shop">
+                        <div class="card-content">
+                            <h3><span class="lang-en">Small Model</span><span class="lang-fr">Modèle Petit</span></h3>
+                            <p><span class="lang-en">Setup: $400 | Monthly Op: $150 | Staff: 1 | Visitors/day: 30</span><span class="lang-fr">Installation : 400 $ | Op mensuel : 150 $ | Personnel : 1 | Visiteurs/jour : 30</span></p>
+                            <button class="btn" data-modal-target="modal-small"><span class="lang-en">Learn More & Join</span><span class="lang-fr">En Savoir Plus & Rejoindre</span></button>
+                        </div>
+                    </div>
+                    <div class="hcs-model-card">
+                        <img src="../assets/WhatsApp Image 2025-09-09 at 00.59.36.jpeg" alt="Medium Model coffee shop">
+                        <div class="card-content">
+                            <h3><span class="lang-en">Medium Model</span><span class="lang-fr">Modèle Moyen</span></h3>
+                            <p><span class="lang-en">Setup: $600 | Monthly Op: $250 | Staff: 2 | Visitors/day: 50</span><span class="lang-fr">Installation : 600 $ | Op mensuel : 250 $ | Personnel : 2 | Visiteurs/jour : 50</span></p>
+                            <button class="btn" data-modal-target="modal-medium"><span class="lang-en">Learn More & Join</span><span class="lang-fr">En Savoir Plus & Rejoindre</span></button>
+                        </div>
+                    </div>
+                    <div class="hcs-model-card">
+                        <img src="../assets/gathering.png" alt="Large Model community gathering">
+                        <div class="card-content">
+                            <h3><span class="lang-en">Large Model</span><span class="lang-fr">Modèle Grand</span></h3>
+                            <p><span class="lang-en">Setup: $1,000 | Monthly Op: $400 | Staff: 3–4 | Visitors/day: 150</span><span class="lang-fr">Installation : 1 000 $ | Op mensuel : 400 $ | Personnel : 3–4 | Visiteurs/jour : 150</span></p>
+                            <button class="btn" data-modal-target="modal-large"><span class="lang-en">Learn More & Join</span><span class="lang-fr">En Savoir Plus & Rejoindre</span></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="animated-item">
+                    <h2><span class="lang-en">Summary Table</span><span class="lang-fr">Tableau Récapitulatif</span></h2>
+                    <table class="hcs-table">
+                        <thead>
+                            <tr>
+                                <th><span class="lang-en">Model</span><span class="lang-fr">Modèle</span></th>
+                                <th><span class="lang-en">Setup Cost</span><span class="lang-fr">Coût d'installation</span></th>
+                                <th><span class="lang-en">Monthly Op Cost</span><span class="lang-fr">Coût Op mensuel</span></th>
+                                <th><span class="lang-en">Staff</span><span class="lang-fr">Personnel</span></th>
+                                <th><span class="lang-en">Visitors/day</span><span class="lang-fr">Visiteurs/jour</span></th>
+                                <th><span class="lang-en">Visitors/mo (30d)</span><span class="lang-fr">Visiteurs/mo (30j)</span></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="lang-en">Small</span><span class="lang-fr">Petit</span></td>
+                                <td>$400</td>
+                                <td>$150</td>
+                                <td>1</td>
+                                <td>30</td>
+                                <td>900</td>
+                            </tr>
+                            <tr>
+                                <td><span class="lang-en">Medium</span><span class="lang-fr">Moyen</span></td>
+                                <td>$600</td>
+                                <td>$250</td>
+                                <td>2</td>
+                                <td>50</td>
+                                <td>1,500</td>
+                            </tr>
+                            <tr>
+                                <td><span class="lang-en">Large</span><span class="lang-fr">Grand</span></td>
+                                <td>$1,000</td>
+                                <td>$400</td>
+                                <td>3–4</td>
+                                <td>150</td>
+                                <td>4,500</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="animated-item">
+                    <h2><span class="lang-en">Financial Scenarios</span><span class="lang-fr">Scénarios Financiers</span></h2>
+                    <table class="hcs-table">
+                        <thead>
+                            <tr>
+                                <th><span class="lang-en">Model</span><span class="lang-fr">Modèle</span></th>
+                                <th><span class="lang-en">Monthly Cost</span><span class="lang-fr">Coût Mensuel</span></th>
+                                <th><span class="lang-en">Conservative Income</span><span class="lang-fr">Revenu Conservateur</span></th>
+                                <th><span class="lang-en">Realistic Income</span><span class="lang-fr">Revenu Réaliste</span></th>
+                                <th><span class="lang-en">Aggressive Income</span><span class="lang-fr">Revenu Agressif</span></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="lang-en">Small</span><span class="lang-fr">Petit</span></td>
+                                <td>$150</td>
+                                <td><span class="lang-en">$110 (Net: -$40)</span><span class="lang-fr">$110 (Net: -40 $)</span></td>
+                                <td><span class="lang-en">$290 (Net: +$140)</span><span class="lang-fr">$290 (Net: +140 $)</span></td>
+                                <td><span class="lang-en">$490 (Net: +$340)</span><span class="lang-fr">$490 (Net: +340 $)</span></td>
+                            </tr>
+                            <tr>
+                                <td><span class="lang-en">Medium</span><span class="lang-fr">Moyen</span></td>
+                                <td>$250</td>
+                                <td><span class="lang-en">$425 (Net: +$175)</span><span class="lang-fr">$425 (Net: +175 $)</span></td>
+                                <td><span class="lang-en">$1,000 (Net: +$750)</span><span class="lang-fr">$1,000 (Net: +750 $)</span></td>
+                                <td><span class="lang-en">$1,750 (Net: +$1,500)</span><span class="lang-fr">$1,750 (Net: +1 500 $)</span></td>
+                            </tr>
+                            <tr>
+                                <td><span class="lang-en">Large</span><span class="lang-fr">Grand</span></td>
+                                <td>$400</td>
+                                <td><span class="lang-en">$1,075 (Net: +$675)</span><span class="lang-fr">$1,075 (Net: +675 $)</span></td>
+                                <td><span class="lang-en">$3,000 (Net: +$2,600)</span><span class="lang-fr">$3,000 (Net: +2 600 $)</span></td>
+                                <td><span class="lang-en">$5,800 (Net: +$5,400)</span><span class="lang-fr">$5,800 (Net: +5 400 $)</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="animated-item">
+                    <h2><span class="lang-en">Conditions to Join</span><span class="lang-fr">Conditions pour Rejoindre</span></h2>
+                    <ul>
+                        <li><span class="lang-en">Commitment to WDC’s mission of transparent, community-driven aid.</span><span class="lang-fr">Engagement envers la mission de WDC d’une aide transparente et axée sur la communauté.</span></li>
+                        <li><span class="lang-en">Ability to cover setup and operational costs (grants/sponsorships available for eligible partners).</span><span class="lang-fr">Capacité à couvrir les coûts d’installation et opérationnels (subventions/sponsorings disponibles pour les partenaires éligibles).</span></li>
+                        <li><span class="lang-en">Participation in WDC training for ambassadors (in-person or virtual).</span><span class="lang-fr">Participation à la formation WDC pour les ambassadeurs (en personne ou virtuelle).</span></li>
+                        <li><span class="lang-en">Compliance with local regulations and WDC’s operational guidelines.</span><span class="lang-fr">Conformité avec les réglementations locales et les directives opérationnelles de WDC.</span></li>
+                        <li><span class="lang-en">Willingness to collect and share anonymized KPIs for impact measurement.</span><span class="lang-fr">Volonté de collecter et partager des KPI anonymisés pour mesurer l’impact.</span></li>
+                    </ul>
+                </div>
+
+                <div class="animated-item">
+                    <h2><span class="lang-en">Get Started</span><span class="lang-fr">Commencer</span></h2>
+                    <p><span class="lang-en">Ready to bring Happy Coffee Shop to your community? Contact our team to explore which model suits your needs and start the application process.</span><span class="lang-fr">Prêt à apporter Happy Coffee Shop à votre communauté ? Contactez notre équipe pour découvrir quel modèle répond à vos besoins et commencer le processus de candidature.</span></p>
+                    <div class="cta-buttons">
+                        <a href="#partnerships" class="btn nav-link-jumper"><span class="lang-en">Apply Now</span><span class="lang-fr">Postuler Maintenant</span></a>
+                        <button class="btn btn-secondary" data-modal-target="modal-financial"><span class="lang-en">View Financial Model</span><span class="lang-fr">Voir le Modèle Financier</span></button>
+                        <button class="btn btn-secondary" data-modal-target="modal-franchise"><span class="lang-en">Franchise Agreement</span><span class="lang-fr">Accord de Franchise</span></button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="playbook" class="page-section animated-section">
+            <div class="container">
+                <div class="page-header animated-item">
+                    <h1><span class="lang-en">Operational Playbook</span><span class="lang-fr">Playbook Opérationnel</span></h1>
+                    <p class="subtitle"><span class="lang-en">Our operational playbook is a comprehensive guide for partners, detailing every aspect of running a Happy Coffee Shop and integrating with the NOVA7 platform.</span><span class="lang-fr">Notre playbook opérationnel est un guide complet pour les partenaires, détaillant tous les aspects de la gestion d’un Happy Coffee Shop et de l’intégration avec la plateforme NOVA7.</span></p>
+                </div>
+                <div class="content-grid">
+                    <div class="card animated-item">
+            <div class="icon"><i class="fas fa-book-open"></i></div>
+            <h3><span class="lang-en">Setup & Training</span><span class="lang-fr">Installation & Formation</span></h3>
+            <p><span class="lang-en">Step-by-step guides for setting up a Happy Coffee Shop, including staff training, branding, and operational workflows to ensure a smooth launch.</span><span class="lang-fr">Guides étape par étape pour la mise en place d’un Happy Coffee Shop, incluant la formation du personnel, le branding et les flux de travail opérationnels pour assurer un lancement fluide.</span></p>
+            <button class="btn" data-modal-target="modal-setup"><span class="lang-en">Explore Setup Guide</span><span class="lang-fr">Explorer le Guide d’Installation</span></button>
+        </div>
+        <div class="card animated-item">
+            <div class="icon"><i class="fas fa-handshake"></i></div>
+            <h3><span class="lang-en">Partnership Integration</span><span class="lang-fr">Intégration des Partenariats</span></h3>
+            <p><span class="lang-en">Detailed protocols for NGOs and corporate partners to integrate NOVA7 tools into their programs, including API access and data reporting standards.</span><span class="lang-fr">Protocoles détaillés pour les ONG et partenaires corporatifs pour intégrer les outils NOVA7 dans leurs programmes, y compris l’accès API et les normes de rapport de données.</span></p>
+            <button class="btn" data-modal-target="modal-integration"><span class="lang-en">View Integration Docs</span><span class="lang-fr">Voir les Docs d’Intégration</span></button>
+        </div>
+        <div class="card animated-item">
+            <div class="icon"><i class="fas fa-chart-line"></i></div>
+            <h3><span class="lang-en">Impact Measurement</span><span class="lang-fr">Mesure de l’Impact</span></h3>
+            <p><span class="lang-en">Learn how to collect and report KPIs to demonstrate impact, secure funding, and scale operations using our standardized templates and tools.</span><span class="lang-fr">Apprenez à collecter et rapporter les KPI pour démontrer l’impact, sécuriser des financements et étendre les opérations à l’aide de nos modèles et outils standardisés.</span></p>
+            <button class="btn" data-modal-target="modal-impact"><span class="lang-en">See Metrics Guide</span><span class="lang-fr">Voir le Guide des Métriques</span></button>
+        </div>
+    </div>
+</section>
+
+<section id="security" class="page-section animated-section">
+    <div class="container">
+        <div class="page-header animated-item">
+            <h1><span class="lang-en">Security You Can Trust</span><span class="lang-fr">Sécurité en laquelle vous pouvez avoir confiance</span></h1>
+            <p class="subtitle"><span class="lang-en">NOVA7 is built with cutting-edge security measures to protect users and partners, ensuring trust and reliability in every transaction.</span><span class="lang-fr">NOVA7 est construit avec des mesures de sécurité de pointe pour protéger les utilisateurs et les partenaires, garantissant confiance et fiabilité dans chaque transaction.</span></p>
+        </div>
+        <div class="content-grid">
+            <div class="card animated-item">
+                <div class="icon"><i class="fas fa-lock"></i></div>
+                <h3><span class="lang-en">Bank-Grade Encryption</span><span class="lang-fr">Chiffrement de Niveau Bancaire</span></h3>
+                <p><span class="lang-en">All data and transactions are protected with AES-256 encryption, ensuring that sensitive information remains secure.</span><span class="lang-fr">Toutes les données et transactions sont protégées par un chiffrement AES-256, garantissant que les informations sensibles restent sécurisées.</span></p>
+            </div>
+            <div class="card animated-item">
+                <div class="icon"><i class="fas fa-shield-alt"></i></div>
+                <h3><span class="lang-en">AI Fraud Detection</span><span class="lang-fr">Détection de Fraude par IA</span></h3>
+                <p><span class="lang-en">Our AI-driven system monitors transactions in real-time to detect and prevent fraudulent activities, keeping your funds safe.</span><span class="lang-fr">Notre système piloté par IA surveille les transactions en temps réel pour détecter et prévenir les activités frauduleuses, gardant vos fonds en sécurité.</span></p>
+            </div>
+            <div class="card animated-item">
+                <div class="icon"><i class="fas fa-user-shield"></i></div>
+                <h3><span class="lang-en">Secure Digital Identity</span><span class="lang-fr">Identité Numérique Sécurisée</span></h3>
+                <p><span class="lang-en">Our KYC processes are designed to verify identities securely, preventing unauthorized access and ensuring aid reaches the right people.</span><span class="lang-fr">Nos processus KYC sont conçus pour vérifier les identités de manière sécurisée, empêchant les accès non autorisés et garantissant que l’aide atteint les bonnes personnes.</span></p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Modals -->
+<div id="modal-small" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><span class="lang-en">Small Model Details</span><span class="lang-fr">Détails du Modèle Petit</span></h2>
+            <span class="close-button">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="modal-media">
+                <img src="../assets/WhatsApp Image 2025-09-09 at 00.53.39.jpeg" alt="Small Model coffee shop">
+            </div>
+            <h3><span class="lang-en">Overview</span><span class="lang-fr">Aperçu</span></h3>
+            <p><span class="lang-en">The Small Model is perfect for community-driven initiatives in smaller locales, offering a low-cost entry to the Happy Coffee Shop franchise.</span><span class="lang-fr">Le Modèle Petit est parfait pour les initiatives communautaires dans des localités plus petites, offrant une entrée à faible coût dans la franchise Happy Coffee Shop.</span></p>
+            <h3><span class="lang-en">Key Features</span><span class="lang-fr">Caractéristiques Clés</span></h3>
+            <ul>
+                <li><span class="lang-en">Setup Cost: $400</span><span class="lang-fr">Coût d’installation : 400 $</span></li>
+                <li><span class="lang-en">Monthly Operational Cost: $150</span><span class="lang-fr">Coût Opérationnel Mensuel : 150 $</span></li>
+                <li><span class="lang-en">Staff: 1 trained ambassador</span><span class="lang-fr">Personnel : 1 ambassadeur formé</span></li>
+                <li><span class="lang-en">Capacity: Up to 30 visitors/day</span><span class="lang-fr">Capacité : Jusqu’à 30 visiteurs/jour</span></li>
+                <li><span class="lang-en">Ideal for: Rural areas, small communities</span><span class="lang-fr">Idéal pour : Zones rurales, petites communautés</span></li>
+            </ul>
+            <h3><span class="lang-en">How to Join</span><span class="lang-fr">Comment Rejoindre</span></h3>
+            <p><span class="lang-en">Contact our team to discuss your location and start the application process. Grants available for eligible partners.</span><span class="lang-fr">Contactez notre équipe pour discuter de votre emplacement et commencer le processus de candidature. Subventions disponibles pour les partenaires éligibles.</span></p>
+        </div>
+    </div>
+</div>
+
+<div id="modal-medium" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><span class="lang-en">Medium Model Details</span><span class="lang-fr">Détails du Modèle Moyen</span></h2>
+            <span class="close-button">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="modal-media">
+                <img src="../assets/WhatsApp Image 2025-09-09 at 00.59.36.jpeg" alt="Medium Model coffee shop">
+            </div>
+            <h3><span class="lang-en">Overview</span><span class="lang-fr">Aperçu</span></h3>
+            <p><span class="lang-en">The Medium Model is designed for urban settings with moderate foot traffic, balancing affordability and impact.</span><span class="lang-fr">Le Modèle Moyen est conçu pour les environnements urbains avec un trafic piétonnier modéré, équilibrant abordabilité et impact.</span></p>
+            <h3><span class="lang-en">Key Features</span><span class="lang-fr">Caractéristiques Clés</span></h3>
+            <ul>
+                <li><span class="lang-en">Setup Cost: $600</span><span class="lang-fr">Coût d’installation : 600 $</span></li>
+                <li><span class="lang-en">Monthly Operational Cost: $250</span><span class="lang-fr">Coût Opérationnel Mensuel : 250 $</span></li>
+                <li><span class="lang-en">Staff: 2 trained ambassadors</span><span class="lang-fr">Personnel : 2 ambassadeurs formés</span></li>
+                <li><span class="lang-en">Capacity: Up to 50 visitors/day</span><span class="lang-fr">Capacité : Jusqu’à 50 visiteurs/jour</span></li>
+                <li><span class="lang-en">Ideal for: Small cities, community hubs</span><span class="lang-fr">Idéal pour : Petites villes, centres communautaires</span></li>
+            </ul>
+            <h3><span class="lang-en">How to Join</span><span class="lang-fr">Comment Rejoindre</span></h3>
+            <p><span class="lang-en">Reach out to explore partnership opportunities and receive tailored support for your setup.</span><span class="lang-fr">Contactez-nous pour explorer les opportunités de partenariat et recevoir un soutien adapté à votre installation.</span></p>
+        </div>
+    </div>
+</div>
+
+<div id="modal-large" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><span class="lang-en">Large Model Details</span><span class="lang-fr">Détails du Modèle Grand</span></h2>
+            <span class="close-button">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="modal-media">
+                <img src="../assets/gathering.png" alt="Large Model community gathering">
+            </div>
+            <h3><span class="lang-en">Overview</span><span class="lang-fr">Aperçu</span></h3>
+            <p><span class="lang-en">The Large Model is built for high-traffic urban centers, maximizing reach and impact with robust operations.</span><span class="lang-fr">Le Modèle Grand est conçu pour les centres urbains à fort trafic, maximisant la portée et l’impact avec des opérations robustes.</span></p>
+            <h3><span class="lang-en">Key Features</span><span class="lang-fr">Caractéristiques Clés</span></h3>
+            <ul>
+                <li><span class="lang-en">Setup Cost: $1,000</span><span class="lang-fr">Coût d’installation : 1 000 $</span></li>
+                <li><span class="lang-en">Monthly Operational Cost: $400</span><span class="lang-fr">Coût Opérationnel Mensuel : 400 $</span></li>
+                <li><span class="lang-en">Staff: 3–4 trained ambassadors</span><span class="lang-fr">Personnel : 3–4 ambassadeurs formés</span></li>
+                <li><span class="lang-en">Capacity: Up to 150 visitors/day</span><span class="lang-fr">Capacité : Jusqu’à 150 visiteurs/jour</span></li>
+                <li><span class="lang-en">Ideal for: Major cities, disaster-prone areas</span><span class="lang-fr">Idéal pour : Grandes villes, zones sujettes aux catastrophes</span></li>
+            </ul>
+            <h3><span class="lang-en">How to Join</span><span class="lang-fr">Comment Rejoindre</span></h3>
+            <p><span class="lang-en">Contact us to discuss scaling your impact with the Large Model and explore funding opportunities.</span><span class="lang-fr">Contactez-nous pour discuter de l’amplification de votre impact avec le Modèle Grand et explorer les opportunités de financement.</span></p>
+        </div>
+    </div>
+</div>
+
+<div id="modal-financial" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><span class="lang-en">Financial Model Details</span><span class="lang-fr">Détails du Modèle Financier</span></h2>
+            <span class="close-button">&times;</span>
+        </div>
+        <div class="modal-body">
+            <h3><span class="lang-en">Revenue Projections</span><span class="lang-fr">Projections de Revenus</span></h3>
+            <p><span class="lang-en">Detailed breakdown of conservative, realistic, and aggressive income scenarios for each HCS model, including sponsorships, grants, and ecosystem incentives.</span><span class="lang-fr">Répartition détaillée des scénarios de revenus conservateurs, réalistes et agressifs pour chaque modèle HCS, incluant les sponsorings, subventions et incitations de l’écosystème.</span></p>
+            <h3><span class="lang-en">Cost Management</span><span class="lang-fr">Gestion des Coûts</span></h3>
+            <p><span class="lang-en">Guidance on minimizing operational costs while maximizing community impact, with tips on securing local sponsorships.</span><span class="lang-fr">Conseils sur la minimisation des coûts opérationnels tout en maximisant l’impact communautaire, avec des astuces pour sécuriser des sponsorings locaux.</span></p>
+        </div>
+    </div>
+</div>
+
+<div id="modal-franchise" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><span class="lang-en">Franchise Agreement</span><span class="lang-fr">Accord de Franchise</span></h2>
+            <span class="close-button">&times;</span>
+        </div>
+        <div class="modal-body">
+            <h3><span class="lang-en">Terms & Conditions</span><span class="lang-fr">Termes & Conditions</span></h3>
+            <p><span class="lang-en">Overview of the franchise agreement, including operational guidelines, compliance requirements, and support provided by WDC.</span><span class="lang-fr">Aperçu de l’accord de franchise, incluant les directives opérationnelles, les exigences de conformité et le soutien fourni par WDC.</span></p>
+            <h3><span class="lang-en">Next Steps</span><span class="lang-fr">Prochaines Étapes</span></h3>
+            <p><span class="lang-en">Contact our team to receive the full agreement and discuss customization for your region.</span><span class="lang-fr">Contactez notre équipe pour recevoir l’accord complet et discuter de la personnalisation pour votre région.</span></p>
+        </div>
+    </div>
+</div>
+
+<div id="modal-setup" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><span class="lang-en">Setup & Training Guide</span><span class="lang-fr">Guide d’Installation & Formation</span></h2>
+            <span class="close-button">&times;</span>
+        </div>
+        <div class="modal-body">
+            <h3><span class="lang-en">Setup Process</span><span class="lang-fr">Processus d’Installation</span></h3>
+            <p><span class="lang-en">Step-by-step instructions for setting up your Happy Coffee Shop, including physical space requirements, branding, and equipment setup.</span><span class="lang-fr">Instructions étape par étape pour la mise en place de votre Happy Coffee Shop, incluant les exigences d’espace physique, le branding et la configuration de l’équipement.</span></p>
+            <h3><span class="lang-en">Training Modules</span><span class="lang-fr">Modules de Formation</span></h3>
+            <p><span class="lang-en">Access to online and in-person training for ambassadors, covering customer engagement, NOVA7 onboarding, and disaster preparedness workshops.</span><span class="lang-fr">Accès à la formation en ligne et en personne pour les ambassadeurs, couvrant l’engagement des clients, l’intégration à NOVA7 et les ateliers de préparation aux catastrophes.</span></p>
+        </div>
+    </div>
+</div>
+
+<div id="modal-integration" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><span class="lang-en">Partnership Integration Docs</span><span class="lang-fr">Docs d’Intégration des Partenariats</span></h2>
+            <span class="close-button">&times;</span>
+        </div>
+        <div class="modal-body">
+            <h3><span class="lang-en">API Access</span><span class="lang-fr">Accès API</span></h3>
+            <p><span class="lang-en">Technical documentation for integrating NOVA7’s APIs into your systems for seamless data sharing and transaction processing.</span><span class="lang-fr">Documentation technique pour l’intégration des API de NOVA7 dans vos systèmes pour un partage de données et un traitement des transactions fluides.</span></p>
+            <h3><span class="lang-en">Data Standards</span><span class="lang-fr">Normes de Données</span></h3>
+            <p><span class="lang-en">Guidelines for collecting and reporting anonymized data to ensure compliance and maximize impact measurement.</span><span class="lang-fr">Lignes directrices pour la collecte et le rapport de données anonymisées pour garantir la conformité et maximiser la mesure de l’impact.</span></p>
+        </div>
+    </div>
+</div>
+
+<div id="modal-impact" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><span class="lang-en">Impact Measurement Guide</span><span class="lang-fr">Guide de Mesure de l’Impact</span></h2>
+            <span class="close-button">&times;</span>
+        </div>
+        <div class="modal-body">
+            <h3><span class="lang-en">Key Metrics</span><span class="lang-fr">Métriques Clés</span></h3>
+            <p><span class="lang-en">Learn how to track footfall, program uptake, and transaction volumes to demonstrate your impact to sponsors and donors.</span><span class="lang-fr">Apprenez à suivre la fréquentation, l’adoption des programmes et les volumes de transactions pour démontrer votre impact aux sponsors et donateurs.</span></p>
+            <h3><span class="lang-en">Reporting Tools</span><span class="lang-fr">Outils de Rapport</span></h3>
+            <p><span class="lang-en">Access to NOVA7’s reporting templates and dashboards for real-time impact analysis and reporting.</span><span class="lang-fr">Accès aux modèles de rapport et tableaux de bord de NOVA7 pour une analyse et un rapport d’impact en temps réel.</span></p>
+        </div>
+    </div>
+</div>
+
+</main>
+
+<footer class="page-section">
+    <div class="container">
+        <div class="page-header animated-item">
+            <h1><span class="lang-en">Join the Movement</span><span class="lang-fr">Rejoignez le Mouvement</span></h1>
+            <p class="subtitle"><span class="lang-en">Together, we can build a world where no one is left behind in times of crisis. Partner with NOVA7 and the World Disaster Center today.</span><span class="lang-fr">Ensemble, nous pouvons construire un monde où personne n’est laissé pour compte en temps de crise. Associez-vous à NOVA7 et au Centre Mondial des Catastrophes dès aujourd’hui.</span></p>
+            <div class="cta-buttons animated-item">
+                <a href="#partnerships" class="btn nav-link-jumper"><span class="lang-en">Become a Partner</span><span class="lang-fr">Devenir Partenaire</span></a>
+                <a href="#happy-coffee-shop" class="btn btn-secondary nav-link-jumper"><span class="lang-en">Explore Happy Coffee Shop</span><span class="lang-fr">Explorer Happy Coffee Shop</span></a>
+            </div>
+        </div>
+        <p class="copyright animated-item"><span class="lang-en">© 2025 World Disaster Center. All rights reserved.</span><span class="lang-fr">© 2025 Centre Mondial des Catastrophes. Tous droits réservés.</span></p>
+    </div>
+</footer>
+
+<a href="https://lifeline-wdc.com" class="floating-btn"><i class="fas fa-rocket"></i> <span class="lang-en">Join NOVA7</span><span class="lang-fr">Rejoindre NOVA7</span></a>
+
+<script>
+    // Navigation Scroll Behavior
+    document.addEventListener('DOMContentLoaded', () => {
+        const navLinks = document.querySelectorAll('.nav-link, .nav-link-jumper');
+        const menuToggle = document.getElementById('menu-toggle');
+        const mainNav = document.getElementById('main-nav');
+        const header = document.getElementById('main-header');
+
+        // Smooth scroll for nav links
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href').substring(1);
+                const targetSection = document.getElementById(targetId);
+                if (targetSection) {
+                    window.scrollTo({
+                        top: targetSection.offsetTop - (window.innerWidth <= 992 ? 70 : 80),
+                        behavior: 'smooth'
+                    });
+                    mainNav.classList.remove('open');
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Toggle mobile menu
+        menuToggle.addEventListener('click', () => {
+            mainNav.classList.toggle('open');
+            menuToggle.innerHTML = mainNav.classList.contains('open') ? '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
+        });
+
+        // Header scroll effect
+        window.addEventListener('scroll', () => {
+            header.classList.toggle('header-scrolled', window.scrollY > 50);
+        });
+
+        // Language switcher
+        const langButtons = document.querySelectorAll('.lang-btn');
+        langButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const lang = button.getAttribute('data-lang');
+                document.body.className = lang;
+                langButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                localStorage.setItem('preferredLanguage', lang);
+            });
+        });
+
+        // Load preferred language
+        const savedLang = localStorage.getItem('preferredLanguage') || 'en';
+        document.body.className = savedLang;
+        langButtons.forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-lang') === savedLang));
+
+        // Form submission
+        const partnerForm = document.getElementById('partner-form');
+        const formFeedback = document.getElementById('form-feedback');
+        partnerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (partnerForm.checkValidity()) {
+                formFeedback.style.display = 'block';
+                formFeedback.innerHTML = document.body.classList.contains('en') 
+                    ? 'Thank you! Your application has been submitted successfully.' 
+                    : 'Merci ! Votre demande a été soumise avec succès.';
+                partnerForm.reset();
+                setTimeout(() => {
+                    formFeedback.style.display = 'none';
+                }, 5000);
+            } else {
+                formFeedback.style.display = 'block';
+                formFeedback.style.backgroundColor = '#f8d7da';
+                formFeedback.style.color = '#721c24';
+                formFeedback.style.borderColor = '#f5c6cb';
+                formFeedback.innerHTML = document.body.classList.contains('en') 
+                    ? 'Please fill out all required fields correctly.' 
+                    : 'Veuillez remplir correctement tous les champs requis.';
+                setTimeout(() => {
+                    formFeedback.style.display = 'none';
+                }, 5000);
+            }
+            partnerForm.classList.add('was-validated');
+        });
+
+        // Modal functionality
+        const modalButtons = document.querySelectorAll('[data-modal-target]');
+        const modals = document.querySelectorAll('.modal');
+        const closeButtons = document.querySelectorAll('.close-button');
+
+        modalButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const modalId = button.getAttribute('data-modal-target');
+                const modal = document.getElementById(modalId);
+                modal.style.display = 'block';
+                setTimeout(() => modal.classList.add('active'), 10);
+            });
+        });
+
+        closeButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const modal = button.closest('.modal');
+                modal.classList.remove('active');
+                setTimeout(() => modal.style.display = 'none', 400);
+            });
+        });
+
+        modals.forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                    setTimeout(() => modal.style.display = 'none', 400);
+                }
+            });
+        });
+
+        // Scroll animation for sections
+        const animatedSections = document.querySelectorAll('.animated-section');
+        const observerOptions = {
+            root: null,
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        animatedSections.forEach(section => observer.observe(section));
+    });
+</script>
+<!-- Code injected by live-server -->
+<script>
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function () {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					var parent = elem.parentElement || head;
+					parent.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					parent.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function (msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+				console.log('Live reload enabled.');
+				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+			}
+		})();
+	}
+	else {
+		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+	}
+	// ]]>
+</script>
+</body>
+</html>
